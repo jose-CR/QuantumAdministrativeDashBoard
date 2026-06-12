@@ -5,10 +5,9 @@ namespace App\Filament\Admin\Resources\Users\Tables;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Table;
-use Filament\Tables\Columns\TextColumn;
 use Filament\Notifications\Notification;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
 
 class UsersTable
 {
@@ -20,11 +19,12 @@ class UsersTable
                 TextColumn::make('email'),
                 TextColumn::make('last_seen')
                     ->label('Última conexión'),
-                //
+                TextColumn::make('references')
+                    ->counts('references')
+                    ->label('Referencias')
+                    ->badge(),
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->recordActions([
                 EditAction::make(),
             ])
@@ -36,8 +36,9 @@ class UsersTable
                                 ->success()
                                 ->title('Usuarios eliminados')
                                 ->body('Los usuarios seleccionados fueron eliminados correctamente.')
-                            ),
+                        ),
                 ]),
-            ]);
+            ])
+        ;
     }
 }

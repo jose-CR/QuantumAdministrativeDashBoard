@@ -10,8 +10,6 @@ use App\Filament\Admin\Resources\Users\Schemas\UserForm;
 use App\Filament\Admin\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Admin\Resources\Users\Tables\UsersTable;
 use App\Models\User;
-use BackedEnum;
-use UnitEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -21,9 +19,9 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedUsers;
+    protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Administración';
+    protected static string|\UnitEnum|null $navigationGroup = 'Administración';
 
     protected static ?string $recordTitleAttribute = 'User';
 
@@ -44,9 +42,7 @@ class UserResource extends Resource
 
     public static function getRelations(): array
     {
-        return [
-            //
-        ];
+        return [];
     }
 
     public static function getPages(): array

@@ -4,9 +4,8 @@ namespace App\Filament\Admin\Resources\Users\Pages;
 
 use App\Filament\Admin\Resources\Users\UserResource;
 use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
-use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
+use Filament\Resources\Pages\EditRecord;
 
 class EditUser extends EditRecord
 {
@@ -30,7 +29,8 @@ class EditUser extends EditRecord
         return Notification::make()
             ->success()
             ->title('Usuario editado')
-            ->body('El usuario ha sido editado correctamente.');
+            ->body('El usuario ha sido editado correctamente.')
+        ;
     }
 
     protected function getRedirectUrl(): string

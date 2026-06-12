@@ -2,8 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Users\Schemas;
 
-use Filament\Schemas\Schema;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Schema;
 use Illuminate\Support\Facades\Hash;
 
 class UserForm
@@ -13,7 +13,7 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label("usuario")
+                    ->label('usuario')
                     ->required(),
                 TextInput::make('password')
                     ->label('contraseña')
@@ -21,12 +21,12 @@ class UserForm
                     ->revealable()
                     ->dehydrated(fn ($state) => filled($state))
                     ->dehydrateStateUsing(fn ($state): string => Hash::make($state))
-                    ->required(fn (string $operation): bool => $operation === 'create'),
+                    ->required(fn (string $operation): bool => 'create' === $operation),
                 TextInput::make('email')
                     ->email()
                     ->unique()
                     ->required(),
-                //
-            ]);
+            ])
+        ;
     }
 }
