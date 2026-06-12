@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('identity_document')->nullable()->unique();
 
             $table->date('birth_date')->nullable();
-            $table->string('gender')->nullable();
+            $table->enum('gender', ['male', 'female', 'other']);
 
             $table->string('phone_primary');
             $table->string('phone_secondary')->nullable();
