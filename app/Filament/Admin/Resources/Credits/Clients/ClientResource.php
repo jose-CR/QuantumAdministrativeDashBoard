@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Clients;
+namespace App\Filament\Admin\Resources\Credits\Clients;
 
-use App\Filament\Admin\Resources\Clients\Pages\CreateClient;
-use App\Filament\Admin\Resources\Clients\Pages\EditClient;
-use App\Filament\Admin\Resources\Clients\Pages\ListClients;
+use App\Filament\Admin\Resources\Credits\Clients\Pages\CreateClient;
+use App\Filament\Admin\Resources\Credits\Clients\Pages\EditClient;
+use App\Filament\Admin\Resources\Credits\Clients\Pages\ListClients;
 use App\Filament\Admin\Resources\Clients\RelationManagers\ReferencesRelationManager;
 use App\Filament\Admin\Resources\Clients\Schemas\ClientForm;
 use App\Filament\Admin\Resources\Clients\Tables\ClientsTable;
@@ -23,6 +23,8 @@ class ClientResource extends Resource
     protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
 
     protected static ?string $recordTitleAttribute = 'Clientes';
+
+    protected static ?string $slug = 'creditos/clients';
 
     public static function form(Schema $schema): Schema
     {

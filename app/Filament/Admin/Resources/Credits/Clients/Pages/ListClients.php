@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Clients\Pages;
+namespace App\Filament\Admin\Resources\Credits\Clients\Pages;
 
-use App\Filament\Admin\Resources\Clients\ClientResource;
+use App\Filament\Admin\Resources\Credits\Clients\ClientResource;
 use Filament\Actions\CreateAction;
 use Filament\Resources\Pages\ListRecords;
 
