@@ -33,11 +33,6 @@ class Client extends Model
         'is_active',
     ];
 
-    public function references()
-    {
-        return $this->hasMany(ClientReference::class);
-    }
-
     /**
      * Get the attributes that should be cast.
      *
@@ -50,5 +45,15 @@ class Client extends Model
             'monthly_income' => 'decimal:2',
             'is_active' => 'boolean',
         ];
+    }
+
+    public function references()
+    {
+        return $this->hasMany(ClientReference::class);
+    }
+
+    public function credits()
+    {
+        return $this->hasMany(Credit::class);
     }
 }
