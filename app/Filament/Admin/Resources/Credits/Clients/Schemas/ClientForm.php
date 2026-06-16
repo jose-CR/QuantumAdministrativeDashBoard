@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Clients\Schemas;
+namespace App\Filament\Admin\Resources\Credits\Clients\Schemas;
 
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;

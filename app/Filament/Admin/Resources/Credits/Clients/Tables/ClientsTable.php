@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Clients\Tables;
+namespace App\Filament\Admin\Resources\Credits\Clients\Tables;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
@@ -48,7 +48,6 @@ class ClientsTable
                                 ->body('Los Clientes seleccionados fueron eliminados correctamente.')
                         ),
                 ]),
-            ])
-        ;
+            ]);
     }
 }

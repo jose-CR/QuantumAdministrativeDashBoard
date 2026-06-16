@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Clients\RelationManagers;
+namespace App\Filament\Admin\Resources\Credits\Clients\RelationManagers;
 
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
