@@ -17,9 +17,9 @@ class CategoriesTable
             ->columns([
                 TextColumn::make('name')
                     ->label('Categoria')
-                                        ->searchable()
+                    ->searchable()
                     ->sortable(),
-                
+
                 TextColumn::make('descripcion')
                     ->label('descripcion')
                 //

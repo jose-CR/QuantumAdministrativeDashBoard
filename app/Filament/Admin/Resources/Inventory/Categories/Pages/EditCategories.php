@@ -24,7 +24,7 @@ class EditCategories extends EditRecord
         ];
     }
 
-        protected function getSavedNotification(): ?Notification
+    protected function getSavedNotification(): ?Notification
     {
         return Notification::make()
             ->success()
@@ -37,5 +37,5 @@ class EditCategories extends EditRecord
     {
         return static::getResource()::getUrl('index');
     }
-    
+
 }

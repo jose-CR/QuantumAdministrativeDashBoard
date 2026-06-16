@@ -10,7 +10,7 @@ class CreateCategories extends CreateRecord
 {
     protected static string $resource = CategoriesResource::class;
 
-        protected function getCreatedNotification(): ?Notification
+    protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()
             ->success()

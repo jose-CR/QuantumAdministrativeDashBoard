@@ -14,7 +14,7 @@ class CategoriesForm
 
                 TextInput::make('name')
                     ->required(),
-                
+
                 TextInput::make('descripcion')
                     ->required()
                 //
