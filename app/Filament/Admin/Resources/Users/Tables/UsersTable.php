@@ -19,10 +19,6 @@ class UsersTable
                 TextColumn::make('email'),
                 TextColumn::make('last_seen')
                     ->label('Última conexión'),
-                TextColumn::make('references')
-                    ->counts('references')
-                    ->label('Referencias')
-                    ->badge(),
             ])
             ->filters([])
             ->recordActions([
