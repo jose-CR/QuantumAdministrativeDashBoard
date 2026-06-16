@@ -22,7 +22,7 @@ class ClientResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
 
-    protected static ?string $recordTitleAttribute = 'Clientes';
+    protected static ?string $recordTitleAttribute = 'first_name';
 
     protected static ?string $slug = 'creditos/clients';
 
