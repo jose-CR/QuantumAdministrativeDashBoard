@@ -71,7 +71,9 @@ class Credit extends Model
 
     public function installments()
     {
-        return $this->belongsTo(Installment::class);
+        return $this->hasMany(
+            Installment::class
+        );
     }
 
     public function originalCredit()

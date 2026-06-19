@@ -19,34 +19,18 @@ class InstallmentFactory extends Factory
     {
         $amount = fake()->randomFloat(
             2,
-            50,
+            100,
             500
         );
 
         return [
             'credit_id' => Credit::factory(),
-
-            'number' => fake()->numberBetween(
-                1,
-                36
-            ),
-
+            'number' => 1,
             'amount' => $amount,
-
             'remaining_balance' => $amount,
-
-            'due_date' => fake()->dateTimeBetween(
-                'now',
-                '+2 years'
-            ),
-
+            'due_date' => now()->addMonth(),
+            'status' => 'pending',
             'paid_at' => null,
-
-            'status' => fake()->randomElement([
-                'pending',
-                'paid',
-                'late',
-            ]),
         ];
     }
 }

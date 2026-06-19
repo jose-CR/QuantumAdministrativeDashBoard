@@ -86,6 +86,7 @@ class ClientForm
                                             ->required(),
                                     ]),
                             ]),
+
                         Tab::make('Referencias')
                             ->visible(fn (string $operation): bool => $operation === 'create')
                             ->schema([
@@ -133,7 +134,8 @@ class ClientForm
 
                                             ])
                                     ])
-                            ])
+                            ]),
+
                     ])
                     ->columnSpanFull(),
             ]);

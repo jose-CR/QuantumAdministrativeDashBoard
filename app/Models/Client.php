@@ -47,6 +47,11 @@ class Client extends Model
         ];
     }
 
+    public function getFullNameAttribute(): string
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
     public function references()
     {
         return $this->hasMany(ClientReference::class);
