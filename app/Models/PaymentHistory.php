@@ -5,9 +5,9 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Payment extends Model
+class PaymentHistory extends Model
 {
-    /** @use HasFactory<\Database\Factories\PaymentFactory> */
+    /** @use HasFactory<\Database\Factories\PaymentHistoryFactory> */
     use HasFactory;
 
     /**
@@ -16,10 +16,14 @@ class Payment extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'installment_id',
+        'credit_id',
+        'user_id',
         'amount',
+        'payment_method',
         'payment_date',
         'receipt_number',
+        'previous_balance',
+        'new_balance',
         'notes',
     ];
 
@@ -36,8 +40,8 @@ class Payment extends Model
         ];
     }
 
-    public function installment()
+    public function credit()
     {
-        return $this->belongsTo(Installment::class);
+        return $this->belongsTo(Credit::class);
     }
 }

@@ -17,19 +17,19 @@ class InstallmentFactory extends Factory
      */
     public function definition(): array
     {
-        $amount = fake()->randomFloat(
-            2,
-            100,
-            500
-        );
-
         return [
             'credit_id' => Credit::factory(),
+
             'number' => 1,
-            'amount' => $amount,
-            'remaining_balance' => $amount,
+
+            'amount' => 100,
+
+            'remaining_balance' => 100,
+
             'due_date' => now()->addMonth(),
+
             'status' => 'pending',
+
             'paid_at' => null,
         ];
     }

@@ -46,8 +46,8 @@ class Installment extends Model
         return $this->belongsTo(Credit::class);
     }
 
-    public function payments()
+    public function paymentHistories()
     {
-        return $this->hasMany(Payment::class);
+        return $this->hasMany(PaymentHistory::class);
     }
 }

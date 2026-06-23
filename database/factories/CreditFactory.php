@@ -11,15 +11,19 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class CreditFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $initialAmount = fake()->randomFloat(2, 3000, 15000);
-        $downPayment = fake()->randomFloat(2, 500, 2000);
+        $initialAmount = fake()->randomFloat(
+            2,
+            3000,
+            15000
+        );
+
+        $downPayment = fake()->randomFloat(
+            2,
+            500,
+            2000
+        );
 
         $financedAmount = $initialAmount - $downPayment;
 
@@ -30,38 +34,63 @@ class CreditFactory extends Factory
             36,
         ]);
 
-        $installmentAmount = round(
-            $financedAmount / $installments,
+        $periodicity = fake()->randomElement([
+            'weekly',
+            'monthly',
+            'yearly',
+        ]);
+
+        $interestRate = fake()->randomFloat(
+            2,
+            5,
+            25
+        );
+
+        $totalInterest = round(
+            $financedAmount * ($interestRate / 100),
             2
         );
 
-        $periodicity = fake()->randomElement([
-        'weekly',
-        'monthly',
-        'yearly',
-    ]);
+        $totalAmount = round(
+            $financedAmount + $totalInterest,
+            2
+        );
 
-        $totalInterest = fake()->randomFloat(
-            2,
-            500,
-            5000
+        $installmentAmount = round(
+            $totalAmount / $installments,
+            2
         );
 
         $paymentDay = null;
         $paymentMonth = null;
 
         match ($periodicity) {
-            'weekly' => $paymentDay = fake()->numberBetween(1, 7),
 
-            'monthly' => $paymentDay = fake()->numberBetween(1, 28),
+            'weekly' => $paymentDay = fake()->numberBetween(
+                1,
+                7
+            ),
+
+            'monthly' => $paymentDay = fake()->numberBetween(
+                1,
+                28
+            ),
 
             'yearly' => [
-                $paymentDay = fake()->numberBetween(1, 28),
-                $paymentMonth = fake()->numberBetween(1, 12),
+                $paymentDay = fake()->numberBetween(
+                    1,
+                    28
+                ),
+
+                $paymentMonth = fake()->numberBetween(
+                    1,
+                    12
+                ),
             ],
         };
 
         return [
+
             'client_id' => Client::factory(),
 
             'article_unit_id' => ArticleUnit::factory(),
@@ -78,38 +107,26 @@ class CreditFactory extends Factory
 
             'installment_amount' => $installmentAmount,
 
-            'periodicity' => fake()->randomElement([
-                'weekly',
-                'monthly',
-                'yearly',
-            ]),
+            'periodicity' => $periodicity,
 
-            'interest_rate' => fake()->randomFloat(
-                2,
-                5,
-                25
-            ),
+            'interest_rate' => $interestRate,
 
             'total_interest' => $totalInterest,
 
-            'total_amount' => $financedAmount + $totalInterest,
+            'total_amount' => $totalAmount,
 
-            'pending_balance' => $financedAmount + $totalInterest,
+            'pending_balance' => $totalAmount,
 
             'start_date' => fake()->dateTimeBetween(
                 '-1 year',
                 'now'
             ),
 
-                    'payment_day' => $paymentDay,
+            'payment_day' => $paymentDay,
 
-        'payment_month' => $paymentMonth,
+            'payment_month' => $paymentMonth,
 
-            'status' => fake()->randomElement([
-                'pending',
-                'active',
-                'paid',
-            ]),
+            'status' => 'active',
         ];
     }
 }

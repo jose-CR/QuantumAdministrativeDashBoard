@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
 
             CreditSeeder::class,
             InstallmentSeeder::class,
-            PaymentSeeder::class,
+            PaymentHistorySeeder::class,
         ]);
     }
 }

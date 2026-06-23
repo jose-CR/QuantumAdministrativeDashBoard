@@ -76,6 +76,13 @@ class Credit extends Model
         );
     }
 
+    public function paymentHistories()
+    {
+        return $this->hasMany(
+            PaymentHistory::class
+        );
+    }
+
     public function originalCredit()
     {
         return $this->belongsTo(Credit::class, 'refinanced_from_id');
