@@ -19,16 +19,17 @@ class CreateLoans extends CreateRecord
         return array_merge(
             $data,
             $calculator->calculate($data)
-        ); 
+        );
     }
 
-    
 
-    protected function afterCreate(): void {
-            app(
-        InstallmentGeneratorService::class
-    )->generate(
-        $this->record
-    );
+
+    protected function afterCreate(): void
+    {
+        app(
+            InstallmentGeneratorService::class
+        )->generate(
+            $this->record
+        );
     }
 }

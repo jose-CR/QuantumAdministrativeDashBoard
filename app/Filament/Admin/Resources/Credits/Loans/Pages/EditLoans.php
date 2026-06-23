@@ -23,12 +23,13 @@ class EditLoans extends EditRecord
         );
     }
 
-    protected function afterSave(): void{
-            app(
-        InstallmentGeneratorService::class
-    )->generate(
-        $this->record
-    );
+    protected function afterSave(): void
+    {
+        app(
+            InstallmentGeneratorService::class
+        )->generate(
+            $this->record
+        );
     }
 
     protected function getHeaderActions(): array

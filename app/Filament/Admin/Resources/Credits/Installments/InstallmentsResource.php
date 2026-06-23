@@ -19,12 +19,12 @@ class InstallmentsResource extends Resource
     protected static ?string $model = Installment::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
-    
-        protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
+
+    protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
 
     protected static ?string $recordTitleAttribute = 'number';
 
-        protected static ?string $slug = 'creditos/installments';
+    protected static ?string $slug = 'creditos/installments';
 
     public static function form(Schema $schema): Schema
     {

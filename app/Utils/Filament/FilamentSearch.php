@@ -11,8 +11,7 @@ class FilamentSearch
         string $relation,
         string $search,
         array $columns
-    ): Builder
-    {
+    ): Builder {
 
         $query->whereHas(
             $relation,

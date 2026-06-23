@@ -19,8 +19,8 @@ class EditInstallments extends EditRecord
     }
 
     protected function afterCreate(): void
-{
-    app(InstallmentGeneratorService::class)
-        ->generate($this->record);
-}
+    {
+        app(InstallmentGeneratorService::class)
+            ->generate($this->record);
+    }
 }

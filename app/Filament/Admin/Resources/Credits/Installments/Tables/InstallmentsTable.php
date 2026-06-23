@@ -20,7 +20,7 @@ class InstallmentsTable
             ->columns([
                 TextColumn::make('credit.client.full_name')
                     ->label('Crédito'),
-                
+
                 TextColumn::make('credit.articleUnit.display_name')
                     ->label('Vehículo')
                     ->searchable(),
@@ -33,10 +33,11 @@ class InstallmentsTable
 
                 TextColumn::make('remaining_balance')
                     ->money('USD'),
-                
+
                 TextColumn::make('paid_amount')
                     ->label('Abonado')
-                    ->state(fn ($record) =>
+                    ->state(
+                        fn ($record) =>
                         $record->amount - $record->remaining_balance
                     )
                     ->money('USD'),
