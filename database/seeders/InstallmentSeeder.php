@@ -3,9 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Credit;
-use App\Models\Installment;
 use App\Services\InstallmentGeneratorService;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class InstallmentSeeder extends Seeder

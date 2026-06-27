@@ -18,8 +18,8 @@ class ArticleUnit extends Model
     protected $fillable = [
         'article_id',
         'vin',
-        'engine_number',
-        'plate',
+        'engine_number', // Motor
+        'plate', // Placa
         'color',
         'status',
     ];

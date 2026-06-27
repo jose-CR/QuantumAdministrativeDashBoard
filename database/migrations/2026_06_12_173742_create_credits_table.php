@@ -15,11 +15,13 @@ return new class () extends Migration {
 
             $table->foreignId('client_id')
                 ->constrained()
-                ->restrictOnDelete();
+                //->restrictOnDelete()
+                ->cascadeOnDelete();
 
             $table->foreignId('article_unit_id')
                 ->constrained()
-                ->restrictOnDelete();
+                //->restrictOnDelete();
+                ->cascadeOnDelete();
 
             $table->foreignId('refinanced_from_id')
                 ->nullable()

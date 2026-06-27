@@ -16,23 +16,29 @@ class Credit extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'client_id',
-        'article_unit_id',
-        'refinanced_from_id',
-        'initial_amount',
-        'down_payment',
-        'financed_amount',
-        'installments',
-        'installment_amount',
-        'periodicity',
-        'interest_rate',
-        'total_interest',
-        'total_amount',
-        'pending_balance',
-        'start_date',
-        'payment_day',
-        'payment_month',
-        'status',
+        'client_id',              // Cliente dueño del crédito
+        'article_unit_id',       // Vehículo o artículo financiado
+        'refinanced_from_id',    // Crédito del cual proviene (si es refinanciamiento)
+
+        'initial_amount',        // Monto inicial del crédito (precio base)
+        'down_payment',          // Prima o pago inicial
+        'financed_amount',       // Monto que realmente se financia (sin prima)
+
+        'installments',          // Cantidad total de cuotas
+        'installment_amount',    // Monto fijo de cada cuota
+
+        'periodicity',           // Frecuencia de pago (mensual, semanal, etc.)
+        'interest_rate',         // Tasa de interés aplicada
+        'total_interest',        // Total de interés generado en el crédito
+
+        'total_amount',          // Total final a pagar (capital + interés)
+        'pending_balance',       // Saldo pendiente total del crédito
+
+        'start_date',            // Fecha de inicio del crédito
+        'payment_day',           // Día de pago asignado
+        'payment_month',         // Mes de pago (si aplica)
+
+        'status',                // Estado del crédito (activo, cerrado, refinanciado, etc.)
     ];
 
     /**

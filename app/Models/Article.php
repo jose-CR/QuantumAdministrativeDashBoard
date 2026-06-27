@@ -17,12 +17,12 @@ class Article extends Model
      */
     protected $fillable = [
         'category_id',
-        'brand',
+        'brand', // marca 
         'model',
         'year',
         'color',
-        'cash_price',
-        'credit_price',
+        'cash_price', // Precio Contado
+        'credit_price', // Precio Crédito
         'descripcion'
     ];
 
