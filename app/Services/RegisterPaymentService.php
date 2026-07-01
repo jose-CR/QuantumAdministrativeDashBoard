@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Credit;
 use App\Models\PaymentHistory;
+use App\Services\Credits\CloseCreditService;
 use Illuminate\Support\Facades\DB;
 
 class RegisterPaymentService
@@ -12,8 +13,10 @@ class RegisterPaymentService
         Credit $credit,
         float $amount,
         string $paymentMethod,
-        ?string $receiptNumber = null,
+        ?string $receiptNumber,
         ?string $notes = null,
+        string $mode = 'auto',
+        ?int $installmentId = null,
     ): PaymentHistory {
 
         return DB::transaction(function () use (
@@ -21,7 +24,9 @@ class RegisterPaymentService
             $amount,
             $paymentMethod,
             $receiptNumber,
-            $notes
+            $notes,
+            $mode,
+            $installmentId
         ) {
 
             $previousBalance = $credit->pending_balance;
@@ -41,8 +46,12 @@ class RegisterPaymentService
                 ApplyPaymentService::class
             )->apply(
                 $credit,
-                $amount
+                $amount,
+                $mode,
+                $installmentId
             );
+
+            app(CloseCreditService::class)->execute($credit);
 
             $paymentHistory->update([
                 'new_balance' => $credit

@@ -125,6 +125,7 @@ class LoansForm
                                         'active' => 'Activo',
                                         'paid' => 'Pagado',
                                         'cancelled' => 'Cancelado',
+                                        'completed' => 'Completado'
                                     ])
                                     ->default('pending')
                                     ->required(),

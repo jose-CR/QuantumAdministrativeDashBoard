@@ -2,6 +2,9 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\Schemas;
 
+use App\Models\ArticleUnit;
+use App\Models\Credit;
+use App\Utils\Filament\FilamentSelect;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Schemas\Components\Grid;
@@ -9,6 +12,7 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class ClientForm
@@ -135,34 +139,91 @@ class ClientForm
                                             ])
                                     ])
                             ]),
+                        Tab::make('Crédito')
+                            ->visible(fn (string $operation): bool => $operation === 'create')
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+                                        Select::make('article_unit_id')
+                                            ->label('Artículo')
+                                            ->options(
+                                                FilamentSelect::options(
+                                                    ArticleUnit::class,
+                                                    [
+                'display_name',
+            ]
+                                                )
+                                            )
+                                            ->searchable()
+                                            ->preload()
+                                            ->required(),
 
-                    ])
+                                        TextInput::make('initial_amount')
+                                            ->label('Monto Inicial')
+                                            ->numeric()
+                                            ->prefix('$')
+                                            ->required(),
+
+                                        TextInput::make('down_payment')
+                                            ->label('Prima')
+                                            ->numeric()
+                                            ->prefix('$')
+                                            ->required(),
+
+                                        TextInput::make('installments')
+                                            ->label('Número de Cuotas')
+                                            ->numeric()
+                                            ->required(),
+
+                                        TextInput::make('installment_amount')
+                                            ->label('Valor Cuota')
+                                            ->numeric()
+                                            ->prefix('$')
+                                            ->required(),
+
+                                        Select::make('periodicity')
+                                            ->label('Periodicidad')
+                                            ->options([
+                                                'weekly' => 'Semanal',
+                                                'biweekly' => 'Quincenal',
+                                                'monthly' => 'Mensual',
+                                            ])
+                                            ->required(),
+
+                                        DatePicker::make('start_date')
+                                            ->label('Fecha Inicio')
+                                            ->required(),
+
+                                        TextInput::make('payment_day')
+                                            ->label('Día de Pago')
+                                            ->numeric()
+                                            ->required(),
+
+                                        Select::make('status')
+                                            ->label('Estado')
+                                            ->options([
+                                                'pending' => 'Pendiente',
+                                                'active' => 'Activo',
+                                                'paid' => 'Pagado',
+                                                'cancelled' => 'Cancelado',
+                                                'completed' => 'Completado',
+                                            ])
+                                            ->default('active')
+                                            ->required(),
+
+                                        Select::make('refinanced_from_id')
+                                            ->label('Refinanciar Crédito')
+                                            ->options(
+                                                Credit::query()
+                                                    ->pluck('id', 'id')
+                                            )
+                                            ->searchable()
+                                            ->preload()
+                                            ->nullable(),
+                                    ]),
+                            ]),
+                        ])
                     ->columnSpanFull(),
             ]);
     }
 }
-
-
-
-/*
-        Tab::make('Información Laboral')
-            ->schema([
-                Grid::make(2)
-                    ->schema([
-                        TextInput::make('occupation')
-                            ->label('Ocupación'),
-
-                        TextInput::make('workplace')
-                            ->label('Lugar de trabajo'),
-
-                        TextInput::make('monthly_income')
-                            ->label('Ingreso mensual')
-                            ->numeric()
-                            ->prefix('$'),
-
-                        Toggle::make('is_active')
-                            ->label('Activo')
-                            ->default(true),
-                    ]),
-            ]),
-*/

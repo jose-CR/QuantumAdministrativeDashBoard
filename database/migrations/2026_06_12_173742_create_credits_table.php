@@ -73,6 +73,7 @@ return new class () extends Migration {
                 'refinanced',
                 'cancelled',
                 'defaulted',
+                'completed',
             ])->default('pending');
 
             $table->timestamps();

@@ -29,6 +29,7 @@ class InstallmentsForm
                         'paid' => 'Pagado',
                         'late' => 'Atrasado',
                         'cancelled' => 'Cancelado',
+                        'completed' => 'Conpletado',
                     ])
                     ->required(),
 
