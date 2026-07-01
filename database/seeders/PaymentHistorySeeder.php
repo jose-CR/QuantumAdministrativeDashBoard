@@ -11,7 +11,7 @@ class PaymentHistorySeeder extends Seeder
 {
     public function run(): void
     {
-        Credit::all()->each(function (Credit $credit){
+        Credit::all()->each(function (Credit $credit) {
 
             $scenario = fake()->randomElement([
                 'none',
@@ -22,7 +22,7 @@ class PaymentHistorySeeder extends Seeder
             if ($scenario === 'none') {
                 return;
             }
-            
+
             if ($scenario === 'partial') {
 
                 $amount = fake()->randomFloat(

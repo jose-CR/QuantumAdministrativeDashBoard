@@ -6,8 +6,8 @@ use App\Models\Credit;
 
 class CloseCreditService
 {
-
-    public function execute(Credit $credit): void{
+    public function execute(Credit $credit): void
+    {
         $credit->refresh();
 
         if (

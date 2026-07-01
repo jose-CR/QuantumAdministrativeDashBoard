@@ -34,7 +34,7 @@ class PaymentHistoryFactory extends Factory
                     '-6 months',
                     'now'
                 ),
-            
+
             'payment_method' => fake()->randomElement([
                 'cash',
                 'bank_transfer',
@@ -45,7 +45,7 @@ class PaymentHistoryFactory extends Factory
                 => fake()->numerify(
                     'REC-#####'
                 ),
-            
+
             'previous_balance' => $previousBalance,
 
             'new_balance' => max(

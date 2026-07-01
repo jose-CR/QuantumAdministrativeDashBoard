@@ -2,8 +2,8 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\Tables;
 
-use App\Models\Credit;
-use App\Models\Installment;
+use App\Models\Client;
+use App\Services\Credits\RefinancingService;
 use App\Services\RegisterPaymentService;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -15,6 +15,8 @@ use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 
 class ClientsTable
 {
@@ -112,6 +114,120 @@ class ClientsTable
                                 installmentId: $data['installment_id'],
                             );
                         }),
+
+                Action::make('refinanced')
+                    ->label('Refinanciar')
+                    ->form([
+                        Section::make('Crédito actual')
+                            ->description('Información del crédito que será refinanciado.')
+                            ->schema([
+                                Grid::make(2)
+                                    ->schema([
+
+                                        TextInput::make('client')
+                                            ->label('Cliente')
+                                            ->default(fn (Client $record) => $record->full_name)
+                                            ->readOnly()
+                                            ->dehydrated(false),
+
+                                        TextInput::make('current_credit')
+                                            ->label('Crédito a refinanciar')
+                                            ->default(function (Client $record) {
+
+                                                $credit = $record->activeCredit;
+
+                                                return "Crédito #{$credit->id} • {$credit->articleUnit->display_name} • ({$credit->installments} cuotas)";
+                                            })
+                                            ->readOnly()
+                                            ->dehydrated(false),
+
+                                        TextInput::make('pending_balance')
+                                            ->label('Saldo pendiente')
+                                            ->default(fn (Client $record) => number_format(
+                                                $record->activeCredit->pending_balance,
+                                                2
+                                            ))
+                                            ->prefix('$')
+                                            ->readOnly()
+                                            ->dehydrated(false),
+
+                                        TextInput::make('remaining_installments')
+                                            ->label('Cuotas pendientes')
+                                            ->default(fn (Client $record) => $record
+                                                ->activeCredit
+                                                ->installments()
+                                                ->where('status', 'pending')
+                                                ->count())
+                                            ->readOnly()
+                                            ->dehydrated(false),
+
+                                    ]),
+                            ]),
+
+                        Section::make('Nuevo crédito')
+                            ->description('Ingrese la información del nuevo crédito.')
+                            ->schema([
+
+                                Grid::make(2)
+                                    ->schema([
+
+                                        TextInput::make('initial_amount')
+                                            ->label('Monto a financiar')
+                                            ->prefix('$')
+                                            ->numeric()
+                                            ->helperText(
+                                                'Puede ser diferente al saldo pendiente.'
+                                            )
+                                            ->required(),
+
+                                        TextInput::make('down_payment')
+                                            ->label('Prima')
+                                            ->prefix('$')
+                                            ->numeric(),
+
+                                        TextInput::make('installments')
+                                            ->label('Cantidad de cuotas')
+                                            ->numeric()
+                                            ->required(),
+
+                                        TextInput::make('installment_amount')
+                                            ->label('Valor de la cuota')
+                                            ->prefix('$')
+                                            ->numeric()
+                                            ->required(),
+
+                                        Select::make('periodicity')
+                                            ->label('Periodicidad')
+                                            ->options([
+                                                'weekly' => 'Semanal',
+                                                'biweekly' => 'Quincenal',
+                                                'monthly' => 'Mensual',
+                                            ])
+                                            ->required(),
+
+                                        DatePicker::make('start_date')
+                                            ->label('Fecha de inicio')
+                                            ->required(),
+
+                                        TextInput::make('payment_day')
+                                            ->label('Día de pago')
+                                            ->numeric()
+                                            ->minValue(1)
+                                            ->maxValue(31)
+                                            ->required(),
+
+                                    ]),
+                            ]),
+                    ])
+                    ->action(function (array $data, Client $record) {
+
+                        app(RefinancingService::class)->execute(
+                            client: $record,
+                            oldCredit: $record->activeCredit,
+                            data: $data,
+                        );
+
+                    })
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

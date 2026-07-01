@@ -35,7 +35,7 @@ return new class () extends Migration {
                 'paid',
                 'late',
                 'cancelled',
-                'completed',
+                'refinanced',
             ])->default('pending');
 
             $table->decimal('remaining_balance', 10, 2)

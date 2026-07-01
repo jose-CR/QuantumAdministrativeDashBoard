@@ -17,7 +17,7 @@ class Article extends Model
      */
     protected $fillable = [
         'category_id',
-        'brand', // marca 
+        'brand', // marca
         'model',
         'year',
         'color',
