@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Models\Installment;
+use App\Observers\InstallmentObserver;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -18,5 +20,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Installment::observe(
+            InstallmentObserver::class
+        );
     }
 }

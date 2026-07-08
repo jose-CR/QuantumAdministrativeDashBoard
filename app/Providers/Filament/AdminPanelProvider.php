@@ -60,6 +60,8 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Administración'),
             ])
+            ->databaseNotifications()
+            ->databaseNotificationsPolling('5s');
         ;
     }
 }

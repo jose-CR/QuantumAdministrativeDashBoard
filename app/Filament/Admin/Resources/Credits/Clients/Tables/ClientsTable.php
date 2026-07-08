@@ -2,14 +2,21 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\Tables;
 
+use App\Models\Alert;
 use App\Models\Client;
+use App\Models\Installment;
+use App\Models\User;
+use App\Services\Alerts\AlertService;
 use App\Services\Credits\RefinancingService;
 use App\Services\RegisterPaymentService;
+use Filament\Facades\Filament;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Columns\TextColumn;
@@ -218,6 +225,7 @@ class ClientsTable
 
                                     ]),
                             ]),
+                            
                     ])
                     ->action(function (array $data, Client $record) {
 
@@ -227,7 +235,110 @@ class ClientsTable
                             data: $data,
                         );
 
-                    })
+                    }),
+                Action::make('Alert')
+                    ->label('Alerta')
+                    ->form([
+                        Grid::make(2)
+                            ->schema([
+                                Select::make('assigned_user_id')
+                                    ->label('Asignar a')
+                                    ->options(
+                                        User::query()
+                                            ->pluck('name', 'id')
+                                    )
+                                    ->searchable()
+                                    ->required(),
+
+                                Select::make('installment_id')
+                                    ->label('Cuota')
+                                    ->searchable()
+                                    ->preload()
+                                    ->nullable()
+                                    ->options(function ($record): array {
+
+                                        $credit = $record->activeCredit;
+
+                                        if (! $credit) {
+                                            return [];
+                                        }
+
+                                        return $credit->installments()
+                                            ->where('status', 'pending')
+                                            ->orderBy('number')
+                                            ->get()
+                                            ->mapWithKeys(function (Installment $installment) {
+
+                                                return [
+                                                    $installment->id => sprintf(
+                                                        'Cuota #%d • Vence: %s • Saldo: $%s',
+                                                        $installment->number,
+                                                        $installment->due_date->format('d/m/Y'),
+                                                        number_format($installment->remaining_balance, 2),
+                                                    ),
+                                                ];
+                                            })
+                                            ->toArray();
+                                    }),
+
+                                Select::make('type')
+                                    ->label('Tipo de alerta')
+                                    ->options(Alert::getManualTypes())
+                                    ->searchable()
+                                    ->native(false)
+                                    ->required(),
+
+                                TextInput::make('title')
+                                    ->label('Título')
+                                    ->placeholder('Ej. Recordar llamar al cliente')
+                                    ->maxLength(255)
+                                    ->required(),
+
+                                DateTimePicker::make('alert_at')
+                                    ->label('Fecha y hora de la alerta')
+                                    ->seconds(false)
+                                    ->native(false)
+                                    ->required(),
+
+                                RichEditor::make('message')
+                                    ->label('Contenido')
+                                    ->placeholder('Escriba el mensaje de la alerta...')
+                                    ->columnSpanFull()
+                                    ->required(),
+                            ])
+                    ])
+                    ->action(function (array $data, Client $record) {
+                        $credit = $record->activeCredit;
+
+                        $assignedUser = User::findOrFail($data['assigned_user_id']);
+
+                        if (! $credit) {
+                            Notification::make()
+                                ->title('El cliente no tiene un crédito activo.')
+                                ->danger()
+                                ->send();
+
+                            return;
+                        }
+
+                        $installment = $data['installment_id']
+                            ? $credit->installments()->findOrFail($data['installment_id'])
+                            : null;
+
+                        app(AlertService::class)->create(
+                            client: $record,
+                            credit: $credit,
+                            creator: Filament::auth()->user(),
+                            assignedUser: $assignedUser,
+                            installment: $installment,
+                            data: $data,
+                        );
+
+                        Notification::make()
+                            ->title('Alerta creada correctamente.')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
