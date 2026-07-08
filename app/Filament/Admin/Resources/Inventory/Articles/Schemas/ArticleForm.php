@@ -28,6 +28,9 @@ class ArticleForm
                     ->label('Modelo')
                     ->required()
                     ->maxLength(255),
+                
+                TextInput::make('color')
+                    ->label('Color'),
 
                 TextInput::make('year')
                     ->label('Año')

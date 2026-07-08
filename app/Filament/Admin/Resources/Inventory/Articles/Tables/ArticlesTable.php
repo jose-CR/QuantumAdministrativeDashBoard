@@ -27,7 +27,17 @@ class ArticlesTable
 
                 TextColumn::make('color')
                     ->label('Color')
-                    ->searchable(),
+                    ->searchable()
+                    ->color(fn (string $state) => match ($state) {
+                        'Rojo'     => 'danger',
+                        'Verde'    => 'success',
+                        'Azul'     => 'info',
+                        'Amarillo' => 'warning',
+                        'Gris'     => 'gray',
+                        'Negro'    => 'gray',
+                        'Blanco'   => 'gray',
+                        default    => 'primary',
+                    }),
 
                 TextColumn::make('cash_price')
                     ->label('Precio Contado')

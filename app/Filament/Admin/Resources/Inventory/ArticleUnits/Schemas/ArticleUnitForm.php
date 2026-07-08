@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Inventory\ArticleUnits\Schemas;
 
+use App\Models\Article;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -18,7 +19,12 @@ class ArticleUnitForm
                     ->getOptionLabelFromRecordUsing(
                         fn ($record) => $record->full_name
                     )
-                    ->searchable()
+                    ->live()
+                    ->afterStateUpdated(function ($state, callable $set) {
+                        $article = Article::find($state);
+
+                        $set('cash_price', $article?->cash_price);
+                    })
                     ->required(),
 
                 TextInput::make('vin')
@@ -30,12 +36,16 @@ class ArticleUnitForm
                     ->required(),
 
                 TextInput::make('plate')
-                    ->label('Placa')
-                    ->required(),
+                    ->label('Placa'),
 
                 TextInput::make('color')
                     ->label('Color')
                     ->required(),
+                
+                TextInput::make('cash_price')
+                    ->label('Precio al contado')
+                    ->disabled()
+                    ->dehydrated(false),
 
                 Select::make('status')
                     ->label('Estado')

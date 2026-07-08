@@ -12,7 +12,6 @@ use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class ClientForm
@@ -119,10 +118,7 @@ class ClientForm
                                                     ->required(),
 
                                                 TextInput::make('relationship')
-                                                    ->label('Parentesco')
-                                                    ->required(),
-
-
+                                                    ->label('Parentesco'),
 
                                                 TextInput::make('phone')
                                                     ->label('Teléfono')
@@ -150,17 +146,26 @@ class ClientForm
                                                 FilamentSelect::options(
                                                     ArticleUnit::class,
                                                     [
-                'display_name',
-            ]
+                                                        'display_name',
+                                                    ]
                                                 )
                                             )
                                             ->searchable()
                                             ->preload()
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, callable $set){
+                                                $articleUnit = ArticleUnit::with('article')->find($state);
+
+                                                $set(
+                                                    'initial_amount',
+                                                    $articleUnit?->article?->cash_price
+                                                );
+                                            })
                                             ->required(),
 
                                         TextInput::make('initial_amount')
                                             ->label('Monto Inicial')
-                                            ->numeric()
+                                            ->readOnly()
                                             ->prefix('$')
                                             ->required(),
 

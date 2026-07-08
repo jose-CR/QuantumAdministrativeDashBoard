@@ -43,7 +43,11 @@ class ArticleUnitsTable
                 TextColumn::make('color')
                     ->label('Color')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->color(fn (string $state) => match ($state) {
+                        'azul'     => 'info',
+                        default     => 'gray',
+                    }),
 
                 TextColumn::make('status')
                     ->label('Estado')
