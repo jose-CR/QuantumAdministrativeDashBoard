@@ -61,7 +61,6 @@ class AdminPanelProvider extends PanelProvider
                     ->label('Administración'),
             ])
             ->databaseNotifications()
-            ->databaseNotificationsPolling('5s');
         ;
     }
 }

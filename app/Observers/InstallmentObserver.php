@@ -11,11 +11,12 @@ class InstallmentObserver
     /**
      * Se crea una nueva cuota.
      */
-    public function created(Installment $installment): void
+/*     public function created(Installment $installment): void
     {
         app(AlertService::class)
             ->createUpcoming($installment);
-    }
+    } */
+   
 
     /**
      * Se actualiza una cuota.

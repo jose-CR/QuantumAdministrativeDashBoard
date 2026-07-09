@@ -51,15 +51,13 @@ class AlertService
             'metadata' => $data['metadata'] ?? null,
         ]);
 
-        $this->notify($alert);
-
         return $alert;
     }
 
     /**
      * Alerta automática antes del vencimiento.
      */
-    public function createUpcoming(
+/*     public function createUpcoming(
         Installment $installment,
         User $creator,
         ?User $assignedUser,
@@ -90,7 +88,7 @@ class AlertService
         $this->notify($alert);
 
         return $alert;
-    }
+    } */
 
     /**
      * Alertas que deben mostrarse hoy.
@@ -183,7 +181,7 @@ class AlertService
         ]);
 }
 
-    private function notify(Alert $alert): void
+    public function notify(Alert $alert): void
     {
         $users = collect([
             $alert->creator,

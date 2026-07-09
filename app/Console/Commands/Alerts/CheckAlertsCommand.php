@@ -2,10 +2,7 @@
 
 namespace App\Console\Commands\Alerts;
 
-use App\Models\User;
-use App\Services\Alerts\AlertService as AlertsAlertService;
-use App\Services\AlertService;
-use Filament\Notifications\Notification;
+use App\Services\Alerts\AlertService;
 use Illuminate\Console\Command;
 
 class CheckAlertsCommand extends Command
@@ -16,26 +13,23 @@ class CheckAlertsCommand extends Command
 
     public function handle(): int
     {
-        $alerts = app(AlertsAlertService::class)
-            ->dueToday();
+        $alertService = app(AlertService::class);
+
+        $alerts = $alertService->dueToday();
 
         if ($alerts->isEmpty()) {
+            $this->info('No hay alertas pendientes.');
+
             return self::SUCCESS;
         }
-        
+
         foreach ($alerts as $alert) {
+            $alertService->notify($alert);
 
-            if ($alert->assignedUser) {
-                Notification::make()
-                    ->title($alert->title)
-                    ->body($alert->message)
-                    ->warning()
-                    ->sendToDatabase($alert->assignedUser);
-            }
-
-            app(AlertsAlertService::class)
-                ->markAsSent($alert);
+            $alertService->markAsSent($alert);
         }
+
+        $this->info("Se enviaron {$alerts->count()} alertas.");
 
         return self::SUCCESS;
     }
