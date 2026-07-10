@@ -3,8 +3,10 @@
 namespace App\Filament\Admin\Resources\Credits\Clients\Pages;
 
 use App\Filament\Admin\Resources\Credits\Clients\ClientResource;
+use App\Models\User;
 use App\Services\InstallmentGeneratorService;
 use App\Services\LoanCalculatorService;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 use Filament\Notifications\Notification;
 
@@ -37,7 +39,21 @@ class CreateClient extends CreateRecord
 
         $credit = $client->credits()->create($creditData);
 
-        app(InstallmentGeneratorService::class)->generate($credit);
+        $creator = Filament::auth()->user();
+
+        $assignedUser = null;
+
+        if (! empty($this->data['assigned_user_id'])) {
+            $assignedUser = User::findOrFail(
+                $this->data['assigned_user_id']
+            );
+        }
+
+        app(InstallmentGeneratorService::class)->generate(
+            credit: $credit,
+            creator: $creator,
+            assignedUser: $assignedUser,
+        );
     }
 
 

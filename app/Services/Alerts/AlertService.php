@@ -7,7 +7,6 @@ use App\Models\Client;
 use App\Models\Credit;
 use App\Models\Installment;
 use App\Models\User;
-use Filament\Notifications\Notification;
 use Illuminate\Database\Eloquent\Collection;
 use App\Notifications\AlertDatabaseNotification;
 
@@ -57,7 +56,7 @@ class AlertService
     /**
      * Alerta automática antes del vencimiento.
      */
-/*     public function createUpcoming(
+     public function createUpcoming(
         Installment $installment,
         User $creator,
         ?User $assignedUser,
@@ -85,10 +84,8 @@ class AlertService
             ],
         ]);
 
-        $this->notify($alert);
-
         return $alert;
-    } */
+    }
 
     /**
      * Alertas que deben mostrarse hoy.

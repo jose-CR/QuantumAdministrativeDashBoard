@@ -2,11 +2,16 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\Schemas;
 
+use App\Models\Alert;
 use App\Models\ArticleUnit;
 use App\Models\Credit;
+use App\Models\Installment;
+use App\Models\User;
 use App\Utils\Filament\FilamentSelect;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
+use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Components\Tabs;
