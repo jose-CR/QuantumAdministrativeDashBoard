@@ -31,15 +31,11 @@ class ClientsTable
     {
         return $table
             ->columns([
-                TextColumn::make('first_name')
-                    ->label('Nombres')
+                TextColumn::make('full_name')
+                    ->label('Nombre completo')
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('last_name')
-                    ->label('Apellidos')
-                    ->searchable()
-                    ->sortable(),
                 TextColumn::make('identity_document')
                     ->label('DUI'),
                 TextColumn::make('phone_primary')

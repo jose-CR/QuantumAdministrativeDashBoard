@@ -2,14 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\Schemas;
 
-use App\Models\Alert;
 use App\Models\ArticleUnit;
 use App\Models\Credit;
-use App\Models\Installment;
-use App\Models\User;
 use App\Utils\Filament\FilamentSelect;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Schemas\Components\Grid;
@@ -31,12 +27,8 @@ class ClientForm
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
-                                        TextInput::make('first_name')
-                                            ->label('Nombre')
-                                            ->required(),
-
-                                        TextInput::make('last_name')
-                                            ->label('Apellido')
+                                        TextInput::make('full_name')
+                                            ->label('Nombre completo')
                                             ->required(),
 
                                         TextInput::make('identity_document')

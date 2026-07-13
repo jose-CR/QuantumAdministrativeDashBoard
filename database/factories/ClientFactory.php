@@ -13,8 +13,7 @@ class ClientFactory extends Factory
     public function definition(): array
     {
         return [
-            'first_name' => fake()->firstName(),
-            'last_name' => fake()->lastName(),
+            'full_name' => fake()->name(),
 
             'identity_document' => fake()->unique()->numerify('#########'),
 

@@ -16,8 +16,7 @@ class Client extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'first_name',
-        'last_name',
+        'full_name',
         'identity_document',
         'birth_date',
         'gender',
@@ -45,11 +44,6 @@ class Client extends Model
             'monthly_income' => 'decimal:2',
             'is_active' => 'boolean',
         ];
-    }
-
-    public function getFullNameAttribute(): string
-    {
-        return "{$this->first_name} {$this->last_name}";
     }
 
     public function references()

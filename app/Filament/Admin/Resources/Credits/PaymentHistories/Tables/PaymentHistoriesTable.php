@@ -19,7 +19,7 @@ class PaymentHistoriesTable
                     ->label('Cliente')
                     ->searchable(
                         query: function ($query, $search) {
-                            FilamentSearch::relationColumns($query, 'credit.client', $search, ['first_name', 'last_name',]);
+                            FilamentSearch::relationColumns($query, 'credit.client', $search, ['full_name',]);
                         }
                     ),
 

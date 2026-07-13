@@ -28,10 +28,10 @@ class LoansForm
 
                                         Select::make('client_id')
                                             ->label('Cliente')
-                                            ->relationship('client', 'first_name')
+                                            ->relationship('client', 'full_name')
                                             ->getOptionLabelFromRecordUsing(
                                                 fn (Client $record): string =>
-                                                    "{$record->first_name} {$record->last_name}"
+                                                    "{$record->full_name}"
                                             )
                                             ->searchable()
                                             ->preload()
