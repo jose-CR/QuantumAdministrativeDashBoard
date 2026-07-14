@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "348389d427cdb1bfcae10fb25ad41f51",
+    "content-hash": "318ab548ee1fbc1c7d0270a6e945f5a4",
     "packages": [
         {
             "name": "blade-ui-kit/blade-heroicons",
@@ -1956,6 +1956,63 @@
                 }
             ],
             "time": "2026-05-23T22:00:21+00:00"
+        },
+        {
+            "name": "kenepa/translation-manager",
+            "version": "5.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/kenepa/translation-manager.git",
+                "reference": "603912995f0c5341e3224ff40f645f901a74175d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/kenepa/translation-manager/zipball/603912995f0c5341e3224ff40f645f901a74175d",
+                "reference": "603912995f0c5341e3224ff40f645f901a74175d",
+                "shasum": ""
+            },
+            "require": {
+                "filament/filament": "^4.0",
+                "filament/notifications": "^4.0",
+                "php": "^8.2",
+                "spatie/laravel-package-tools": "^1.92",
+                "spatie/laravel-translation-loader": "^2.8",
+                "stijnvanouplines/blade-country-flags": "^1.0.6"
+            },
+            "require-dev": {
+                "tightenco/duster": "^2.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Kenepa\\TranslationManager\\TranslationManagerProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Kenepa\\TranslationManager\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Manage your application's translation strings in Filament.",
+            "homepage": "https://github.com/kenepa/translation-manager",
+            "keywords": [
+                "Kenepa",
+                "filament",
+                "laravel",
+                "localization",
+                "translation"
+            ],
+            "support": {
+                "issues": "https://github.com/kenepa/translation-manager/issues",
+                "source": "https://github.com/kenepa/translation-manager/tree/5.0.2"
+            },
+            "time": "2025-11-04T15:53:33+00:00"
         },
         {
             "name": "kirschbaum-development/eloquent-power-joins",
@@ -5139,6 +5196,78 @@
             "time": "2026-05-19T14:06:37+00:00"
         },
         {
+            "name": "spatie/laravel-translation-loader",
+            "version": "2.8.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/laravel-translation-loader.git",
+                "reference": "17fa7d211bca1423a0e424823e7fddd5c2bc4ab6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/laravel-translation-loader/zipball/17fa7d211bca1423a0e424823e7fddd5c2bc4ab6",
+                "reference": "17fa7d211bca1423a0e424823e7fddd5c2bc4ab6",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/translation": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^8.0",
+                "spatie/laravel-package-tools": "^1.12"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.59",
+                "orchestra/testbench": "^6.0|^7.0|^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^1.23|^2.0|^3.7|^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Spatie\\TranslationLoader\\TranslationServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\TranslationLoader\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Store your language lines in the database, yaml or other sources",
+            "homepage": "https://github.com/spatie/laravel-translation-loader",
+            "keywords": [
+                "database",
+                "db",
+                "i8n",
+                "language",
+                "laravel",
+                "laravel-translation-loader",
+                "spatie",
+                "translate"
+            ],
+            "support": {
+                "source": "https://github.com/spatie/laravel-translation-loader/tree/2.8.3"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2026-02-21T21:44:45+00:00"
+        },
+        {
             "name": "spatie/shiki-php",
             "version": "2.4.0",
             "source": {
@@ -5202,6 +5331,60 @@
                 }
             ],
             "time": "2026-04-27T14:27:52+00:00"
+        },
+        {
+            "name": "stijnvanouplines/blade-country-flags",
+            "version": "1.0.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/stijnvanouplines/blade-country-flags.git",
+                "reference": "06b53f8ae58238c30a5eaa35fd199ffd772a83f8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/stijnvanouplines/blade-country-flags/zipball/06b53f8ae58238c30a5eaa35fd199ffd772a83f8",
+                "reference": "06b53f8ae58238c30a5eaa35fd199ffd772a83f8",
+                "shasum": ""
+            },
+            "require": {
+                "blade-ui-kit/blade-icons": "^1.0",
+                "illuminate/support": "^8.0|^9.0|^10.0|^11.0|^12.0|^13.0",
+                "php": "^7.4|^8.0"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^6.18|^8.0|^9.0|^10.0|^11.0",
+                "pestphp/pest": "^1.4|^2.34|^3.0|^4.4",
+                "spatie/pest-plugin-snapshots": "^1.0|^2.1"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "StijnVanouplines\\BladeCountryFlags\\BladeCountryFlagsServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "StijnVanouplines\\BladeCountryFlags\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A package to easily make use of country flags in your Laravel Blade views.",
+            "homepage": "https://github.com/stijnvanouplines/blade-country-flags",
+            "keywords": [
+                "blade",
+                "country flags",
+                "laravel"
+            ],
+            "support": {
+                "issues": "https://github.com/stijnvanouplines/blade-country-flags/issues",
+                "source": "https://github.com/stijnvanouplines/blade-country-flags/tree/1.0.9"
+            },
+            "time": "2026-03-03T13:15:47+00:00"
         },
         {
             "name": "symfony/clock",
