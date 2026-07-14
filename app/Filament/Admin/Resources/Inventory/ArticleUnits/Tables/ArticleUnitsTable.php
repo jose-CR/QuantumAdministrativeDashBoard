@@ -16,41 +16,41 @@ class ArticleUnitsTable
         return $table
             ->columns([
                 TextColumn::make('article.brand')
-                    ->label('Marca')
+                    ->label(__('resources.inventary.articleUnits.brand'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('article.model')
-                    ->label('Modelo')
+                    ->label(__('resources.inventary.articleUnits.model'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('vin')
-                    ->label('VIN')
+                    ->label(__('resources.inventary.articleUnits.vin'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('engine_number')
-                    ->label('Motor')
+                    ->label(__('resources.inventary.articleUnits.engine_number'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('plate')
-                    ->label('Placa')
+                    ->label(__('resources.inventary.articleUnits.plate'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('color')
-                    ->label('Color')
+                    ->label(__('resources.inventary.articleUnits.color'))
                     ->searchable()
                     ->sortable()
                     ->color(fn (string $state) => match ($state) {
-                        'azul'     => 'info',
+                        'blue'     => 'info',
                         default     => 'gray',
                     }),
 
                 TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('resources.inventary.articleUnits.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'available' => 'Disponible',
@@ -78,8 +78,8 @@ class ArticleUnitsTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Articulos Unitarios eliminados')
-                                ->body('Los articulos unitarios seleccionados fueron eliminados correctamente.')
+                                ->title(__('notifications.inventary.articleUnits.delete.title'))
+                                ->body(__('notifications.inventary.articleUnits.delete.body'))
                         ),
                 ]),
             ]);

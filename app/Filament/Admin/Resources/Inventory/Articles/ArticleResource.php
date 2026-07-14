@@ -22,9 +22,11 @@ class ArticleResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'brand';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventary';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     protected static ?string $slug = 'inventary/article';
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
@@ -41,6 +43,19 @@ class ArticleResource extends Resource
         return [
             //
         ];
+    }
+
+    /*
+    * funciones para la traduccion
+    */
+    public static function getModelLabel(): string
+    {
+        return __('models.inventary.article.navegation');
+    }
+
+    public static function getNavigationGroup(): string
+    {
+        return __('models.others.inventary');
     }
 
     public static function getPages(): array

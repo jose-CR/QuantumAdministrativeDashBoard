@@ -15,10 +15,12 @@ class UsersTable
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
+                TextColumn::make('name')
+                            ->label(__('resources.users.name')),
+                TextColumn::make('email')
+                            ->label(__('resources.users.email')),
                 TextColumn::make('last_seen')
-                    ->label('Última conexión'),
+                            ->label(__('resources.users.last_seen')),
             ])
             ->filters([])
             ->recordActions([
@@ -30,8 +32,8 @@ class UsersTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Usuarios eliminados')
-                                ->body('Los usuarios seleccionados fueron eliminados correctamente.')
+                                ->title(__('notifications.users.delete.title'))
+                                ->body(__('notifications.users.delete.body'))
                         ),
                 ]),
             ])

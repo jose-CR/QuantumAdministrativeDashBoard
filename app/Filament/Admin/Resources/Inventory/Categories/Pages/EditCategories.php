@@ -18,8 +18,8 @@ class EditCategories extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title('Categoria eliminada')
-                        ->body('La categoria ha sido eliminada correctamente.')
+                        ->title(__('notifications.inventory.category.delete.title'))
+                        ->body(__('notifications.inventory.category.delete.body'))
                 ),
         ];
     }
@@ -28,8 +28,8 @@ class EditCategories extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title('Categoria editada')
-            ->body('La categoria ha sido editada correctamente.')
+            ->title(__('notifications.inventory.category.update.title'))
+            ->body(__('notifications.inventory.category.update.body'))
         ;
     }
 

@@ -16,17 +16,17 @@ class ArticlesTable
         return $table
             ->columns([
                 TextColumn::make('brand')
-                    ->label('Marca')
+                    ->label(__('resources.inventary.article.brand'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('model')
-                    ->label('Modelo')
+                    ->label(__('resources.inventary.article.model'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('color')
-                    ->label('Color')
+                     ->label(__('resources.inventary.article.color'))
                     ->searchable()
                     ->color(fn (string $state) => match ($state) {
                         'Rojo'     => 'danger',
@@ -40,22 +40,17 @@ class ArticlesTable
                     }),
 
                 TextColumn::make('cash_price')
-                    ->label('Precio Contado')
+                    ->label(__('resources.inventary.article.cash_price'))
                     ->money('USD')
                     ->sortable(),
 
-                TextColumn::make('credit_price')
-                    ->label('Precio Crédito')
-                    ->money('USD')
-                    ->sortable(),
-
-                TextColumn::make('descripcion')
-                    ->label('Descripción')
+                TextColumn::make('description')
+                    ->label(__('resources.inventary.article.description'))
                     ->limit(50)
                     ->tooltip(fn ($record) => $record->descripcion),
 
                 TextColumn::make('created_at')
-                    ->label('Creado')
+                    ->label(__('resources.inventary.article.created_at'))
                     ->dateTime('d/m/Y')
                     ->sortable(),
                 //
@@ -72,8 +67,8 @@ class ArticlesTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Articulos eliminados')
-                                ->body('Los articulos seleccionados fueron eliminados correctamente.')
+                                ->title(__('notifications.inventary.article.delete.title'))
+                                ->body(__('notifications.inventary.articleUnits.delete.body'))
                         ),
                 ]),
             ]);

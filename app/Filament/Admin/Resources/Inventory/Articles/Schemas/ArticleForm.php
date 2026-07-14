@@ -14,44 +14,38 @@ class ArticleForm
         return $schema
             ->components([
                 Select::make('category_id')
-                    ->label('Categoría')
+                    ->label(__('resources.inventary.article.category'))
                     ->relationship('category', 'name')
                     ->searchable()
                     ->required(),
 
                 TextInput::make('brand')
-                    ->label('Marca')
+                    ->label(__('resources.inventary.article.brand'))
                     ->required()
                     ->maxLength(255),
 
                 TextInput::make('model')
-                    ->label('Modelo')
+                    ->label(__('resources.inventary.article.model'))
                     ->required()
                     ->maxLength(255),
                 
                 TextInput::make('color')
-                    ->label('Color'),
+                    ->label(__('resources.inventary.article.color')),
 
                 TextInput::make('year')
-                    ->label('Año')
+                    ->label(__('resources.inventary.article.year'))
                     ->numeric()
                     ->minValue(1900)
                     ->maxValue(date('Y') + 1),
 
                 TextInput::make('cash_price')
-                    ->label('Precio Contado')
+                    ->label(__('resources.inventary.article.cash_price'))
                     ->numeric()
                     ->prefix('$')
                     ->required(),
 
-                TextInput::make('credit_price')
-                    ->label('Precio Crédito')
-                    ->numeric()
-                    ->prefix('$')
-                    ->required(),
-
-                RichEditor::make('descripcion')
-                    ->label('Descripción')
+                RichEditor::make('description')
+                    ->label(__('resources.inventary.article.description'))
                     ->columnSpanFull(),
             ]);
     }

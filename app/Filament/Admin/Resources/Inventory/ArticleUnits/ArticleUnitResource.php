@@ -22,9 +22,11 @@ class ArticleUnitResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'vin';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Inventary';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     protected static ?string $slug = 'inventary/articleunit';
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
@@ -41,6 +43,18 @@ class ArticleUnitResource extends Resource
         return [
             //
         ];
+    }
+
+    /*
+    * funciones para la traduccion
+    */
+
+    public static function getModelLabel(): string {
+        return __('models.inventary.articleunits.navegation');
+    }
+
+    public static function getNavigationGroup(): string {
+        return __('models.others.inventary');
     }
 
     public static function getPages(): array

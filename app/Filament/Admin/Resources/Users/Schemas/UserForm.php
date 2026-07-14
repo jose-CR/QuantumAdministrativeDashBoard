@@ -13,16 +13,17 @@ class UserForm
         return $schema
             ->components([
                 TextInput::make('name')
-                    ->label('usuario')
+                    ->label(__('resources.users.user'))
                     ->required(),
                 TextInput::make('password')
-                    ->label('contraseña')
+                    ->label(__('resources.users.password'))
                     ->password()
                     ->revealable()
                     ->dehydrated(fn ($state) => filled($state))
                     ->dehydrateStateUsing(fn ($state): string => Hash::make($state))
                     ->required(fn (string $operation): bool => 'create' === $operation),
                 TextInput::make('email')
+                    ->label(__('resources.users.email'))
                     ->email()
                     ->unique()
                     ->required(),

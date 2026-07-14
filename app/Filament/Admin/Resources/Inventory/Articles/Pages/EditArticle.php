@@ -18,8 +18,8 @@ class EditArticle extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title('Articulo eliminado')
-                        ->body('El articulo ha sido eliminado correctamente.')
+                        ->title(__('notifications.inventary.articleUnits.delete.title'))
+                        ->body(__('notifications.inventary.articleUnits.delete.body'))
                 ),
         ];
     }
@@ -28,8 +28,8 @@ class EditArticle extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title('Articulo editado')
-            ->body('El Articulo ha sido editado correctamente.')
+            ->title(__('notifications.inventary.articleUnits.update.title'))
+            ->body(__('notifications.inventary.articleUnits.update.body'))
         ;
     }
 

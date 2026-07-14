@@ -16,12 +16,12 @@ class CategoriesTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->label('Categoria')
+                    ->label(__('resources.inventary.category.name'))
                     ->searchable()
                     ->sortable(),
 
-                TextColumn::make('descripcion')
-                    ->label('descripcion')
+                TextColumn::make('description')
+                    ->label(__('resources.inventary.category.description'))
                 //
             ])
             ->filters([
@@ -36,8 +36,8 @@ class CategoriesTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Categorias eliminados')
-                                ->body('Las categorias seleccionados fueron eliminados correctamente.')
+                                ->title(__('notifications.inventory.category.delete.title'))
+                                ->body(__('notifications.inventory.category.delete.body'))
                         ),
                 ]),
             ]);

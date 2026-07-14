@@ -14,7 +14,7 @@ class ArticleUnitForm
         return $schema
             ->components([
                 Select::make('article_id')
-                    ->label('Artículo')
+                    ->label(__('resources.inventary.article.article'))
                     ->relationship('article', 'id')
                     ->getOptionLabelFromRecordUsing(
                         fn ($record) => $record->full_name
@@ -28,27 +28,27 @@ class ArticleUnitForm
                     ->required(),
 
                 TextInput::make('vin')
-                    ->label('VIN')
+                    ->label(__('resources.inventary.articleUnits.vin'))
                     ->required(),
 
                 TextInput::make('engine_number')
-                    ->label('Motor')
+                    ->label(__('resources.inventary.articleUnits.engine_number'))
                     ->required(),
 
                 TextInput::make('plate')
-                    ->label('Placa'),
+                    ->label(__('resources.inventary.articleUnits.plate')),
 
                 TextInput::make('color')
-                    ->label('Color')
+                    ->label(__('resources.inventary.articleUnits.color'))
                     ->required(),
                 
                 TextInput::make('cash_price')
-                    ->label('Precio al contado')
+                    ->label(__('resources.inventary.articleUnits.cash_price'))
                     ->disabled()
                     ->dehydrated(false),
 
                 Select::make('status')
-                    ->label('Estado')
+                    ->label(__('resources.inventary.articleUnits.status'))
                     ->options([
                         'available' => 'Disponible',
                         'reserved'  => 'Reservado',

@@ -21,9 +21,12 @@ class UserResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedUsers;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administration';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?string $modelLabel = null;
+
 
     public static function form(Schema $schema): Schema
     {
@@ -43,6 +46,18 @@ class UserResource extends Resource
     public static function getRelations(): array
     {
         return [];
+    }
+
+    /*
+    * funciones para la traduccion
+    */
+
+    public static function getModelLabel(): string {
+        return __('models.users.navegation');
+    }
+
+    public static function getNavigationGroup(): string {
+        return __('models.others.administration');
     }
 
     public static function getPages(): array

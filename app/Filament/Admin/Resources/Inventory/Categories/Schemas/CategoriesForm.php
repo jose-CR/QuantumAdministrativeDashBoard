@@ -13,9 +13,11 @@ class CategoriesForm
             ->components([
 
                 TextInput::make('name')
+                    ->label(__('resources.inventary.category.name'))
                     ->required(),
 
                 TextInput::make('descripcion')
+                    ->label(__('resources.inventary.category.description'))
                     ->required()
                 //
             ]);

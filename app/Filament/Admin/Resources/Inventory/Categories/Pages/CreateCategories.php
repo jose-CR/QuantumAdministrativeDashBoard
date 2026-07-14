@@ -14,8 +14,8 @@ class CreateCategories extends CreateRecord
     {
         return Notification::make()
             ->success()
-            ->title('Categoria creada')
-            ->body('La categoria ha sido creada correctamente.');
+            ->title(__('notifications.inventory.category.create.title'))
+            ->body(__('notifications.inventory.category.create.body'));
     }
 
     protected function getRedirectUrl(): string
