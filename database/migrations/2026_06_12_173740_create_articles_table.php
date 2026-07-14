@@ -18,6 +18,7 @@ return new class () extends Migration {
                 ->restrictOnDelete();
 
             $table->string('brand');
+            
             $table->string('model');
 
             $table->year('year');
@@ -25,11 +26,8 @@ return new class () extends Migration {
             $table->string('color')->nullable();
 
             $table->decimal('cash_price', 10, 2);
-            $table->decimal('credit_price', 10, 2);
 
-
-
-            $table->text('descripcion')->nullable();
+            $table->text('description')->nullable();
 
             $table->unique([
                 'category_id',

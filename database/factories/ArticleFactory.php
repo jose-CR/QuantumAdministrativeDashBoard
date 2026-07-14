@@ -28,9 +28,8 @@ class ArticleFactory extends Factory
             'color' => fake()->safeColorName(),
 
             'cash_price' => fake()->randomFloat(2, 1000, 15000),
-            'credit_price' => fake()->randomFloat(2, 1500, 20000),
 
-            'descripcion' => fake()->sentence(),
+            'description' => fake()->sentence(),
         ];
     }
 }

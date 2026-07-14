@@ -22,8 +22,7 @@ class Article extends Model
         'year',
         'color',
         'cash_price', // Precio Contado
-        'credit_price', // Precio Crédito
-        'descripcion'
+        'description'
     ];
 
     /**
@@ -36,7 +35,6 @@ class Article extends Model
         return [
             'year' => 'integer',
             'cash_price' => 'decimal:2',
-            'credit_price' => 'decimal:2',
         ];
     }
 
