@@ -5,8 +5,10 @@ namespace App\Filament\Admin\Resources\Credits\Clients;
 use App\Filament\Admin\Resources\Credits\Clients\Pages\CreateClient;
 use App\Filament\Admin\Resources\Credits\Clients\Pages\EditClient;
 use App\Filament\Admin\Resources\Credits\Clients\Pages\ListClients;
+use App\Filament\Admin\Resources\Credits\Clients\Pages\ViewClient;
 use App\Filament\Admin\Resources\Credits\Clients\RelationManagers\ReferencesRelationManager;
 use App\Filament\Admin\Resources\Credits\Clients\Schemas\ClientForm;
+use App\Filament\Admin\Resources\Credits\Clients\Schemas\ClientInfolist;
 use App\Filament\Admin\Resources\Credits\Clients\Tables\ClientsTable;
 use App\Models\Client;
 use Filament\Resources\Resource;
@@ -36,6 +38,11 @@ class ClientResource extends Resource
         return ClientsTable::configure($table);
     }
 
+    public static function infolist(Schema $schema): Schema
+    {
+        return ClientInfolist::configure($schema);
+    }
+
     public static function getRelations(): array
     {
         return [
@@ -48,6 +55,7 @@ class ClientResource extends Resource
         return [
             'index' => ListClients::route('/'),
             'create' => CreateClient::route('/create'),
+            'view' => ViewClient::route('/{record}'),
             'edit' => EditClient::route('/{record}/edit'),
         ];
     }

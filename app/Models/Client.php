@@ -61,4 +61,10 @@ class Client extends Model
         return $this->hasOne(Credit::class)
             ->where('status', 'active');
     }
+
+    public function latestCredit()
+    {
+        return $this->hasOne(Credit::class)
+            ->latestOfMany('created_at');
+    }
 }
