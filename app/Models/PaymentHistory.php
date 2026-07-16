@@ -18,6 +18,7 @@ class PaymentHistory extends Model
     protected $fillable = [
         'credit_id',
         'user_id',
+        'bank_id',
         'amount',
         'payment_method',
         'payment_date',
@@ -43,5 +44,10 @@ class PaymentHistory extends Model
     public function credit()
     {
         return $this->belongsTo(Credit::class);
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(Bank::class);
     }
 }

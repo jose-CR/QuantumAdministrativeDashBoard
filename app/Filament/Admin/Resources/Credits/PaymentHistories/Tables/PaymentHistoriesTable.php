@@ -34,6 +34,9 @@ class PaymentHistoriesTable
                         'card' => 'Tarjeta',
                         default => $state,
                     }),
+                
+                TextColumn::make('bank.name')
+                    ->default('N/A'),
 
                 TextColumn::make('payment_date')
                     ->label('dia de pago'),

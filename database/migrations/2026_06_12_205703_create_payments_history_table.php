@@ -22,8 +22,7 @@ return new class () extends Migration {
                 ->constrained()
                 ->nullOnDelete()
                 ->cascadeOnDelete();
-            ;
-
+            
             // Monto abonado
             $table->decimal('amount', 10, 2);
 
@@ -33,6 +32,12 @@ return new class () extends Migration {
                 'bank_transfer',
                 'card',
             ]);
+
+            // Bancos
+            $table->foreignId('bank_id')
+                ->nullable()
+                ->constrained()
+                ->cascadeOnDelete();
 
             // Fecha efectiva del pago
             $table->date('payment_date');

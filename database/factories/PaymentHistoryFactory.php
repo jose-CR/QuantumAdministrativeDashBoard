@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Bank;
 use App\Models\Credit;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -22,6 +23,12 @@ class PaymentHistoryFactory extends Factory
             15000
         );
 
+        $paymentMethod = fake()->randomElement([
+            'cash',
+            'bank_transfer',
+            'card',
+        ]);
+
         return [
             'credit_id' => Credit::factory(),
 
@@ -29,17 +36,19 @@ class PaymentHistoryFactory extends Factory
 
             'amount' => $amount,
 
+            'payment_method' => $paymentMethod,
+
+            'bank_id' => $paymentMethod === 'cash'
+                ? null
+                : Bank::query()
+                    ->inRandomOrder()
+                    ->value('id'),
+
             'payment_date'
                 => fake()->dateTimeBetween(
                     '-6 months',
                     'now'
                 ),
-
-            'payment_method' => fake()->randomElement([
-                'cash',
-                'bank_transfer',
-                'card',
-            ]),
 
             'receipt_number'
                 => fake()->numerify(

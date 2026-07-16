@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Bank;
 use App\Models\Credit;
 use App\Models\PaymentHistory;
 use App\Services\ApplyPaymentService;
@@ -33,14 +34,23 @@ class PaymentHistorySeeder extends Seeder
 
                 $previousBalance = $credit->pending_balance;
 
+                $paymentMethod = fake()->randomElement([
+                    'cash',
+                    'bank_transfer',
+                    'card',
+                ]);
+
                 PaymentHistory::create([
                     'credit_id' => $credit->id,
                     'amount' => $amount,
-                    'payment_method' => fake()->randomElement([
-                        'cash',
-                        'bank_transfer',
-                        'card',
-                    ]),
+                    'payment_method' => $paymentMethod,
+
+                    'bank_id' => $paymentMethod === 'cash'
+                        ? null
+                        : Bank::query()
+                            ->inRandomOrder()
+                            ->value('id'),
+
                     'payment_date' => now(),
                     'receipt_number' => fake()->numerify(
                         'REC-#####'
