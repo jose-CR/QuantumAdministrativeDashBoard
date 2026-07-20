@@ -20,7 +20,7 @@ class PaymentHistoriesResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static string|\UnitEnum|null $navigationGroup  = 'Creditos';
+    protected static string|\UnitEnum|null $navigationGroup  = 'Credits';
 
     protected static ?string $recordTitleAttribute = 'user_id';
 

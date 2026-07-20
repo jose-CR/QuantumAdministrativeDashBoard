@@ -22,7 +22,7 @@ class ClientResource extends Resource
 
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedUserGroup;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
+    protected static string|\UnitEnum|null $navigationGroup = 'Credits';
 
     protected static ?string $recordTitleAttribute = 'full_name';
 

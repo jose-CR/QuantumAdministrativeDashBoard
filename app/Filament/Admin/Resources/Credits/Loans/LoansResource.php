@@ -20,7 +20,7 @@ class LoansResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Creditos';
+    protected static string|\UnitEnum|null $navigationGroup = 'Credits';
 
     protected static ?string $recordTitleAttribute = 'client_id';
 
