@@ -12,14 +12,16 @@ class ApplyPaymentService
         Credit $credit,
         float $amount,
         string $mode = 'auto',
-        ?int $installmentId = null
+        ?int $installmentId = null,
+        ?string $paymentDate = null,
     ): void {
 
         DB::transaction(function () use (
             $credit,
             $amount,
             $mode,
-            $installmentId
+            $installmentId,
+            $paymentDate,
         ) {
 
             $credit = Credit::where('id', $credit->id)
@@ -31,24 +33,22 @@ class ApplyPaymentService
                 $this->applyStartingFromInstallment(
                     $credit,
                     $installmentId,
-                    $amount
+                    $amount,
+                    $paymentDate,
                 );
 
-                $this->recalculatePendingBalance(
-                    $credit
-                );
+                $this->recalculatePendingBalance($credit);
 
                 return;
             }
 
             $this->applyAutomatically(
                 $credit,
-                $amount
+                $amount,
+                $paymentDate,
             );
 
-            $this->recalculatePendingBalance(
-                $credit
-            );
+            $this->recalculatePendingBalance($credit);
         });
     }
 
@@ -59,7 +59,8 @@ class ApplyPaymentService
      */
     private function applyAutomatically(
         Credit $credit,
-        float $amount
+        float $amount,
+        ?string $paymentDate = null,
     ): void {
 
         $remainingPayment = $amount;
@@ -87,13 +88,13 @@ class ApplyPaymentService
                 $installment->update([
                     'remaining_balance' => 0,
                     'status' => 'paid',
-                    'paid_at' => now(),
+                    'paid_at' => $paymentDate ?? now(),
                 ]);
 
                 continue;
             }
 
-            // Pago parcial (sigue pending)
+            // Pago parcial (la cuota sigue pendiente)
             $installment->update([
                 'remaining_balance' => $balance - $remainingPayment,
             ]);
@@ -108,7 +109,8 @@ class ApplyPaymentService
     private function applyStartingFromInstallment(
         Credit $credit,
         ?int $installmentId,
-        float $amount
+        float $amount,
+        ?string $paymentDate = null,
     ): void {
 
         $remainingPayment = $amount;
@@ -138,12 +140,13 @@ class ApplyPaymentService
                 $installment->update([
                     'remaining_balance' => 0,
                     'status' => 'paid',
-                    'paid_at' => now(),
+                    'paid_at' => $paymentDate ?? now(),
                 ]);
 
                 continue;
             }
 
+            // Pago parcial (la cuota sigue pendiente)
             $installment->update([
                 'remaining_balance' => $balance - $remainingPayment,
             ]);

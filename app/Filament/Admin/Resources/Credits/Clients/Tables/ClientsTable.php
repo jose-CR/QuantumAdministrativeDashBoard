@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Credits\Clients\Tables;
 
 use App\Models\Alert;
+use App\Models\Bank;
 use App\Models\Client;
 use App\Models\Installment;
 use App\Models\User;
@@ -25,6 +26,7 @@ use Filament\Tables\Table;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 
 class ClientsTable
 {
@@ -52,73 +54,95 @@ class ClientsTable
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('payInstallment')
-                        ->label('Pagar Cuota')
-                        ->form([
+                    ->label('Pagar Cuota')
+                    ->form([
 
-                            Select::make('installment_id')
-                                ->label('Cuota')
-                                ->options(function ($record) {
+                        Select::make('installment_id')
+                            ->label('Cuota')
+                            ->options(function ($record) {
 
-                                    $credit = $record->activeCredit;
+                                $credit = $record->activeCredit;
 
-                                    if (! $credit) {
-                                        return [];
-                                    }
+                                if (! $credit) {
+                                    return [];
+                                }
 
-                                    return $credit->installments()
-                                        ->where('status', 'pending')
-                                        ->orderBy('number')
-                                        ->get()
-                                        ->mapWithKeys(fn ($installment) => [
-                                            $installment->id =>
-                                                "Cuota #{$installment->number} - Saldo: $" .
-                                                number_format(
-                                                    $installment->remaining_balance,
-                                                    2
-                                                ),
-                                        ])
-                                        ->toArray();
-                                })
-                                ->required()
-                                ->searchable(),
+                                return $credit->installments()
+                                    ->where('status', 'pending')
+                                    ->orderBy('number')
+                                    ->get()
+                                    ->mapWithKeys(fn ($installment) => [
+                                        $installment->id =>
+                                            "Cuota #{$installment->number} - Saldo: $" .
+                                            number_format(
+                                                $installment->remaining_balance,
+                                                2
+                                            ),
+                                    ])
+                                    ->toArray();
+                            })
+                            ->required()
+                            ->searchable(),
 
-                            TextInput::make('amount')
-                                ->label('Monto a pagar')
-                                ->numeric()
-                                ->required(),
+                        TextInput::make('amount')
+                            ->label('Monto a pagar')
+                            ->numeric()
+                            ->required(),
 
-                            Select::make('payment_method')
-                                ->label('Método de pago')
-                                ->options([
-                                    'cash' => 'Efectivo',
-                                    'card' => 'Tarjeta',
-                                    'bank_transfer' => 'Transferencia bancaria',
-                                ])
-                                ->required(),
+                        Select::make('payment_method')
+                            ->label('Método de pago')
+                            ->options([
+                                'cash' => 'Efectivo',
+                                'card' => 'Tarjeta',
+                                'bank_transfer' => 'Transferencia bancaria',
+                            ])
+                            ->live()
+                            ->required(),
 
-                            TextInput::make('receipt_number')
-                                ->label('N° de factura')
-                                ->required(),
+                        Select::make('bank_id')
+                            ->label('Banco')
+                            ->options(
+                                Bank::pluck('name', 'id')
+                            )
+                            ->visible(
+                                fn (Get $get) =>
+                                    $get('payment_method') !== 'cash'
+                            )
+                            ->required(
+                                fn (Get $get) =>
+                                    $get('payment_method') !== 'cash'
+                            ),
 
-                        ])
-                        ->action(function (array $data, $record) {
+                        TextInput::make('receipt_number')
+                            ->label('N° de factura')
+                            ->required(),
 
-                            $credit = $record->activeCredit;
+                        DatePicker::make('payment_date')
+                            ->label('Fecha del pago')
+                            ->default(now())
+                            ->required(),
 
-                            if (! $credit) {
-                                return;
-                            }
+                    ])
+                    ->action(function (array $data, $record) {
 
-                            app(RegisterPaymentService::class)->execute(
-                                credit: $credit,
-                                amount: $data['amount'],
-                                paymentMethod: $data['payment_method'],
-                                receiptNumber: $data['receipt_number'],
-                                notes: null,
-                                mode: 'single',
-                                installmentId: $data['installment_id'],
-                            );
-                        }),
+                        $credit = $record->activeCredit;
+
+                        if (! $credit) {
+                            return;
+                        }
+
+                        app(RegisterPaymentService::class)->execute(
+                            credit: $credit,
+                            amount: $data['amount'],
+                            paymentMethod: $data['payment_method'],
+                            receiptNumber: $data['receipt_number'],
+                            notes: null,
+                            mode: 'single',
+                            installmentId: $data['installment_id'],
+                            bankId: $data['bank_id'] ?? null,
+                            paymentDate: $data['payment_date'],
+                        );
+                    }),
 
                 Action::make('refinanced')
                     ->label('Refinanciar')

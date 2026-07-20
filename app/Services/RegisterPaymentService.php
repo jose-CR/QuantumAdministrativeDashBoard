@@ -17,6 +17,8 @@ class RegisterPaymentService
         ?string $notes = null,
         string $mode = 'auto',
         ?int $installmentId = null,
+        ?int $bankId = null,
+        ?string $paymentDate = null,
     ): PaymentHistory {
 
         return DB::transaction(function () use (
@@ -26,20 +28,23 @@ class RegisterPaymentService
             $receiptNumber,
             $notes,
             $mode,
-            $installmentId
+            $installmentId,
+            $bankId,
+            $paymentDate,
         ) {
 
             $previousBalance = $credit->pending_balance;
 
             $paymentHistory = PaymentHistory::create([
-                'credit_id' => $credit->id,
-                'amount' => $amount,
-                'payment_method' => $paymentMethod,
-                'payment_date' => now(),
-                'receipt_number' => $receiptNumber,
+                'credit_id'        => $credit->id,
+                'amount'           => $amount,
+                'payment_method'   => $paymentMethod,
+                'payment_date'     => $paymentDate ?? now(),
+                'receipt_number'   => $receiptNumber,
                 'previous_balance' => $previousBalance,
-                'new_balance' => $previousBalance,
-                'notes' => $notes,
+                'new_balance'      => $previousBalance,
+                'notes'            => $notes,
+                'bank_id'          => $bankId,
             ]);
 
             app(
@@ -48,7 +53,8 @@ class RegisterPaymentService
                 $credit,
                 $amount,
                 $mode,
-                $installmentId
+                $installmentId,
+                $paymentDate,
             );
 
             app(CloseCreditService::class)->execute($credit);
