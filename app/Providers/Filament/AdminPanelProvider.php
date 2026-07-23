@@ -65,7 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ->databaseNotifications()
             ->plugins([
                 TranslationManagerPlugin::make()
-                ->navigationGroup('Traducctions')
+                ->navigationGroup(__('models.admin_panels.translate'))
             ])
         ;
     }

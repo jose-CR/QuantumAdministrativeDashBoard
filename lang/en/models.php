@@ -59,6 +59,10 @@ return [
         ],
     ],
 
+    'admin_panels' => [
+        'translate' => 'Translations'
+    ],
+
     'others' => [
         'administration' => 'administration',
         'inventary' => 'Inventary',
