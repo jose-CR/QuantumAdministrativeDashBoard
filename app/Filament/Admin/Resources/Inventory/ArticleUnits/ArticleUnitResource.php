@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\ListArticleUnits;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Schemas\ArticleUnitForm;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Tables\ArticleUnitsTable;
 use App\Models\ArticleUnit;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,6 +17,13 @@ use Filament\Tables\Table;
 
 class ArticleUnitResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.inventary.article_units';
+    }
+
     protected static ?string $model = ArticleUnit::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
@@ -48,10 +56,6 @@ class ArticleUnitResource extends Resource
     /*
     * funciones para la traduccion
     */
-
-    public static function getModelLabel(): string {
-        return __('models.inventary.articleunits.navegation');
-    }
 
     public static function getNavigationGroup(): string {
         return __('models.others.inventary');

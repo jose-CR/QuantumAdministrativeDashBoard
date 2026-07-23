@@ -2,21 +2,66 @@
 
 return [
     'users' => [
-        'navegation' => 'Usuarios',
+        'navigation' => 'Usuarios',
         'singular' => 'Usuario',
         'plural' => 'Usuarios',
     ],
 
+    'banks' => [
+        'navigation' => 'Bancos',
+        'singular' => 'Banco',
+        'plural' => 'Bancos',
+    ],
+
     'inventary' => [
         'category' => [
-            'navegation' => 'Categorias',
-            'singular' => 'Categoria',
-            'plural' => 'Categorias',
+            'navigation' => 'Categorías',
+            'singular' => 'Categoría',
+            'plural' => 'Categorías',
+        ],
+
+        'article_units' => [
+            'navigation' => 'Unidades de Artículo',
+            'singular' => 'Unidad de Artículo',
+            'plural' => 'Unidades de Artículo',
+        ],
+
+        'article' => [
+            'navigation' => 'Artículos',
+            'singular' => 'Artículo',
+            'plural' => 'Artículos',
+        ],
+    ],
+
+    'credits' => [
+        'clients' => [
+            'navigation' => 'Clientes',
+            'singular' => 'Cliente',
+            'plural' => 'Clientes',
+        ],
+
+        'payment_histories' => [
+            'navigation' => 'Historial de Pagos',
+            'singular' => 'Historial de Pago',
+            'plural' => 'Historiales de Pago',
+        ],
+
+        'loans' => [
+            'navigation' => 'Créditos',
+            'singular' => 'Crédito',
+            'plural' => 'Créditos',
+        ],
+
+        'installment' => [
+            'navigation' => 'Cuotas',
+            'singular' => 'Cuota',
+            'plural' => 'Cuotas',
         ],
     ],
 
     'others' => [
-        'administration' => 'administracion',
+        'administration' => 'Administración',
         'inventary' => 'Inventario',
+        'credits' => 'Créditos',
     ],
 ];

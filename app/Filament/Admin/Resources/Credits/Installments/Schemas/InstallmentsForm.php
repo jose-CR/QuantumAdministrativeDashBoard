@@ -16,17 +16,17 @@ class InstallmentsForm
         return $schema
             ->components([
                 TextInput::make('amount')
-                    ->label('Monto de la cuota')
+                    ->label(__('resources.credits.installment.amount'))
                     ->numeric()
                     ->required(),
 
                 TextInput::make('remaining_balance')
-                    ->label('Saldo restante')
+                    ->label(__('resources.credits.installment.remaining_balance'))
                     ->numeric()
                     ->required(),
 
                 Select::make('status')
-                    ->label('Estado')
+                    ->label(__('resources.credits.installment.status'))
                     ->options([
                         'pending' => 'Pendiente',
                         'paid' => 'Pagado',
@@ -37,21 +37,21 @@ class InstallmentsForm
                     ->required(),
 
                 TextInput::make('number')
-                    ->label('Número de cuota')
+                    ->label(__('resources.credits.installment.number'))
                     ->numeric()
                     ->disabled(),
 
                 TextInput::make('due_date')
-                    ->label('Fecha de vencimiento')
+                    ->label(__('resources.credits.installment.paid_at'))
                     ->disabled(),
 
                 // Datos del pago
                 TextInput::make('paid_amount')
-                    ->label('Monto abonado')
+                    ->label(__('resources.credits.installment.paid_amount'))
                     ->numeric(),
 
                 Select::make('payment_method')
-                    ->label('Método de pago')
+                    ->label(__('resources.credits.payment_histories.payment_method'))
                     ->options([
                         'cash' => 'Efectivo',
                         'card' => 'Tarjeta',
@@ -60,7 +60,7 @@ class InstallmentsForm
                     ->live(),
 
                 Select::make('bank_id')
-                    ->label('Banco')
+                    ->label(__('resources.credits.payment_histories.bank'))
                     ->options(
                         Bank::pluck('name', 'id')
                     )
@@ -72,10 +72,10 @@ class InstallmentsForm
                     ),
 
                 TextInput::make('receipt_number')
-                    ->label('Número de comprobante'),
+                    ->label(__('resources.credits.payment_histories.receipt_number')),
 
                 DatePicker::make('payment_date')
-                    ->label('Fecha del pago')
+                    ->label(__('resources.credits.payment_histories.payment_date'))
                     ->default(now()),
             ]);
     }

@@ -35,30 +35,31 @@ class ClientsTable
         return $table
             ->columns([
                 TextColumn::make('full_name')
-                    ->label('Nombre completo')
+                    ->label(__('resources.credits.clients.client'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('identity_document')
-                    ->label('DUI'),
+                    ->label(__('resources.credits.clients.identity_document')),
+
                 TextColumn::make('phone_primary')
-                    ->label('Telefonos')
+                    ->label(__('resources.credits.clients.phone_primary'))
                     ->formatStateUsing(function ($state, $record) {
                         return $state . ' / ' . $record->phone_secondary;
                     }),
                 TextColumn::make('address')
-                    ->label('direccion'),
+                    ->label(__('resources.credits.clients.address')),
             ])
             ->filters([])
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
                 Action::make('payInstallment')
-                    ->label('Pagar Cuota')
+                    ->label(__('resources.credits.clients.pay_installment.installment'))
                     ->form([
 
                         Select::make('installment_id')
-                            ->label('Cuota')
+                            ->label(__('resources.credits.clients.pay_installment.installment_to_pay'))
                             ->options(function ($record) {
 
                                 $credit = $record->activeCredit;
@@ -72,12 +73,10 @@ class ClientsTable
                                     ->orderBy('number')
                                     ->get()
                                     ->mapWithKeys(fn ($installment) => [
-                                        $installment->id =>
-                                            "Cuota #{$installment->number} - Saldo: $" .
-                                            number_format(
-                                                $installment->remaining_balance,
-                                                2
-                                            ),
+                                        $installment->id => __('resources.credits.clients.pay_installment.installment_format', [
+                                            'number' => $installment->number,
+                                            'balance' => number_format($installment->remaining_balance, 2),
+                                        ]),
                                     ])
                                     ->toArray();
                             })
@@ -85,22 +84,22 @@ class ClientsTable
                             ->searchable(),
 
                         TextInput::make('amount')
-                            ->label('Monto a pagar')
+                            ->label(__('resources.credits.clients.pay_installment.amount'))
                             ->numeric()
                             ->required(),
 
                         Select::make('payment_method')
-                            ->label('Método de pago')
+                            ->label(__('resources.credits.clients.pay_installment.payment_method'))
                             ->options([
-                                'cash' => 'Efectivo',
-                                'card' => 'Tarjeta',
-                                'bank_transfer' => 'Transferencia bancaria',
+                                'cash' => __('resources.credits.clients.pay_installment.payment_methods.cash'),
+                                'card' => __('resources.credits.clients.pay_installment.payment_methods.card'),
+                                'bank_transfer' => __('resources.credits.clients.pay_installment.payment_methods.bank_transfer'),
                             ])
                             ->live()
                             ->required(),
 
                         Select::make('bank_id')
-                            ->label('Banco')
+                            ->label(__('resources.credits.clients.pay_installment.bank'))
                             ->options(
                                 Bank::pluck('name', 'id')
                             )
@@ -114,11 +113,11 @@ class ClientsTable
                             ),
 
                         TextInput::make('receipt_number')
-                            ->label('N° de factura')
+                            ->label(__('resources.credits.clients.pay_installment.receipt_number'))
                             ->required(),
 
                         DatePicker::make('payment_date')
-                            ->label('Fecha del pago')
+                            ->label(__('resources.credits.clients.pay_installment.payment_date'))
                             ->default(now())
                             ->required(),
 
@@ -145,33 +144,40 @@ class ClientsTable
                     }),
 
                 Action::make('refinanced')
-                    ->label('Refinanciar')
+                    ->visible(fn (Client $record) =>
+                        $record->latestCredit !== null
+                        && $record->latestCredit->status === 'active'
+                    )
+                    ->label(__('resources.credits.clients.refinanced'))
                     ->form([
-                        Section::make('Crédito actual')
-                            ->description('Información del crédito que será refinanciado.')
+                        Section::make(__('resources.credits.clients.refinance.current_credit_section'))
+                            ->description(__('resources.credits.clients.refinance.current_credit_description'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
-
                                         TextInput::make('client')
-                                            ->label('Cliente')
+                                            ->label(__('resources.credits.clients.client'))
                                             ->default(fn (Client $record) => $record->full_name)
                                             ->readOnly()
                                             ->dehydrated(false),
 
                                         TextInput::make('current_credit')
-                                            ->label('Crédito a refinanciar')
+                                            ->label(__('resources.credits.clients.refinance.current_credit'))
                                             ->default(function (Client $record) {
 
                                                 $credit = $record->activeCredit;
 
-                                                return "Crédito #{$credit->id} • {$credit->articleUnit->display_name} • ({$credit->installments} cuotas)";
+                                                return __('resources.credits.clients.refinance.credit_format', [
+                                                    'credit' => $credit->id,
+                                                    'article' => $credit->articleUnit->display_name,
+                                                    'installments' => $credit->installments,
+                                                ]);
                                             })
                                             ->readOnly()
                                             ->dehydrated(false),
 
                                         TextInput::make('pending_balance')
-                                            ->label('Saldo pendiente')
+                                            ->label(__('resources.credits.clients.refinance.pending_balance'))
                                             ->default(fn (Client $record) => number_format(
                                                 $record->activeCredit->pending_balance,
                                                 2
@@ -181,7 +187,7 @@ class ClientsTable
                                             ->dehydrated(false),
 
                                         TextInput::make('remaining_installments')
-                                            ->label('Cuotas pendientes')
+                                            ->label(__('resources.credits.clients.refinance.remaining_installments'))
                                             ->default(fn (Client $record) => $record
                                                 ->activeCredit
                                                 ->installments()
@@ -193,34 +199,34 @@ class ClientsTable
                                     ]),
                             ]),
 
-                        Section::make('Nuevo crédito')
-                            ->description('Ingrese la información del nuevo crédito.')
+                        Section::make(__('resources.credits.clients.refinance.new_credit_section'))
+                            ->description(__('resources.credits.clients.refinance.new_credit_description'))
                             ->schema([
 
                                 Grid::make(2)
                                     ->schema([
 
                                         TextInput::make('initial_amount')
-                                            ->label('Monto a financiar')
+                                            ->label(__('resources.credits.clients.refinance.initial_amount'))
                                             ->prefix('$')
                                             ->numeric()
                                             ->helperText(
-                                                'Puede ser diferente al saldo pendiente.'
+                                                __('resources.credits.clients.refinance.helper_initial_amount')
                                             )
                                             ->required(),
 
                                         TextInput::make('down_payment')
-                                            ->label('Prima')
+                                            ->label(__('resources.credits.clients.refinance.down_payment'))
                                             ->prefix('$')
                                             ->numeric(),
 
                                         TextInput::make('installments')
-                                            ->label('Cantidad de cuotas')
+                                            ->label(__('resources.credits.clients.refinance.installments'))
                                             ->numeric()
                                             ->required(),
 
                                         TextInput::make('installment_amount')
-                                            ->label('Valor de la cuota')
+                                            ->label(__('resources.credits.clients.refinance.installment_amount'))
                                             ->prefix('$')
                                             ->numeric()
                                             ->required(),
@@ -228,18 +234,18 @@ class ClientsTable
                                         Select::make('periodicity')
                                             ->label('Periodicidad')
                                             ->options([
-                                                'weekly' => 'Semanal',
-                                                'biweekly' => 'Quincenal',
-                                                'monthly' => 'Mensual',
+                                                'weekly' => __('resources.credits.clients.refinance.weekly'),
+                                                'biweekly' => __('resources.credits.clients.refinance.biweekly'),
+                                                'monthly' => __('resources.credits.clients.refinance.monthly'),
                                             ])
                                             ->required(),
 
                                         DatePicker::make('start_date')
-                                            ->label('Fecha de inicio')
+                                            ->label(__('resources.credits.clients.refinance.start_date'))
                                             ->required(),
 
                                         TextInput::make('payment_day')
-                                            ->label('Día de pago')
+                                            ->label(__('resources.credits.clients.refinance.payment_day'))
                                             ->numeric()
                                             ->minValue(1)
                                             ->maxValue(31)
@@ -259,12 +265,12 @@ class ClientsTable
 
                     }),
                 Action::make('Alert')
-                    ->label('Alerta')
+                    ->label(__('resources.alert.label'))
                     ->form([
                         Grid::make(2)
                             ->schema([
                                 Select::make('assigned_user_id')
-                                    ->label('Asignar a')
+                                    ->label(__('resources.alert.assigned_user'))
                                     ->options(
                                         User::query()
                                             ->pluck('name', 'id')
@@ -273,7 +279,7 @@ class ClientsTable
                                     ->required(),
 
                                 Select::make('installment_id')
-                                    ->label('Cuota')
+                                    ->label(__('resources.alert.installment'))
                                     ->searchable()
                                     ->preload()
                                     ->nullable()
@@ -293,7 +299,7 @@ class ClientsTable
 
                                                 return [
                                                     $installment->id => sprintf(
-                                                        'Cuota #%d • Vence: %s • Saldo: $%s',
+                                                        __('resources.alert.installment_format'),
                                                         $installment->number,
                                                         $installment->due_date->format('d/m/Y'),
                                                         number_format($installment->remaining_balance, 2),
@@ -304,27 +310,27 @@ class ClientsTable
                                     }),
 
                                 Select::make('type')
-                                    ->label('Tipo de alerta')
+                                    ->label(__('resources.alert.type'))
                                     ->options(Alert::getManualTypes())
                                     ->searchable()
                                     ->native(false)
                                     ->required(),
 
                                 TextInput::make('title')
-                                    ->label('Título')
-                                    ->placeholder('Ej. Recordar llamar al cliente')
+                                    ->label(__('resources.alert.title'))
+                                    ->placeholder(__('resources.alert.title_placeholder'))
                                     ->maxLength(255)
                                     ->required(),
 
                                 DateTimePicker::make('alert_at')
-                                    ->label('Fecha y hora de la alerta')
+                                    ->label(__('resources.alert.alert_at'))
                                     ->seconds(false)
                                     ->native(false)
                                     ->required(),
 
                                 RichEditor::make('message')
-                                    ->label('Contenido')
-                                    ->placeholder('Escriba el mensaje de la alerta...')
+                                    ->label(__('resources.alert.message'))
+                                    ->placeholder(__('resources.alert.message_placeholder'))
                                     ->columnSpanFull()
                                     ->required(),
                             ])
@@ -357,7 +363,7 @@ class ClientsTable
                         );
 
                         Notification::make()
-                            ->title('Alerta creada correctamente.')
+                            ->title(__('notifications.alert.create.title'))
                             ->success()
                             ->send();
                     }),
@@ -368,8 +374,8 @@ class ClientsTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title('Clientes eliminados')
-                                ->body('Los Clientes seleccionados fueron eliminados correctamente.')
+                                ->title(__('notifications.alert.deletes.title'))
+                                ->body(__('notifications.alert.deletes.body'))
                         ),
                 ]),
             ]);

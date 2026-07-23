@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Credits\Loans\Pages\ListLoans;
 use App\Filament\Admin\Resources\Credits\Loans\Schemas\LoansForm;
 use App\Filament\Admin\Resources\Credits\Loans\Tables\LoansTable;
 use App\Models\Credit;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,15 +17,24 @@ use Filament\Tables\Table;
 
 class LoansResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.credits.loans';
+    }
+
     protected static ?string $model = Credit::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Credits';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     protected static ?string $recordTitleAttribute = 'client_id';
 
     protected static ?string $slug = 'creditos/loans';
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
@@ -42,6 +52,15 @@ class LoansResource extends Resource
             //
         ];
     }
+
+    /*
+    * funciones para la traduccion
+    */
+    public static function getNavigationGroup(): string
+    {
+        return __('models.others.credits');
+    }
+
 
     public static function getPages(): array
     {

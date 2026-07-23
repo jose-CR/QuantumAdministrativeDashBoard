@@ -16,7 +16,7 @@ class PaymentHistoriesTable
         return $table
             ->columns([
                 TextColumn::make('credit.client.full_name')
-                    ->label('Cliente')
+                    ->label(__('resources.credits.clients.client'))
                     ->searchable(
                         query: function ($query, $search) {
                             FilamentSearch::relationColumns($query, 'credit.client', $search, ['full_name',]);
@@ -24,9 +24,10 @@ class PaymentHistoriesTable
                     ),
 
                 TextColumn::make('amount')
-                    ->label('monto'),
+                    ->label(__('resources.credits.payment_histories.amount')),
 
                 TextColumn::make('payment_method')
+                    ->label(__('resources.credits.payment_histories.payment_method'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'cash' => 'Efectivo',
@@ -36,20 +37,21 @@ class PaymentHistoriesTable
                     }),
                 
                 TextColumn::make('bank.name')
+                    ->label(__('resources.credits.payment_histories.bank'))
                     ->default('N/A'),
 
                 TextColumn::make('payment_date')
-                    ->label('dia de pago'),
+                    ->label(__('resources.credits.payment_histories.payment_date')),
 
                 TextColumn::make('receipt_number')
-                    ->label('numero de facturacion o transferencia')
+                    ->label(__('resources.credits.payment_histories.receipt_number'))
                     ->searchable(),
 
                 TextColumn::make('previous_balance')
-                    ->label('balance previo'),
+                    ->label(__('resources.credits.payment_histories.previous_balance')),
 
                 TextColumn::make('new_balance')
-                    ->label('nuevo balance'),
+                    ->label(__('resources.credits.payment_histories.new_balance')),
 
                 //
             ])

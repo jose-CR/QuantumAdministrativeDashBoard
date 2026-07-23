@@ -19,23 +19,25 @@ class InstallmentsTable
             ]))
             ->columns([
                 TextColumn::make('credit.client.full_name')
-                    ->label('Crédito'),
+                    ->label(__('resources.credits.installment.credit')),
 
                 TextColumn::make('credit.articleUnit.display_name')
-                    ->label('Vehículo')
+                    ->label(__('resources.credits.installment.vehicle'))
                     ->searchable(),
 
                 TextColumn::make('number')
-                    ->label('Cuota'),
+                    ->label(__('resources.credits.installment.number')),
 
                 TextColumn::make('amount')
+                    ->label(__('resources.credits.installment.amount'))
                     ->money('USD'),
 
                 TextColumn::make('remaining_balance')
+                    ->label(__('resources.credits.installment.remaining_balance'))
                     ->money('USD'),
 
                 TextColumn::make('paid_amount')
-                    ->label('Abonado')
+                    ->label(__('resources.credits.installment.paid_amount'))
                     ->state(
                         fn ($record) =>
                         $record->amount - $record->remaining_balance
@@ -43,12 +45,15 @@ class InstallmentsTable
                     ->money('USD'),
 
                 TextColumn::make('due_date')
+                    ->label(__('resources.credits.installment.due_date'))
                     ->date(),
 
                 TextColumn::make('paid_at')
+                    ->label(__('resources.credits.installment.paid_at'))
                     ->date(),
 
                 TextColumn::make('status')
+                    ->label(__('resources.credits.installment.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'pending'   => 'Pendiente',

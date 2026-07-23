@@ -72,7 +72,7 @@ class AlertService
             'assigned_user_id' => $assignedUser?->id,
             'title'          => 'Próximo pago',
             'message'        => sprintf(
-                '%s debe pagar la cuota #%d el %s.',
+                __('resources.alert.message'),
                 $installment->credit->client->full_name,
                 $installment->number,
                 $installment->due_date->format('d/m/Y'),

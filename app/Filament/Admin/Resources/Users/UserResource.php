@@ -10,6 +10,7 @@ use App\Filament\Admin\Resources\Users\Schemas\UserForm;
 use App\Filament\Admin\Resources\Users\Schemas\UserInfolist;
 use App\Filament\Admin\Resources\Users\Tables\UsersTable;
 use App\Models\User;
+use App\Support\Filament\HasTranslatedLabels;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
@@ -17,6 +18,13 @@ use Filament\Tables\Table;
 
 class UserResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.users';
+    }
+
     protected static ?string $model = User::class;
 
     protected static \BackedEnum|string|null $navigationIcon = Heroicon::OutlinedUsers;
@@ -51,10 +59,6 @@ class UserResource extends Resource
     /*
     * funciones para la traduccion
     */
-
-    public static function getModelLabel(): string {
-        return __('models.users.navegation');
-    }
 
     public static function getNavigationGroup(): string {
         return __('models.others.administration');

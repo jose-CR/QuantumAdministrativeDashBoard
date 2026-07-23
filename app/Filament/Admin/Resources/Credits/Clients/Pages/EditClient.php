@@ -23,8 +23,8 @@ class EditClient extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title('Cliente eliminado')
-                        ->body('El Ciente ha sido eliminado correctamente.')
+                        ->title(__('notifications.clients.delete.title'))
+                        ->body(__('notifications.clients.delete.body'))
                 ),
         ];
     }
@@ -33,8 +33,8 @@ class EditClient extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title('Cliente editado')
-            ->body('El Cliente ha sido editado correctamente.')
+            ->title(__('notifications.clients.update.title'))
+            ->body(__('notifications.clients.update.body'))
         ;
     }
 

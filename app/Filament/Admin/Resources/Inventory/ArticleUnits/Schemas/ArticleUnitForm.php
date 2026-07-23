@@ -28,27 +28,27 @@ class ArticleUnitForm
                     ->required(),
 
                 TextInput::make('vin')
-                    ->label(__('resources.inventary.articleUnits.vin'))
+                    ->label(__('resources.inventary.article_units.vin'))
                     ->required(),
 
                 TextInput::make('engine_number')
-                    ->label(__('resources.inventary.articleUnits.engine_number'))
+                    ->label(__('resources.inventary.article_units.engine_number'))
                     ->required(),
 
                 TextInput::make('plate')
-                    ->label(__('resources.inventary.articleUnits.plate')),
+                    ->label(__('resources.inventary.article_units.plate')),
 
                 TextInput::make('color')
-                    ->label(__('resources.inventary.articleUnits.color'))
+                    ->label(__('resources.inventary.article_units.color'))
                     ->required(),
                 
                 TextInput::make('cash_price')
-                    ->label(__('resources.inventary.articleUnits.cash_price'))
+                    ->label(__('resources.inventary.article_units.cash_price'))
                     ->disabled()
                     ->dehydrated(false),
 
                 Select::make('status')
-                    ->label(__('resources.inventary.articleUnits.status'))
+                    ->label(__('resources.inventary.article_units.status'))
                     ->options([
                         'available' => 'Disponible',
                         'reserved'  => 'Reservado',

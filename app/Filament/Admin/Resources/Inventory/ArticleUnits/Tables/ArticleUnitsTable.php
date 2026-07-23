@@ -16,32 +16,32 @@ class ArticleUnitsTable
         return $table
             ->columns([
                 TextColumn::make('article.brand')
-                    ->label(__('resources.inventary.articleUnits.brand'))
+                    ->label(__('resources.inventary.article_units.brand'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('article.model')
-                    ->label(__('resources.inventary.articleUnits.model'))
+                    ->label(__('resources.inventary.article_units.model'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('vin')
-                    ->label(__('resources.inventary.articleUnits.vin'))
+                    ->label(__('resources.inventary.article_units.vin'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('engine_number')
-                    ->label(__('resources.inventary.articleUnits.engine_number'))
+                    ->label(__('resources.inventary.article_units.engine_number'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('plate')
-                    ->label(__('resources.inventary.articleUnits.plate'))
+                    ->label(__('resources.inventary.article_units.plate'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('color')
-                    ->label(__('resources.inventary.articleUnits.color'))
+                    ->label(__('resources.inventary.article_units.color'))
                     ->searchable()
                     ->sortable()
                     ->color(fn (string $state) => match ($state) {
@@ -50,7 +50,7 @@ class ArticleUnitsTable
                     }),
 
                 TextColumn::make('status')
-                    ->label(__('resources.inventary.articleUnits.status'))
+                    ->label(__('resources.inventary.article_units.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'available' => 'Disponible',

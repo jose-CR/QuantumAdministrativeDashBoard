@@ -21,124 +21,125 @@ class ClientForm
     {
         return $schema
             ->components([
-                Tabs::make('Cliente')
+                Tabs::make(__('resources.clients.sections.client'))
                     ->tabs([
-                        Tab::make('Información Personal')
+                        Tab::make(__('resources.clients.sections.personal_information'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         TextInput::make('full_name')
-                                            ->label('Nombre completo')
+                                            ->label(__('resources.clients.fields.full_name'))
                                             ->required(),
 
                                         TextInput::make('identity_document')
-                                            ->label('DUI')
-                                            ->placeholder('12345678-9')
+                                            ->label(__('resources.clients.fields.identity_document'))
+                                            ->placeholder(__('resources.clients.fields.identity_document_placeholder'))
                                             ->required()
                                             ->unique(ignoreRecord: true),
 
                                         DatePicker::make('birth_date')
-                                            ->label('Fecha de nacimiento')
+                                            ->label(__('resources.clients.fields.birth_date'))
                                             ->required(),
 
                                         Select::make('gender')
-                                            ->label('Género')
+                                            ->label(__('resources.clients.fields.gender'))
                                             ->options([
-                                                'male' => 'Masculino',
-                                                'female' => 'Femenino',
+                                                'male' => __('resources.clients.genders.male'),
+                                                'female' => __('resources.clients.genders.female'),
                                             ])
                                             ->required(),
 
                                         Select::make('marital_status')
-                                            ->label('Estado civil')
+                                            ->label(__('resources.clients.fields.marital_status'))
                                             ->options([
-                                                'single' => 'Soltero',
-                                                'married' => 'Casado',
-                                                'divorced' => 'Divorciado',
-                                                'widowed' => 'Viudo',
+                                                'single' => __('resources.clients.marital_statuses.single'),
+                                                'married' => __('resources.clients.marital_statuses.married'),
+                                                'divorced' => __('resources.clients.marital_statuses.divorced'),
+                                                'widowed' => __('resources.clients.marital_statuses.widowed'),
                                             ]),
 
                                         TextInput::make('nationality')
-                                            ->label('Nacionalidad'),
+                                            ->label(__('resources.clients.fields.nationality')),
                                     ])
                             ]),
 
-                        Tab::make('Contacto')
+                        Tab::make(__('resources.clients.sections.contact'))
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         TextInput::make('phone_primary')
-                                            ->label('Teléfono principal')
+                                            ->label(__('resources.clients.fields.phone_primary'))
                                             ->tel()
                                             ->required(),
 
                                         TextInput::make('phone_secondary')
-                                            ->label('Teléfono secundario')
+                                            ->label(__('resources.clients.fields.phone_secondary'))
                                             ->tel(),
 
                                         TextInput::make('email')
-                                                ->label('Correo')
-                                                ->email(),
+                                            ->label(__('resources.clients.fields.email'))
+                                            ->email(),
 
                                         TextInput::make('address')
-                                            ->label('Dirección')
+                                            ->label(__('resources.clients.fields.address'))
                                             ->columnSpanFull()
                                             ->required(),
                                     ]),
                             ]),
 
-                        Tab::make('Referencias')
+                        Tab::make(__('resources.clients.sections.references'))
                             ->visible(fn (string $operation): bool => $operation === 'create')
                             ->schema([
                                 Repeater::make('references')
                                     ->relationship()
-                                    ->label('Referencias')
-                                    ->addActionLabel('Agregar referencia')
+                                    ->label(__('resources.clients.sections.references'))
+                                    ->addActionLabel(__('resources.clients.actions.add_reference'))
                                     ->cloneable()
                                     ->itemLabel(
                                         fn (array $state): ?string =>
-                                                $state['full_name'] ?? 'Nueva referencia'
+                                            $state['full_name']
+                                                ?? __('resources.clients.messages.new_reference')
                                     )
                                     ->schema([
                                         Grid::make(2)
                                             ->schema([
                                                 TextInput::make('full_name')
-                                                    ->label('Nombre completo')
+                                                    ->label(__('resources.clients.fields.full_name'))
                                                     ->required(),
 
                                                 Select::make('reference_type')
-                                                    ->label('Tipo')
+                                                    ->label(__('resources.clients.fields.reference_type'))
                                                     ->options([
-                                                        'family' => 'Familiar',
-                                                        'friend' => 'Amigo',
+                                                        'family' => __('resources.clients.reference_types.family'),
+                                                        'friend' => __('resources.clients.reference_types.friend'),
                                                     ])
                                                     ->required(),
 
                                                 TextInput::make('relationship')
-                                                    ->label('Parentesco'),
+                                                    ->label(__('resources.clients.fields.relationship')),
 
                                                 TextInput::make('phone')
-                                                    ->label('Teléfono')
+                                                    ->label(__('resources.clients.fields.phone'))
                                                     ->tel()
                                                     ->required(),
 
                                                 TextInput::make('occupation')
-                                                    ->label('Ocupación'),
+                                                    ->label(__('resources.clients.fields.occupation')),
 
                                                 TextInput::make('address')
-                                                    ->label('Dirección')
+                                                    ->label(__('resources.clients.fields.address'))
                                                     ->columnSpanFull(),
-
                                             ])
                                     ])
                             ]),
-                        Tab::make('Crédito')
+
+                        Tab::make(__('resources.clients.sections.credit'))
                             ->visible(fn (string $operation): bool => $operation === 'create')
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
                                         Select::make('article_unit_id')
-                                            ->label('Artículo')
+                                            ->label(__('resources.clients.fields.article'))
                                             ->options(
                                                 FilamentSelect::options(
                                                     ArticleUnit::class,
@@ -150,7 +151,7 @@ class ClientForm
                                             ->searchable()
                                             ->preload()
                                             ->live()
-                                            ->afterStateUpdated(function ($state, callable $set){
+                                            ->afterStateUpdated(function ($state, callable $set) {
                                                 $articleUnit = ArticleUnit::with('article')->find($state);
 
                                                 $set(
@@ -161,60 +162,60 @@ class ClientForm
                                             ->required(),
 
                                         TextInput::make('initial_amount')
-                                            ->label('Monto Inicial')
+                                            ->label(__('resources.clients.fields,initial_amount'))
                                             ->readOnly()
                                             ->prefix('$')
                                             ->required(),
 
                                         TextInput::make('down_payment')
-                                            ->label('Prima')
+                                            ->label(__('resources.clients.fields.down_payment'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),
 
                                         TextInput::make('installments')
-                                            ->label('Número de Cuotas')
+                                            ->label(__('resources.clients.fields.installments'))
                                             ->numeric()
                                             ->required(),
 
                                         TextInput::make('installment_amount')
-                                            ->label('Valor Cuota')
+                                            ->label(__('resources.clients.fields.installment_amount'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),
 
                                         Select::make('periodicity')
-                                            ->label('Periodicidad')
+                                            ->label(__('resources.clients.fields.periodicity'))
                                             ->options([
-                                                'weekly' => 'Semanal',
-                                                'biweekly' => 'Quincenal',
-                                                'monthly' => 'Mensual',
+                                                'weekly' => __('resources.clients.periodicities.weekly'),
+                                                'biweekly' => __('resources.clients.periodicities.biweekly'),
+                                                'monthly' => __('resources.clients.periodicities.monthly'),
                                             ])
                                             ->required(),
 
                                         DatePicker::make('start_date')
-                                            ->label('Fecha Inicio')
+                                            ->label(__('resources.clients.fields.start_date'))
                                             ->required(),
 
                                         TextInput::make('payment_day')
-                                            ->label('Día de Pago')
+                                            ->label(__('resources.clients.fields.payment_day'))
                                             ->numeric()
                                             ->required(),
 
                                         Select::make('status')
-                                            ->label('Estado')
+                                            ->label(__('resources.clients.fields.status'))
                                             ->options([
-                                                'pending' => 'Pendiente',
-                                                'active' => 'Activo',
-                                                'paid' => 'Pagado',
-                                                'cancelled' => 'Cancelado',
-                                                'completed' => 'Completado',
+                                                'pending' => __('resources.clients.statuses.pending'),
+                                                'active' => __('resources.clients.statuses.active'),
+                                                'paid' => __('resources.clients.statuses.paid'),
+                                                'cancelled' => __('resources.clients.statuses.cancelled'),
+                                                'completed' => __('resources.clients.statuses.completed'),
                                             ])
                                             ->default('active')
                                             ->required(),
 
                                         Select::make('refinanced_from_id')
-                                            ->label('Refinanciar Crédito')
+                                            ->label(__('resources.clients.fields.refinanced_from'))
                                             ->options(
                                                 Credit::query()
                                                     ->pluck('id', 'id')
@@ -224,7 +225,7 @@ class ClientForm
                                             ->nullable(),
                                     ]),
                             ]),
-                        ])
+                    ])
                     ->columnSpanFull(),
             ]);
     }

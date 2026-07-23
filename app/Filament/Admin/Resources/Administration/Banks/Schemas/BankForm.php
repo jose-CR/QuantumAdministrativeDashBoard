@@ -11,7 +11,8 @@ class BankForm
     {
         return $schema
             ->components([
-                TextInput::make('name'),
+                TextInput::make('name')
+                        ->label(__('resources.clients.fields.bank')),
                 //
             ]);
     }

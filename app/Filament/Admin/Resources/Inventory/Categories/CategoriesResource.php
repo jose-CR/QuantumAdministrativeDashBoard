@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Inventory\Categories\Pages\ListCategories;
 use App\Filament\Admin\Resources\Inventory\Categories\Schemas\CategoriesForm;
 use App\Filament\Admin\Resources\Inventory\Categories\Tables\CategoriesTable;
 use App\Models\Category;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,6 +17,13 @@ use Filament\Tables\Table;
 
 class CategoriesResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.inventary.category';
+    }
+
     protected static ?string $model = Category::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
@@ -48,10 +56,6 @@ class CategoriesResource extends Resource
     /*
     * funciones para la traduccion
     */
-
-    public static function getModelLabel(): string {
-        return __('models.inventary.category.navegation');
-    }
 
     public static function getNavigationGroup(): string {
         return __('models.others.inventary');

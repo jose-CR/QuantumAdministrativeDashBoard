@@ -15,67 +15,70 @@ class ClientInfolist
     {
         return $schema
             ->components([
-                Section::make('Cliente')
+                Section::make(__('resources.clients.sections.client'))
                     ->schema([
                         TextEntry::make('full_name')
-                            ->label('Nombre completo'),
+                            ->label(__('resources.clients.fields.full_name')),
 
                         TextEntry::make('phone_primary') 
-                                ->label('Telefonos') 
+                                ->label(__('resources.clients.fields.phones'))
                                 ->formatStateUsing(function ($state, $record){ 
                                     return $state . '/' . $record->phone_secondary; 
                                 }),
                     ])
                     ->columns(1),
 
-                Section::make('Artículo financiado')
+                Section::make(__('resources.clients.sections.financed_article'))
                     ->schema([
                         TextEntry::make('latestCredit.articleUnit.display_name')
-                            ->label('Vehículo'),
+                        ->label(__('resources.clients.fields.vehicle')),
                     ]),
 
-                Section::make('Resumen del crédito')
+                Section::make(__('resources.clients.sections.credit_summary'))
                     ->schema([
                         TextEntry::make('latestCredit.start_date')
-                            ->label('Fecha de inicio')
+                            ->label(__('resources.clients.fields.start_date'))
                             ->date(),
 
                         TextEntry::make('latestCredit.total_amount')
-                            ->label('Total a pagar')
+                            ->label(__('resources.clients.fields.total_amount'))
                             ->money('USD')
                             ->color('success'),
 
                         TextEntry::make('latestCredit.pending_balance')
-                            ->label('Saldo pendiente')
+                            ->label(__('resources.clients.fields.pending_balance'))
                             ->money('USD')
                             ->color('danger'),
 
                         TextEntry::make('latestCredit.installment_amount')
-                            ->label('Monto por cuota')
+                            ->label(__('resources.clients.fields.installment_amount'))
                             ->money('USD'),
                     ])
                     ->columns(2),
 
-                Section::make('Estado del crédito')
+                Section::make(__('resources.clients.sections.credit_status'))
                     ->schema([
                         TextEntry::make('remaining_installments')
-                            ->label('Cuotas restantes')
+                            ->label(__('resources.clients.fields.remaining_installments'))
                             ->state(function (Client $record): string {
                                 $credit = $record->latestCredit;
 
                                 if (! $credit) {
-                                    return 'Sin créditos registrados';
+                                    return __('resources.clients.messages.no_credits');
                                 }
 
                                 $remaining = $credit->installments()
                                     ->where('status', '!=', 'paid')
                                     ->count();
 
-                                return "{$remaining} de {$credit->installments}";
+                                return __('resources.clients.messages.remaining_installments_format', [
+                                    'remaining' => $remaining,
+                                    'total' => $credit->installments,
+                                ]);
                             }),
 
                         TextEntry::make('credit_progress')
-                            ->label('Avance')
+                            ->label(__('resources.clients.fields.credit_progress'))
                             ->state(function (Client $record): string {
                                 $credit = $record->latestCredit;
 
@@ -95,7 +98,7 @@ class ClientInfolist
                             }),
 
                         TextEntry::make('latestCredit.status')
-                            ->label('Estado')
+                            ->label(__('resources.clients.fields.status'))
                             ->badge()
                             ->color(fn (string $state) => match ($state) {
                                 'active' => 'success',
@@ -106,8 +109,8 @@ class ClientInfolist
                     ])
                     ->columns(3),
 
-                Section::make('Últimos pagos realizados')
-                    ->description('Historial reciente de pagos del crédito.')
+                Section::make(__('resources.clients.sections.latest_payments'))
+                    ->description(__('resources.clients.sections.latest_payments_description'))
                     ->schema([
                         RepeatableEntry::make('payments')
                             ->state(function (Client $record) {
@@ -116,23 +119,23 @@ class ClientInfolist
                                     ->take(5)
                                     ->get();
                             })
-                            ->label('Pagos recientes')
+                            ->label(__('resources.clients.fields.recent_payments'))
                             ->contained(false)
                             ->schema([
                                 TextEntry::make('payment_date')
-                                    ->label('Fecha')
+                                    ->label(__('resources.clients.fields.payment_date'))
                                     ->date(),
 
                                 TextEntry::make('amount')
-                                    ->label('Monto')
+                                    ->label(__('resources.clients.fields.amount'))
                                     ->money('USD')
                                     ->color('success'),
 
                                 TextEntry::make('payment_method')
-                                    ->label('Método'),
+                                    ->label(__('resources.clients.fields.payment_method')),
 
                                 TextEntry::make('receipt_number')
-                                    ->label('Recibo'),
+                                    ->label(__('resources.clients.fields.receipt_number')),
                             ])
                             ->columns(4),
                     ]),

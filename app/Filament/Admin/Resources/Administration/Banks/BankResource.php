@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Administration\Banks\Pages\ListBanks;
 use App\Filament\Admin\Resources\Administration\Banks\Schemas\BankForm;
 use App\Filament\Admin\Resources\Administration\Banks\Tables\BanksTable;
 use App\Models\Bank;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,13 +17,22 @@ use Filament\Tables\Table;
 
 class BankResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.banks';
+    }
+
     protected static ?string $model = Bank::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string|\UnitEnum|null $navigationGroup = 'Administration';
+    protected static string|\UnitEnum|null $navigationGroup = null;
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
@@ -39,6 +49,10 @@ class BankResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getNavigationGroup(): string {
+        return __('models.others.administration');
     }
 
     public static function getPages(): array

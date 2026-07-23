@@ -15,39 +15,39 @@ class LoansTable
         return $table
         ->columns([
             TextColumn::make('client.full_name')
-                ->label('Cliente')
+                ->label(__('resources.credits.clients.client'))
                 ->searchable()
                 ->sortable(),
 
             TextColumn::make('articleUnit.display_name')
-                ->label('Vehículo')
+                ->label(__('resources.credits.clients.vehicle'))
                 ->searchable(),
 
             TextColumn::make('down_payment')
-                ->label('Prima')
+                ->label(__('resources.credits.credits.down_payment'))
                 ->money('USD')
                 ->sortable(),
 
             TextColumn::make('financed_amount')
-                ->label('Financiado')
+                ->label(__('resources.credits.credits.financed_amount'))
                 ->money('USD')
                 ->sortable(),
 
             TextColumn::make('installments')
-                ->label('Cuotas')
+                ->label(__('resources.credits.credits.installments'))
                 ->alignCenter(),
 
             TextColumn::make('installment_amount')
-                ->label('Valor Cuota')
+                ->label(__('resources.credits.credits.installment_amount'))
                 ->money('USD'),
 
             TextColumn::make('pending_balance')
-                ->label('Saldo Pendiente')
+                ->label(__('resources.credits.credits.pending_balance'))
                 ->money('USD')
                 ->sortable(),
 
             TextColumn::make('status')
-                ->label('Estado')
+                ->label(__('resources.credits.credits.status'))
                 ->badge()
                 ->formatStateUsing(fn (string $state) => match ($state) {
                     'pending'   => 'Pendiente',
@@ -66,45 +66,45 @@ class LoansTable
 
             // Ocultas por defecto
             TextColumn::make('initial_amount')
-                ->label('Monto Inicial')
+                ->label(__('resources.credits.credits.initial_amount'))
                 ->money('USD')
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('interest_rate')
-                ->label('Interés')
+                ->label(__('resources.credits.credits.interest_rate'))
                 ->suffix('%')
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('total_interest')
-                ->label('Interés Total')
+                ->label(__('resources.credits.credits.total_interest'))
                 ->money('USD')
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('total_amount')
-                ->label('Total a Pagar')
+                ->label(__('resources.credits.credits.total_amount'))
                 ->money('USD')
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('periodicity')
-                ->label('Periodicidad')
+                ->label(__('resources.credits.credits.periodicity'))
                 ->badge()
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('start_date')
-                ->label('Fecha Inicio')
+                ->label(__('resources.credits.credits.start_date'))
                 ->date('d/m/Y')
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('payment_day')
-                ->label('Día Pago')
+                ->label(__('resources.credits.credits.payment_day'))
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('payment_month')
-                ->label('Mes Pago')
+                ->label(__('resources.credits.credits.payment_month'))
                 ->toggleable(isToggledHiddenByDefault: true),
 
             TextColumn::make('originalCredit.id')
-                ->label('Refinancia Crédito')
+                ->label(__('resources.credits.credits.originalCredit'))
                 ->toggleable(isToggledHiddenByDefault: true),
         ])
             ->filters([

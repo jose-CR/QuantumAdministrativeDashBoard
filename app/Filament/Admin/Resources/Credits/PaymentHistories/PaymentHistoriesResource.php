@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Credits\PaymentHistories\Pages\ListPaymentHisto
 use App\Filament\Admin\Resources\Credits\PaymentHistories\Schemas\PaymentHistoriesForm;
 use App\Filament\Admin\Resources\Credits\PaymentHistories\Tables\PaymentHistoriesTable;
 use App\Models\PaymentHistory;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,15 +17,24 @@ use Filament\Tables\Table;
 
 class PaymentHistoriesResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.credits.payment_histories';
+    }
+
     protected static ?string $model = PaymentHistory::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
 
-    protected static string|\UnitEnum|null $navigationGroup  = 'Credits';
+    protected static string|\UnitEnum|null $navigationGroup = null;
 
     protected static ?string $recordTitleAttribute = 'user_id';
 
     protected static ?string $slug = 'creditos/history';
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
@@ -41,6 +51,10 @@ class PaymentHistoriesResource extends Resource
         return [
             //
         ];
+    }
+
+    public static function getNavigationGroup(): string {
+        return __('models.others.credits');
     }
 
     public static function getPages(): array

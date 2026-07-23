@@ -15,7 +15,8 @@ class BanksTable
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
+                TextColumn::make('name')
+                    ->label(__('resources.clients.fields.bank')),
             ])
             ->filters([
                 //

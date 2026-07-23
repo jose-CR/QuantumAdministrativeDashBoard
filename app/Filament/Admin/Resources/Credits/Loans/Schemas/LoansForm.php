@@ -27,7 +27,7 @@ class LoansForm
                                     ->schema([
 
                                         Select::make('client_id')
-                                            ->label('Cliente')
+                                            ->label(__('resources.credits.clients.client'))
                                             ->relationship('client', 'full_name')
                                             ->getOptionLabelFromRecordUsing(
                                                 fn (Client $record): string =>
@@ -38,7 +38,7 @@ class LoansForm
                                             ->required(),
 
                                         Select::make('article_unit_id')
-                                            ->label('Vehículo')
+                                            ->label(__('resources.credits.clients.vehicle'))
                                             ->relationship('articleUnit', 'vin')
                                             ->getOptionLabelFromRecordUsing(
                                                 fn (ArticleUnit $record): string =>
@@ -56,30 +56,30 @@ class LoansForm
                                     ->schema([
 
                                         TextInput::make('initial_amount')
-                                            ->label('Monto Inicial')
+                                            ->label(__('resources.credits.credits.installment_amount'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),
 
                                         TextInput::make('down_payment')
-                                            ->label('Prima')
+                                                ->label(__('resources.credits.credits.down_payment'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),
 
                                         TextInput::make('installments')
-                                            ->label('Número de Cuotas')
+                                            ->label(__('resources.credits.credits.installments'))
                                             ->numeric()
                                             ->required(),
 
                                         TextInput::make('installment_amount')
-                                            ->label('Valor Cuota')
+                                            ->label(__('resources.credits.credits.installment_amount'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),
 
                                         Select::make('periodicity')
-                                            ->label('Periodicidad')
+                                            ->label(__('resources.credits.credits.periodicity'))
                                             ->options([
                                                 'weekly' => 'Semanal',
                                                 'biweekly' => 'Quincenal',
@@ -88,11 +88,11 @@ class LoansForm
                                             ->required(),
 
                                         DatePicker::make('start_date')
-                                            ->label('Fecha Inicio')
+                                            ->label(__('resources.credits.credits.start_date'))
                                             ->required(),
 
                                         TextInput::make('payment_day')
-                                            ->label('Día de Pago')
+                                            ->label(__('resources.credits.credits.payment_day'))
                                             ->numeric()
                                             ->minValue(1)
                                             ->maxValue(31)
@@ -104,7 +104,7 @@ class LoansForm
                             ->schema([
 
                                 Select::make('refinanced_from_id')
-                                    ->label('Crédito Anterior')
+                                    ->label(__('resources.credits.clients.refinanced'))
                                     ->relationship(
                                         'originalCredit',
                                         'id'
@@ -119,7 +119,7 @@ class LoansForm
                             ->schema([
 
                                 Select::make('status')
-                                    ->label('Estado')
+                                    ->label(__('resources.credits.clients.status'))
                                     ->options([
                                         'pending' => 'Pendiente',
                                         'active' => 'Activo',

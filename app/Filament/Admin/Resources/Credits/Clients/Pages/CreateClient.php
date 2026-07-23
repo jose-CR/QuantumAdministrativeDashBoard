@@ -71,8 +71,8 @@ class CreateClient extends CreateRecord
     {
         return Notification::make()
             ->success()
-            ->title('Cliente creado')
-            ->body('El Cliente ha sido creado correctamente.');
+            ->title(__('notifications.clients.create.title'))
+            ->body(__('notifications.clients.create.body'));
     }
 
     protected function getRedirectUrl(): string

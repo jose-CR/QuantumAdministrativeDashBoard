@@ -99,5 +99,36 @@ return [
                 'body' => 'The article was permanently deleted successfully.',
             ],
         ],
-    ]
+    ],
+
+    'clients' => [
+        'create' => [
+            'title' => 'User created',
+            'body' => 'The user was created successfully.',
+        ],
+
+        'delete' => [
+            'title' => 'Client deleted',
+            'body' => 'The  clients were deleted successfully.',
+        ],
+
+        'update' => [
+            'title' => 'User updated',
+            'body' => 'The user was updated successfully.',
+        ],
+
+        'deletes' => [
+            'title' => 'Clients deleted',
+            'body' => 'The selected clients were deleted successfully.',
+        ],
+    ],
+
+    'alert' => [
+        'create' => [
+            'title' => 'Alert created',
+            'body' => 'The alert was created successfully.',
+        ],
+        
+        'message' => '%s must pay installment #%d on %s.',
+    ],
 ];

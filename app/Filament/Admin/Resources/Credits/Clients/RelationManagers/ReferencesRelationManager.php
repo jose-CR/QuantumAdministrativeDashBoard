@@ -26,28 +26,28 @@ class ReferencesRelationManager extends RelationManager
             ->components([
                 TextInput::make('full_name')
                     ->required()
-                    ->label('Nombre completo')
+                    ->label(__('resources.clients.fields.full_name'))
                     ->maxLength(255),
                 Select::make('reference_type')
                     ->required()
+                    ->label(__('resources.clients.fields.type'))
                     ->options([
-                        'family' => 'Familiar',
-                        'friend' => 'Amigo'])
-                    ->label('Tipo'),
+                        'family' => __('resources.clients.reference_types.family'),
+                        'friend' => __('resources.clients.reference_types.friend')]),
                 TextInput::make('phone')
                     ->required()
-                    ->suffixIcon(Heroicon::Phone)
-                    ->label('Telefono'),
+                    ->label(__('resources.clients.fields.phone'))
+                    ->suffixIcon(Heroicon::Phone),
                 TextInput::make('address')
                     ->required()
-                    ->label('Direccion')
+                    ->label(__('resources.clients.fields.address'))
                     ->maxLength(300),
                 TextInput::make('relationship')
-                    ->label('Parentesco')
+                    ->label(__('resources.clients.fields.relationship'))
                     ->required(),
                 TextInput::make('occupation')
                     ->required()
-                    ->label('Ocupacion')
+                    ->label(__('resources.clients.fields.occupation'))
                     ->maxLength(255),
             ])
         ;
@@ -59,23 +59,24 @@ class ReferencesRelationManager extends RelationManager
             ->recordTitleAttribute('full_name')
             ->columns([
                 TextColumn::make('full_name')
+                    ->label(__('resources.clients.fields.full_name'))
                     ->searchable(),
                 TextColumn::make('reference_type')
-                    ->label('Tipo')
+                    ->label(__('resources.clients.fields.type'))
                     ->badge()
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'family' => 'Familiar',
-                        'friend' => 'Amigo',
+                        'family' => __('resources.clients.reference_types.family'),
+                        'friend' => __('resources.clients.reference_types.friend'),
                         default => $state,
                     }),
 
                 TextColumn::make('relationship')
-                    ->label('Parentesco'),
+                    ->label(__('resources.clients.fields.relationship')),
 
                 TextColumn::make('phone')
-                    ->label('Teléfono'),
+                    ->label(__('resources.clients.fields.phone')),
                 TextColumn::make('occupation')
-                    ->label('Ocupación'),
+                    ->label(__('resources.clients.fields.occupation')),
             ])
             ->filters([])
             ->headerActions([
