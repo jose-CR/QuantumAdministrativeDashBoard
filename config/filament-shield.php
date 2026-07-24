@@ -21,7 +21,7 @@ return [
 
     'shield_resource' => [
         'slug' => 'shield/roles',
-        'show_model_path' => true,
+        'show_model_path' => false,
         'cluster' => null,
         'tabs' => [
             'pages' => true,
@@ -138,13 +138,18 @@ return [
     |
     */
 
+    /*
+    |--------------------------------------------------------------------------
+    | methods
+    |--------------------------------------------------------------------------
+    / deleteAny, restore, forceDelete, restoreAny, replicate, forceDeleteAny
+    */
     'policies' => [
         'path' => app_path('Policies'),
         'merge' => true,
         'generate' => true,
         'methods' => [
-            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'restore',
-            'forceDelete', 'forceDeleteAny', 'restoreAny', 'replicate', 'reorder',
+            'viewAny', 'view', 'create', 'update', 'delete', 'deleteAny', 'reorder',
         ],
         'single_parameter_methods' => [
             'viewAny',
