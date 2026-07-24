@@ -32,7 +32,7 @@ class ClientExporter extends Exporter
             ExportColumn::make('is_active')
                 ->label('Is active'),
             ExportColumn::make('created_at')
-                ->label('Creation Date'),
+                ->label('creation Date'),
         ];
     }
 
