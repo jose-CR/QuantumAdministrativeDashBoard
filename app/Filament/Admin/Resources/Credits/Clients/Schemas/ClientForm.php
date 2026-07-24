@@ -162,7 +162,7 @@ class ClientForm
                                             ->required(),
 
                                         TextInput::make('initial_amount')
-                                            ->label(__('resources.clients.fields,initial_amount'))
+                                            ->label(__('resources.clients.fields.initial_amount'))
                                             ->readOnly()
                                             ->prefix('$')
                                             ->required(),

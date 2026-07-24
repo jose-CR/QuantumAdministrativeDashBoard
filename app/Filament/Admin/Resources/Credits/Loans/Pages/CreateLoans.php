@@ -3,8 +3,10 @@
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
+use App\Models\User;
 use App\Services\InstallmentGeneratorService;
 use App\Services\LoanCalculatorService;
+use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 
 class CreateLoans extends CreateRecord
@@ -22,14 +24,23 @@ class CreateLoans extends CreateRecord
         );
     }
 
-
-
     protected function afterCreate(): void
     {
+
+        $creator = Filament::auth()->user();
+        $assignedUser = null;
+        if (! empty($data['assigned_user_id'])) {
+            $assignedUser = User::findOrFail(
+                $data['assigned_user_id']
+            );
+        }
+
         app(
             InstallmentGeneratorService::class
         )->generate(
-            $this->record
+                credit: $this->record,
+                creator: $creator,
+                assignedUser: $assignedUser,
         );
     }
 }

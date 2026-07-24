@@ -4,9 +4,11 @@ namespace App\Services\Credits;
 
 use App\Models\Client;
 use App\Models\Credit;
+use App\Models\User;
 use App\Services\InstallmentGeneratorService;
 use App\Services\LoanCalculatorService;
 use Exception;
+use Filament\Facades\Filament;
 use Illuminate\Support\Facades\DB;
 
 class RefinancingService
@@ -44,9 +46,23 @@ class RefinancingService
                 ->credits()
                 ->create($creditData);
 
+            $creator = Filament::auth()->user();
+
+            $assignedUser = null;
+
+            if (! empty($data['assigned_user_id'])) {
+                $assignedUser = User::findOrFail(
+                    $data['assigned_user_id']
+                );
+            }
+
             app(
                 InstallmentGeneratorService::class
-            )->generate($newCredit);
+            )->generate(
+                credit: $newCredit,
+                creator: $creator,
+                assignedUser: $assignedUser,
+            );
 
             $oldCredit->update([
                 'status' => 'refinanced',

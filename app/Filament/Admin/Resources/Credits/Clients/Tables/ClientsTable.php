@@ -215,10 +215,14 @@ class ClientsTable
                                             )
                                             ->required(),
 
-                                        TextInput::make('down_payment')
-                                            ->label(__('resources.credits.clients.refinance.down_payment'))
-                                            ->prefix('$')
-                                            ->numeric(),
+                                        Select::make('assigned_user_id')
+                                            ->label(__('resources.alert.assigned_user'))
+                                            ->options(
+                                                User::query()
+                                                    ->pluck('name', 'id')
+                                            )
+                                            ->searchable()
+                                            ->required(),
 
                                         TextInput::make('installments')
                                             ->label(__('resources.credits.clients.refinance.installments'))

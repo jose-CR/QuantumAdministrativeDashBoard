@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 
 use App\Models\ArticleUnit;
 use App\Models\Client;
+use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -46,6 +47,15 @@ class LoansForm
                                             )
                                             ->searchable()
                                             ->preload()
+                                            ->required(),
+
+                                        Select::make('assigned_user_id')
+                                            ->label(__('resources.alert.assigned_user'))
+                                            ->options(
+                                                User::query()
+                                                    ->pluck('name', 'id')
+                                            )
+                                            ->searchable()
                                             ->required(),
                                     ]),
                             ]),
@@ -112,7 +122,6 @@ class LoansForm
                                     ->searchable()
                                     ->preload()
                                     ->nullable(),
-
                             ]),
 
                         Tab::make('Estado')
