@@ -18,8 +18,8 @@ class EditUser extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title(__('notifications.delete.title'))
-                        ->body(__('notifications.delete.body'))
+                        ->title(__('notifications.users.delete.title'))
+                        ->body(__('notifications.users.delete.body'))
                 ),
         ];
     }
@@ -28,8 +28,8 @@ class EditUser extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title(__('notifications.update.title'))
-            ->body(__('notifications.update.body'))
+            ->title(__('notifications.users.update.title'))
+            ->body(__('notifications.users.update.body'))
         ;
     }
 

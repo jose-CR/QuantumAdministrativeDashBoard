@@ -19,6 +19,9 @@ class UsersTable
                             ->label(__('resources.users.name')),
                 TextColumn::make('email')
                             ->label(__('resources.users.email')),
+                TextColumn::make('roles.name')
+                            ->label(__('Roles'))
+                            ->badge(),
                 TextColumn::make('last_seen')
                             ->label(__('resources.users.last_seen')),
             ])

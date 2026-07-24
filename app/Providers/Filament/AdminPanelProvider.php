@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -64,6 +65,7 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->databaseNotifications()
             ->plugins([
+                FilamentShieldPlugin::make(),
                 TranslationManagerPlugin::make()
                 ->navigationGroup(__('models.admin_panels.translate'))
             ])
