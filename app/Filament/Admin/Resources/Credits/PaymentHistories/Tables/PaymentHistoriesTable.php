@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Credits\PaymentHistories\Tables;
 
 use App\Utils\Filament\FilamentSearch;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -60,6 +61,7 @@ class PaymentHistoriesTable
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

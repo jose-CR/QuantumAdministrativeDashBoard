@@ -13,6 +13,7 @@ use App\Services\RegisterPaymentService;
 use Filament\Facades\Filament;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
@@ -54,6 +55,7 @@ class ClientsTable
             ->recordActions([
                 ViewAction::make(),
                 EditAction::make(),
+                DeleteAction::make(),
                 Action::make('payInstallment')
                     ->label(__('resources.credits.clients.pay_installment.installment'))
                     ->form([
