@@ -18,8 +18,8 @@ class EditCategories extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title(__('notifications.inventory.category.delete.title'))
-                        ->body(__('notifications.inventory.category.delete.body'))
+                        ->title(__('notifications.inventary.category.delete.title'))
+                        ->body(__('notifications.inventary.category.delete.body'))
                 ),
         ];
     }
@@ -28,8 +28,8 @@ class EditCategories extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title(__('notifications.inventory.category.update.title'))
-            ->body(__('notifications.inventory.category.update.body'))
+            ->title(__('notifications.inventary.category.update.title'))
+            ->body(__('notifications.inventary.category.update.body'))
         ;
     }
 

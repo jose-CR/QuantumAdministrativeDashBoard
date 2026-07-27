@@ -42,31 +42,6 @@ class ArticleUnitPolicy
         return $authUser->can('DeleteAny:ArticleUnit');
     }
 
-    public function restore(AuthUser $authUser, ArticleUnit $articleUnit): bool
-    {
-        return $authUser->can('Restore:ArticleUnit');
-    }
-
-    public function forceDelete(AuthUser $authUser, ArticleUnit $articleUnit): bool
-    {
-        return $authUser->can('ForceDelete:ArticleUnit');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:ArticleUnit');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:ArticleUnit');
-    }
-
-    public function replicate(AuthUser $authUser, ArticleUnit $articleUnit): bool
-    {
-        return $authUser->can('Replicate:ArticleUnit');
-    }
-
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:ArticleUnit');

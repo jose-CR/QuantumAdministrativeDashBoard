@@ -16,7 +16,6 @@ class ArticleForm
                 Select::make('category_id')
                     ->label(__('resources.inventary.article.category'))
                     ->relationship('category', 'name')
-                    ->searchable()
                     ->required(),
 
                 TextInput::make('brand')

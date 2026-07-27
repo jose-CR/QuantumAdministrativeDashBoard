@@ -42,31 +42,6 @@ class LanguageLinePolicy
         return $authUser->can('DeleteAny:LanguageLine');
     }
 
-    public function restore(AuthUser $authUser, LanguageLine $languageLine): bool
-    {
-        return $authUser->can('Restore:LanguageLine');
-    }
-
-    public function forceDelete(AuthUser $authUser, LanguageLine $languageLine): bool
-    {
-        return $authUser->can('ForceDelete:LanguageLine');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:LanguageLine');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:LanguageLine');
-    }
-
-    public function replicate(AuthUser $authUser, LanguageLine $languageLine): bool
-    {
-        return $authUser->can('Replicate:LanguageLine');
-    }
-
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:LanguageLine');

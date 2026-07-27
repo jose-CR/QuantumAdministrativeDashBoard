@@ -42,31 +42,6 @@ class CreditPolicy
         return $authUser->can('DeleteAny:Credit');
     }
 
-    public function restore(AuthUser $authUser, Credit $credit): bool
-    {
-        return $authUser->can('Restore:Credit');
-    }
-
-    public function forceDelete(AuthUser $authUser, Credit $credit): bool
-    {
-        return $authUser->can('ForceDelete:Credit');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Credit');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Credit');
-    }
-
-    public function replicate(AuthUser $authUser, Credit $credit): bool
-    {
-        return $authUser->can('Replicate:Credit');
-    }
-
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:Credit');

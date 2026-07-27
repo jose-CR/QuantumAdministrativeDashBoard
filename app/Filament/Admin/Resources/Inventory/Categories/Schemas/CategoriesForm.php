@@ -17,8 +17,7 @@ class CategoriesForm
                     ->required(),
 
                 TextInput::make('descripcion')
-                    ->label(__('resources.inventary.category.description'))
-                    ->required()
+                    ->label(__('resources.inventary.category.description')),
                 //
             ]);
     }

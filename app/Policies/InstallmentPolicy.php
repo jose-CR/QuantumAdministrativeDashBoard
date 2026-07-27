@@ -42,31 +42,6 @@ class InstallmentPolicy
         return $authUser->can('DeleteAny:Installment');
     }
 
-    public function restore(AuthUser $authUser, Installment $installment): bool
-    {
-        return $authUser->can('Restore:Installment');
-    }
-
-    public function forceDelete(AuthUser $authUser, Installment $installment): bool
-    {
-        return $authUser->can('ForceDelete:Installment');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Installment');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Installment');
-    }
-
-    public function replicate(AuthUser $authUser, Installment $installment): bool
-    {
-        return $authUser->can('Replicate:Installment');
-    }
-
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:Installment');

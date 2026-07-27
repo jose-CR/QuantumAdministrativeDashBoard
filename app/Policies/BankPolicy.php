@@ -42,31 +42,6 @@ class BankPolicy
         return $authUser->can('DeleteAny:Bank');
     }
 
-    public function restore(AuthUser $authUser, Bank $bank): bool
-    {
-        return $authUser->can('Restore:Bank');
-    }
-
-    public function forceDelete(AuthUser $authUser, Bank $bank): bool
-    {
-        return $authUser->can('ForceDelete:Bank');
-    }
-
-    public function forceDeleteAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('ForceDeleteAny:Bank');
-    }
-
-    public function restoreAny(AuthUser $authUser): bool
-    {
-        return $authUser->can('RestoreAny:Bank');
-    }
-
-    public function replicate(AuthUser $authUser, Bank $bank): bool
-    {
-        return $authUser->can('Replicate:Bank');
-    }
-
     public function reorder(AuthUser $authUser): bool
     {
         return $authUser->can('Reorder:Bank');
