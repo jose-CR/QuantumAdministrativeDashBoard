@@ -45,7 +45,7 @@ class ArticleUnitForm
                 TextInput::make('cash_price')
                     ->label(__('resources.inventary.article_units.cash_price'))
                     ->disabled()
-                    ->dehydrated(false),
+                    ->dehydrated(true),
 
                 Select::make('status')
                     ->label(__('resources.inventary.article_units.status'))
@@ -53,6 +53,8 @@ class ArticleUnitForm
                         'available' => 'Disponible',
                         'reserved'  => 'Reservado',
                         'sold'      => 'Vendido',
+                        'rented'    => 'Alquilado',
+                        'returned'  => 'Devuelto',
                     ])
                     ->default('available')
                     ->hiddenOn('create'),

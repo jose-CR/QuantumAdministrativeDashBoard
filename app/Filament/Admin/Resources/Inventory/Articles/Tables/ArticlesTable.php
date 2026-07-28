@@ -28,15 +28,23 @@ class ArticlesTable
 
                 TextColumn::make('color')
                      ->label(__('resources.inventary.article.color'))
+                     ->badge()
                     ->searchable()
                     ->color(fn (string $state) => match ($state) {
-                        'Rojo'     => 'danger',
-                        'Verde'    => 'success',
-                        'Azul'     => 'info',
-                        'Amarillo' => 'warning',
-                        'Gris'     => 'gray',
-                        'Negro'    => 'gray',
-                        'Blanco'   => 'gray',
+                        'azul'      => 'info',
+                        'rojo'       => 'danger',
+                        'roja'       => 'danger',
+                        'verde'     => 'success',
+                        'amarillo'    => 'warning',
+                        'naranja'    => 'orange',
+                        'purpura'    => 'purple',
+                        'rosa'      => 'pink',
+                        'gris'      => 'gray',
+                        'negro'     => 'zinc',
+                        'negra'     => 'zinc',
+                        'blanco'     => 'slate',
+                        'blanca'     => 'slate',
+                        'cafe'     => 'stone',
                         default    => 'primary',
                     }),
 

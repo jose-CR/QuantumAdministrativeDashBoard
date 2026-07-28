@@ -45,8 +45,23 @@ class ArticleUnitsTable
                     ->label(__('resources.inventary.article_units.color'))
                     ->searchable()
                     ->sortable()
+                    ->badge()
                     ->color(fn (string $state) => match ($state) {
-                        'blue'     => 'info',
+                        'azul'      => 'info',
+                        'rojo'       => 'danger',
+                        'roja'       => 'danger',
+                        'verde'     => 'success',
+                        'amarillo'    => 'warning',
+                        'naranja'    => 'orange',
+                        'purpura'    => 'purple',
+                        'rosa'      => 'pink',
+                        'gris'      => 'gray',
+                        'negro'     => 'zinc',
+                        'negra'     => 'zinc',
+                        'blanco'     => 'slate',
+                        'blanca'     => 'slate',
+                        'cafe'     => 'stone',
+                        'naranja con gris' => 'amber',
                         default     => 'gray',
                     }),
 
@@ -57,12 +72,16 @@ class ArticleUnitsTable
                         'available' => 'Disponible',
                         'reserved'  => 'Reservado',
                         'sold'      => 'Vendido',
+                        'rented'    => 'Alquilado',
+                        'returned'  => 'Devuelto',
                         default     => $state,
                     })
                     ->color(fn (string $state) => match ($state) {
                         'available' => 'success',
                         'reserved'  => 'warning',
                         'sold'      => 'danger',
+                        'rented'    => 'info',
+                        'returned'  => 'gray',
                         default     => 'gray',
                     }),
                 //
