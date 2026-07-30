@@ -49,7 +49,9 @@ class ClientsTable
                         return $state . ' / ' . $record->phone_secondary;
                     }),
                 TextColumn::make('address')
-                    ->label(__('resources.credits.clients.address')),
+                    ->label(__('resources.credits.clients.address'))
+                    ->limit(25)
+                    ->tooltip(fn ($record) => $record->address),
             ])
             ->filters([])
             ->recordActions([
@@ -262,6 +264,8 @@ class ClientsTable
                             
                     ])
                     ->action(function (array $data, Client $record) {
+
+                        dd($data);
 
                         app(RefinancingService::class)->execute(
                             client: $record,

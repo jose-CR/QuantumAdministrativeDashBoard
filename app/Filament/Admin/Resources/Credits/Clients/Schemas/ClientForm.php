@@ -39,7 +39,7 @@ class ClientForm
 
                                         DatePicker::make('birth_date')
                                             ->label(__('resources.clients.fields.birth_date'))
-                                            ->required(),
+                                            ->default(now()->subYears(30)),
 
                                         Select::make('gender')
                                             ->label(__('resources.clients.fields.gender'))

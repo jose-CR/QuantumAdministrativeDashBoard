@@ -39,8 +39,7 @@ class ArticleUnitForm
                     ->label(__('resources.inventary.article_units.plate')),
 
                 TextInput::make('color')
-                    ->label(__('resources.inventary.article_units.color'))
-                    ->required(),
+                    ->label(__('resources.inventary.article_units.color')),
                 
                 TextInput::make('cash_price')
                     ->label(__('resources.inventary.article_units.cash_price'))
