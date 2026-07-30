@@ -4,25 +4,25 @@ namespace App\Services;
 
 class LoanCalculatorService
 {
-    /**
-     * Create a new class instance.
-     */
     public function calculate(array $data): array
     {
-        $financedAmount = $data['initial_amount']
-            - $data['down_payment'];
+        $initialAmount = (float) $data['initial_amount'];
 
-        $totalAmount = $data['installments']
-            * $data['installment_amount'];
+        $downPayment = (float) ($data['down_payment'] ?? 0);
 
-        $totalInterest = $totalAmount
-            - $financedAmount;
+        $financedAmount = $initialAmount - $downPayment;
+
+        $totalAmount = (float) $data['installments']
+            * (float) $data['installment_amount'];
+
+        $totalInterest = $totalAmount - $financedAmount;
 
         $interestRate = $financedAmount > 0
             ? ($totalInterest / $financedAmount) * 100
             : 0;
 
         return [
+            'down_payment' => $downPayment,
             'financed_amount' => round($financedAmount, 2),
             'total_amount' => round($totalAmount, 2),
             'total_interest' => round($totalInterest, 2),
