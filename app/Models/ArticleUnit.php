@@ -26,7 +26,13 @@ class ArticleUnit extends Model
 
     public function getDisplayNameAttribute(): string
     {
-        return "{$this->article->brand} {$this->article->model} - {$this->vin}";
+        return collect([
+            "{$this->article->brand} {$this->article->model} {$this->vin}",
+            $this->color,
+            $this->plate,
+        ])
+            ->filter()
+            ->implode(' • ');
     }
 
     public function article()

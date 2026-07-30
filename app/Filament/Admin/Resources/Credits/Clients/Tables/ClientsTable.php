@@ -265,8 +265,6 @@ class ClientsTable
                     ])
                     ->action(function (array $data, Client $record) {
 
-                        dd($data);
-
                         app(RefinancingService::class)->execute(
                             client: $record,
                             oldCredit: $record->activeCredit,

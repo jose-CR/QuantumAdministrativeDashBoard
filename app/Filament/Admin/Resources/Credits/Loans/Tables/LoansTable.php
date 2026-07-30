@@ -21,8 +21,7 @@ class LoansTable
                 ->sortable(),
 
             TextColumn::make('articleUnit.display_name')
-                ->label(__('resources.credits.clients.vehicle'))
-                ->searchable(),
+                ->label(__('resources.credits.clients.vehicle')),
 
             TextColumn::make('down_payment')
                 ->label(__('resources.credits.credits.down_payment'))

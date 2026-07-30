@@ -25,14 +25,30 @@ class ClientInfolist
                                 ->formatStateUsing(function ($state, $record){ 
                                     return $state . '/' . $record->phone_secondary; 
                                 }),
+                                
+                        TextEntry::make('identity_document')
+                                ->label(__('resources.clients.fields.identity_document')),
+                            
+                        TextEntry::make('email')
+                                ->label(__('resources.clients.fields.email')),
+                            
+                        TextEntry::make('address')
+                                ->label(__('resources.clients.fields.address')), 
                     ])
-                    ->columns(1),
+                    ->columns(4),
 
                 Section::make(__('resources.clients.sections.financed_article'))
                     ->schema([
                         TextEntry::make('latestCredit.articleUnit.display_name')
-                        ->label(__('resources.clients.fields.vehicle')),
-                    ]),
+                            ->label(__('resources.clients.fields.vehicle')),
+
+                        TextEntry::make('latestCredit.articleUnit.article.cash_price')
+                            ->label(__('resources.clients.fields.vehicle')),
+                        
+                        TextEntry::make('latestCredit.down_payment')
+                            ->label(__('resources.clients.fields.down_payment')),
+                    ])
+                    ->columns(3),
 
                 Section::make(__('resources.clients.sections.credit_summary'))
                     ->schema([
@@ -116,7 +132,7 @@ class ClientInfolist
                             ->state(function (Client $record) {
                                 return $record->latestCredit?->paymentHistories()
                                     ->latest('payment_date')
-                                    ->take(5)
+                                    ->take(12)
                                     ->get();
                             })
                             ->label(__('resources.clients.fields.recent_payments'))
@@ -132,7 +148,7 @@ class ClientInfolist
                                     ->color('success'),
 
                                 TextEntry::make('payment_method')
-                                    ->label(__('resources.clients.fields.payment_method')),
+                                    ->label(__('resources.clients.fields_payment_method')),
 
                                 TextEntry::make('receipt_number')
                                     ->label(__('resources.clients.fields.receipt_number')),

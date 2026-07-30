@@ -20,11 +20,11 @@ class InstallmentsTable
             ]))
             ->columns([
                 TextColumn::make('credit.client.full_name')
-                    ->label(__('resources.credits.installment.credit')),
+                    ->label(__('resources.credits.installment.credit'))
+                    ->searchable(),
 
                 TextColumn::make('credit.articleUnit.display_name')
-                    ->label(__('resources.credits.installment.vehicle'))
-                    ->searchable(),
+                    ->label(__('resources.credits.installment.vehicle')),
 
                 TextColumn::make('number')
                     ->label(__('resources.credits.installment.number')),

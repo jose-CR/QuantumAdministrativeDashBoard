@@ -22,7 +22,7 @@ class PaymentHistory extends Model
         'amount',
         'payment_method',
         'payment_date',
-        'receipt_number',
+        'receipt_number', 
         'previous_balance',
         'new_balance',
         'notes',
