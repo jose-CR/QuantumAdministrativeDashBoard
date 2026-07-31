@@ -19,6 +19,12 @@ class InstallmentsTable
                 'credit.articleUnit',
             ]))
             ->columns([
+                TextColumn::make('id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+                
+                TextColumn::make('credit_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('credit.client.full_name')
                     ->label(__('resources.credits.installment.credit')),
 

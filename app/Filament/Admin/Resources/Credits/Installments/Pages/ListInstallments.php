@@ -3,7 +3,9 @@
 namespace App\Filament\Admin\Resources\Credits\Installments\Pages;
 
 use App\Filament\Admin\Resources\Credits\Installments\InstallmentsResource;
+use App\Filament\Exports\Credits\InstallmentsExporter;
 use Filament\Actions\CreateAction;
+use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListInstallments extends ListRecords
@@ -14,6 +16,8 @@ class ListInstallments extends ListRecords
     {
         return [
             //CreateAction::make(),
+            ExportAction::make()
+                ->exporter(InstallmentsExporter::class),
         ];
     }
 }

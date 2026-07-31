@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Exports;
+namespace App\Filament\Exports\Credits;
 
 use App\Models\Client;
 use Filament\Actions\Exports\ExportColumn;

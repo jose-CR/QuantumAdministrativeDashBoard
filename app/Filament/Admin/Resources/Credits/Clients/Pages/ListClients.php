@@ -3,7 +3,7 @@
 namespace App\Filament\Admin\Resources\Credits\Clients\Pages;
 
 use App\Filament\Admin\Resources\Credits\Clients\ClientResource;
-use App\Filament\Exports\ClientExporter;
+use App\Filament\Exports\Credits\ClientExporter;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ExportAction;
 use Filament\Resources\Pages\ListRecords;
