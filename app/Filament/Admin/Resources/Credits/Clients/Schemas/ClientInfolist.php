@@ -148,7 +148,13 @@ class ClientInfolist
                                     ->color('success'),
 
                                 TextEntry::make('payment_method')
-                                    ->label(__('resources.clients.fields_payment_method')),
+                                    ->label(__('resources.clients.fields.payment_method'))
+                                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                                        'cash' => __('resources.payment_history.cash'),
+                                        'card' => __('resources.payment_history.card'),
+                                        'bank_transfer' => __('resources.payment_history.bank_transfer'),
+                                        default => $state,
+                                    }),
 
                                 TextEntry::make('receipt_number')
                                     ->label(__('resources.clients.fields.receipt_number')),

@@ -34,7 +34,6 @@ class LoansForm
                                                 fn (Client $record): string =>
                                                     "{$record->full_name}"
                                             )
-                                            ->searchable()
                                             ->preload()
                                             ->required(),
 
@@ -45,7 +44,6 @@ class LoansForm
                                                 fn (ArticleUnit $record): string =>
                                                     $record->display_name
                                             )
-                                            ->searchable()
                                             ->preload()
                                             ->required(),
 
@@ -66,7 +64,7 @@ class LoansForm
                                     ->schema([
 
                                         TextInput::make('initial_amount')
-                                            ->label(__('resources.credits.credits.installment_amount'))
+                                            ->label(__('resources.credits.credits.initial_amount'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),

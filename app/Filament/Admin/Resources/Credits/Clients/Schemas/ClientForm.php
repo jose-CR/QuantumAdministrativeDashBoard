@@ -148,7 +148,6 @@ class ClientForm
                                                     ]
                                                 )
                                             )
-                                            ->searchable()
                                             ->preload()
                                             ->live()
                                             ->afterStateUpdated(function ($state, callable $set) {
@@ -220,7 +219,6 @@ class ClientForm
                                                 Credit::query()
                                                     ->pluck('id', 'id')
                                             )
-                                            ->searchable()
                                             ->preload()
                                             ->nullable(),
                                     ]),
