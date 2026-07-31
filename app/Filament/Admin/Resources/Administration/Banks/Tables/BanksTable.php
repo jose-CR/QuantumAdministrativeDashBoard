@@ -15,6 +15,9 @@ class BanksTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('name')
                     ->label(__('resources.clients.fields.bank')),
             ])
