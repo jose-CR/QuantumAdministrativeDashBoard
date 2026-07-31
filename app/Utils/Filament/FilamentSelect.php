@@ -17,11 +17,12 @@ class FilamentSelect
             ->mapWithKeys(function (Model $record) use ($columns, $key) {
 
                 $label = collect($columns)
-                    ->map(fn ($column) => $record->{$column})
+                    ->map(fn (string $column) => data_get($record, $column))
+                    ->filter()
                     ->implode(' - ');
 
                 return [
-                    $record->{$key} => $label,
+                    data_get($record, $key) => $label,
                 ];
             })
             ->toArray();
