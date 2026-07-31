@@ -2,12 +2,14 @@
 
 namespace App\Filament\Admin\Resources\Credits\Clients\RelationManagers;
 
+use App\Filament\Exports\Credits\ClientRelationsExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -58,6 +60,16 @@ class ReferencesRelationManager extends RelationManager
         return $table
             ->recordTitleAttribute('full_name')
             ->columns([
+                TextColumn::make('id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('client_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('address')
+                    ->label(__('resources.clients.fields.address'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('full_name')
                     ->label(__('resources.clients.fields.full_name'))
                     ->searchable(),
@@ -81,6 +93,8 @@ class ReferencesRelationManager extends RelationManager
             ->filters([])
             ->headerActions([
                 CreateAction::make(),
+                ExportAction::make()
+                    ->exporter(ClientRelationsExporter::class),
             ])
             ->recordActions([
                 EditAction::make(),
