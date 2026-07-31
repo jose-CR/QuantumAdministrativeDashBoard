@@ -16,6 +16,12 @@ class ArticleUnitsTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                
+                TextColumn::make('article_id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('article.brand')
                     ->label(__('resources.inventary.article_units.brand'))
                     ->searchable()

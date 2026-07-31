@@ -35,6 +35,9 @@ class ClientsTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('full_name')
                     ->label(__('resources.credits.clients.client'))
                     ->searchable()
@@ -52,6 +55,9 @@ class ClientsTable
                     ->label(__('resources.credits.clients.address'))
                     ->limit(25)
                     ->tooltip(fn ($record) => $record->address),
+                
+                TextColumn::make('created_at')
+                            ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([])
             ->recordActions([

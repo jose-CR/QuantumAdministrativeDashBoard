@@ -16,6 +16,9 @@ class CategoriesTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('name')
                     ->label(__('resources.inventary.category.name'))
                     ->searchable()

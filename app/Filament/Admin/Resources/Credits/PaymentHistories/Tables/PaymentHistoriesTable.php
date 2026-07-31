@@ -16,6 +16,22 @@ class PaymentHistoriesTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                
+                TextColumn::make('credit_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('user_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('bank_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('notes')
+                    ->label(__('resources.credits.payment_histories.notes'))
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('credit.client.full_name')
                     ->label(__('resources.credits.clients.client'))
                     ->searchable(

@@ -15,6 +15,18 @@ class LoansTable
     {
         return $table
         ->columns([
+            TextColumn::make('id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('client_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+            
+            TextColumn::make('article_unit_id')
+                ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('refinanced_from_id')
+                ->toggleable(isToggledHiddenByDefault: true),
+
             TextColumn::make('client.full_name')
                 ->label(__('resources.credits.clients.client'))
                 ->searchable()

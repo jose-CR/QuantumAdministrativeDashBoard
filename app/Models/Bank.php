@@ -12,6 +12,7 @@ class Bank extends Model
      * @var list<string>
     */
     protected $fillable = [
+        'id',
         'name',
     ];
 
