@@ -16,6 +16,15 @@ class ArticlesTable
     {
         return $table
             ->columns([
+                TextColumn::make('id')
+                        ->toggleable(isToggledHiddenByDefault: true),
+                
+                TextColumn::make('category_id')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('year')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('brand')
                     ->label(__('resources.inventary.article.brand'))
                     ->searchable()
