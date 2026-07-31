@@ -3,6 +3,7 @@
 namespace App\Filament\Imports;
 
 use App\Models\Client;
+use App\Rules\ClientRules;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -17,46 +18,46 @@ class ClientImporter extends Importer
         return [
             ImportColumn::make('full_name')
                 ->requiredMapping()
-                ->rules(['required', 'string', 'max:255']),
+                ->rules(ClientRules::import()['full_name']),
 
             ImportColumn::make('identity_document')
-                ->rules(['nullable', 'string', 'max:255']),
+                ->rules(ClientRules::import()['identity_document']),
 
             ImportColumn::make('birth_date')
-                ->rules(['nullable', 'date']),
+                ->rules(ClientRules::import()['birth_date']),
 
             ImportColumn::make('gender')
                 ->requiredMapping()
-                ->rules(['required', 'in:male,female,other']),
+                ->rules(ClientRules::import()['gender']),
 
             ImportColumn::make('phone_primary')
                 ->requiredMapping()
-                ->rules(['required', 'string', 'max:255']),
+                ->rules(ClientRules::import()['phone_primary']),
 
             ImportColumn::make('phone_secondary')
-                ->rules(['nullable', 'string', 'max:255']),
+                ->rules(ClientRules::import()['phone_secondary']),
 
             ImportColumn::make('email')
-                ->rules(['nullable', 'email', 'max:255']),
+                ->rules(ClientRules::import()['email']),
 
             ImportColumn::make('address')
                 ->requiredMapping()
-                ->rules(['required', 'string']),
+                ->rules(ClientRules::import()['address']),
 
             ImportColumn::make('occupation')
-                ->rules(['nullable', 'string', 'max:255']),
+                ->rules(ClientRules::import()['occupation']),
 
             ImportColumn::make('workplace')
-                ->rules(['nullable', 'string', 'max:255']),
+                ->rules(ClientRules::import()['workplace']),
 
             ImportColumn::make('monthly_income')
-                ->rules(['nullable', 'numeric', 'min:0']),
+                ->rules(ClientRules::import()['monthly_income']),
 
             ImportColumn::make('marital_status')
-                ->rules(['nullable', 'string', 'max:255']),
+                ->rules(ClientRules::import()['marital_status']),
 
             ImportColumn::make('is_active')
-                ->rules(['boolean']),
+                ->rules(ClientRules::import()['is_active']),
         ];
     }
 
