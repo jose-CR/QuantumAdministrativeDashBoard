@@ -268,4 +268,10 @@ return [
 
         'installment_format' => 'Cuota #%d • Vence: %s • Saldo: $%s',
     ],
+
+    'payment_history' => [
+        'cash' => 'Efectivo',
+        'card' => 'Tarjeta',
+        'bank_transfer' => 'Tranferencia Bancaria'
+    ]
 ];

@@ -272,4 +272,10 @@ return [
 
         'installment_format' => 'Installment #%d • Due: %s • Balance: $%s',
     ],
+
+    'payment_history' => [
+        'cash' => 'Cash',
+        'card' => 'Card',
+        'bank_transfer' => 'Bank Transfer'
+    ]
 ];
