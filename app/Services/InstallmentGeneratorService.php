@@ -24,6 +24,11 @@ class InstallmentGeneratorService
 
         $alertService = app(AlertService::class);
 
+        /*dd(
+            $credit->installments,
+            gettype($credit->installments)
+        ); */
+
         for ($i = 1; $i <= $credit->installments; $i++) {
 
             $installment = Installment::create([
