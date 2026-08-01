@@ -17,7 +17,8 @@ class CategoriesTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                        ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__('resources.inventary.category.id')),
+
 
                 TextColumn::make('name')
                     ->label(__('resources.inventary.category.name'))
@@ -26,6 +27,11 @@ class CategoriesTable
 
                 TextColumn::make('description')
                     ->label(__('resources.inventary.category.description'))
+                    ->formatStateUsing(fn (?string $state) => str_replace(
+                        ['<p>', '</p>'],
+                        '',
+                        $state
+                    ))
                 //
             ])
             ->filters([

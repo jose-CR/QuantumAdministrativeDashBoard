@@ -16,25 +16,25 @@ class UnitArticlesExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label(__('resources.inventory.article_units.id')),
+                ->label(__('resources.inventary.article_units.id')),
 
             ExportColumn::make('article_id')
-                ->label(__('resources.inventory.article_units.article')),
+                ->label(__('resources.inventary.article_units.article')),
 
             ExportColumn::make('vin')
-                ->label(__('resources.inventory.article_units.vin')),
+                ->label(__('resources.inventary.article_units.vin')),
 
             ExportColumn::make('engine_number')
-                ->label(__('resources.inventory.article_units.engine_number')),
+                ->label(__('resources.inventary.article_units.engine_number')),
 
             ExportColumn::make('plate')
-                ->label(__('resources.inventory.article_units.plate')),
+                ->label(__('resources.inventary.article_units.plate')),
 
             ExportColumn::make('color')
-                ->label(__('resources.inventory.article_units.color')),
+                ->label(__('resources.inventary.article_units.color')),
 
             ExportColumn::make('status')
-                ->label(__('resources.inventory.article_units.status')),
+                ->label(__('resources.inventary.article_units.status')),
         ];
     }
 

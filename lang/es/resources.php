@@ -125,11 +125,13 @@ return [
 
     'inventary' => [
         'category' => [
+            'id' => 'Id',
             'name' => 'Categoría',
             'description' => 'Descripción',
         ],
 
         'article_units' => [
+            'id' => 'Id',
             'brand' => 'Marca',
             'model' => 'Modelo',
             'vin' => 'VIN',
@@ -141,6 +143,7 @@ return [
         ],
 
         'article' => [
+            'id' => 'Id',
             'category' => 'Categoría',
             'article' => 'Artículo',
             'brand' => 'Marca',

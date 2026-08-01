@@ -65,7 +65,12 @@ class ArticlesTable
                 TextColumn::make('description')
                     ->label(__('resources.inventary.article.description'))
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->descripcion),
+                    ->tooltip(fn ($record) => $record->descripcion)
+                    ->formatStateUsing(fn (?string $state) => str_replace(
+                        ['<p>', '</p>'],
+                        '',
+                        $state
+                    )),
 
                 TextColumn::make('created_at')
                     ->label(__('resources.inventary.article.created_at'))

@@ -21,6 +21,16 @@ class Category extends Model
         'description',
     ];
 
+    /**
+     * @return array<string, string>
+     */
+    protected function casts(): array
+    {
+        return [
+            'content' => 'array',
+        ];
+    }
+
     public function articles()
     {
         return $this->hasMany(Article::class);
