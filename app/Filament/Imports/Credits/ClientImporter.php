@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Imports;
+namespace App\Filament\Imports\Credits;
 
 use App\Models\Client;
 use App\Rules\ClientRules;

@@ -16,28 +16,28 @@ class ArticlesExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label(__('resources.inventory.article.id')),
+                ->label(__('resources.inventary.article.id')),
 
             ExportColumn::make('category_id')
-                ->label(__('resources.inventory.article.category')),
+                ->label(__('resources.inventary.article.category')),
 
             ExportColumn::make('brand')
-                ->label(__('resources.inventory.article.brand')),
+                ->label(__('resources.inventary.article.brand')),
 
             ExportColumn::make('model')
-                ->label(__('resources.inventory.article.model')),
+                ->label(__('resources.inventary.article.model')),
 
             ExportColumn::make('year')
-                ->label(__('resources.inventory.article.year')),
+                ->label(__('resources.inventary.article.year')),
 
             ExportColumn::make('color')
-                ->label(__('resources.inventory.article.color')),
+                ->label(__('resources.inventary.article.color')),
 
             ExportColumn::make('cash_price')
-                ->label(__('resources.inventory.article.cash_price')),
+                ->label(__('resources.inventary.article.cash_price')),
 
             ExportColumn::make('description')
-                ->label(__('resources.inventory.article.description')),
+                ->label(__('resources.inventary.article.description')),
         ];
     }
 

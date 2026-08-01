@@ -4,7 +4,7 @@ namespace App\Filament\Admin\Resources\Credits\Clients\Pages;
 
 use App\Filament\Admin\Resources\Credits\Clients\ClientResource;
 use App\Filament\Exports\Credits\ClientExporter;
-use App\Filament\Imports\ClientImporter;
+use App\Filament\Imports\Credits\ClientImporter;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ImportAction;
