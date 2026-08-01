@@ -4,7 +4,7 @@ namespace App\Rules\Credits;
 
 use Illuminate\Validation\Rule;
 
-class InstallmentRulesRules
+class InstallmentRules
 {
     public static function import(): array
     {

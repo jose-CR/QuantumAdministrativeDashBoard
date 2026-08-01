@@ -3,7 +3,7 @@
 namespace App\Filament\Imports\Credits;
 
 use App\Models\Client;
-use App\Rules\ClientRules;
+use App\Rules\Credits\ClientRules;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;

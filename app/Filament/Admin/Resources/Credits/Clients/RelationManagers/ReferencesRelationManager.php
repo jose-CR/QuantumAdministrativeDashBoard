@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Credits\Clients\RelationManagers;
 
 use App\Filament\Exports\Credits\ClientRelationsExporter;
+use App\Filament\Imports\Credits\ReferenceClientImporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -10,6 +11,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
@@ -95,6 +97,8 @@ class ReferencesRelationManager extends RelationManager
                 CreateAction::make(),
                 ExportAction::make()
                     ->exporter(ClientRelationsExporter::class),
+                ImportAction::make()
+                    ->importer(ReferenceClientImporter::class),
             ])
             ->recordActions([
                 EditAction::make(),
