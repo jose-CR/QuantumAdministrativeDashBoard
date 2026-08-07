@@ -20,6 +20,12 @@ class UnitArticlesExporter extends Exporter
 
             ExportColumn::make('article_id')
                 ->label(__('resources.inventary.article_units.article')),
+            
+            ExportColumn::make('article.brand')
+                ->label(__('resources.inventary.article_units.brand')),
+            
+            ExportColumn::make('article.model')
+                ->label(__('resources.inventary.article_units.model')),
 
             ExportColumn::make('vin')
                 ->label(__('resources.inventary.article_units.vin')),
