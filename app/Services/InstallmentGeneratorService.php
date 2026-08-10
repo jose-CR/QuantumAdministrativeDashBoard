@@ -29,6 +29,8 @@ class InstallmentGeneratorService
             gettype($credit->installments)
         ); */
 
+        $firstInstallment = null;
+
         for ($i = 1; $i <= $credit->installments; $i++) {
 
             $installment = Installment::create([
@@ -40,11 +42,9 @@ class InstallmentGeneratorService
                 'status' => 'pending',
             ]);
 
-            $alertService->createUpcoming(
-                installment: $installment,
-                creator: $creator,
-                assignedUser: $assignedUser,
-            );
+            if ($firstInstallment === null) {
+                $firstInstallment = $installment;
+            }
 
             match ($credit->periodicity) {
                 'weekly' => $dueDate->addWeek(),
@@ -52,5 +52,11 @@ class InstallmentGeneratorService
                 'yearly' => $dueDate->addYear(),
             };
         }
+
+        $alertService->createUpcoming(
+            installment: $firstInstallment,
+            creator: $creator,
+            assignedUser: $assignedUser,
+        );
     }
 }

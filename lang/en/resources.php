@@ -271,6 +271,11 @@ return [
         'alert_at' => 'Alert Date and Time',
         'message' => 'Content',
 
+        'upcoming_message' => '%s must pay installment #%d on %s.',
+
+        'upcoming_payment' => 'Upcoming payment',
+
+
         'title_placeholder' => 'E.g. Remember to call the client',
         'message_placeholder' => 'Write the alert message...',
 

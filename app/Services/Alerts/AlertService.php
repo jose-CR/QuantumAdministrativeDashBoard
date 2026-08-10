@@ -70,9 +70,9 @@ class AlertService
             'credit_id'      => $installment->credit_id,
             'user_id' => $creator->id,
             'assigned_user_id' => $assignedUser?->id,
-            'title'          => 'Próximo pago',
+            'title'          => __('resources.alert.upcoming_payment'),
             'message'        => sprintf(
-                __('resources.alert.message'),
+                __('resources.alert.upcoming_message'),
                 $installment->credit->client->full_name,
                 $installment->number,
                 $installment->due_date->format('d/m/Y'),
@@ -117,15 +117,36 @@ class AlertService
     ): void {
 
         Alert::query()
-
             ->where('installment_id', $installment->id)
-
             ->where('status', Alert::STATUS_PENDING)
-
             ->update([
-
                 'status' => Alert::STATUS_COMPLETED,
             ]);
+
+        $nextInstallment = $installment->credit
+            ->installments()
+            ->where('status', 'pending')
+            ->orderBy('number')
+            ->first();
+
+        if (! $nextInstallment) {
+            return;
+        }
+
+        $exists = Alert::query()
+            ->where('installment_id', $nextInstallment->id)
+            ->where('type', Alert::TYPE_UPCOMING_PAYMENT)
+            ->exists();
+
+        if ($exists) {
+            return;
+        }
+
+        $this->createUpcoming(
+            installment: $nextInstallment,
+            creator: $installment->credit->client,
+            assignedUser: null,
+        );
     }
 
     /**

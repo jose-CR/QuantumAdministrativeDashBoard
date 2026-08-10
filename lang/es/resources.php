@@ -264,7 +264,13 @@ return [
         'type' => 'Tipo de alerta',
         'title' => 'Título',
         'alert_at' => 'Fecha y hora de la alerta',
+        // Etiqueta del formulario
         'message' => 'Contenido',
+
+        // Plantilla del mensaje
+        'upcoming_message' => '%s debe pagar la cuota #%d el %s.',
+
+        'upcoming_payment' => 'Proximo pago',
 
         'title_placeholder' => 'Ej.: Recordar llamar al cliente',
         'message_placeholder' => 'Escriba el mensaje de la alerta...',
