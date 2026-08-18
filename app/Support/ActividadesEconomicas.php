@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support\Catalogos;
+namespace App\Support;
 
 use Illuminate\Support\Facades\Storage;
 use RuntimeException;
