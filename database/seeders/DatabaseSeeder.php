@@ -20,7 +20,7 @@ class DatabaseSeeder extends Seeder
             ArticleUnitSeeder::class,
 
             CustomerSeeder::class,
-            ClientSeeder::class,
+            //ClientSeeder::class,
             ClientReferenceSeeder::class,
 
             CreditSeeder::class,

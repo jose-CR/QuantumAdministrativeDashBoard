@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Client;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +19,7 @@ class ClientReferenceFactory extends Factory
         ]);
 
         return [
-            'client_id' => Client::factory(),
+            'customer_id' => Customer::factory(),
 
             'reference_type' => $type,
 

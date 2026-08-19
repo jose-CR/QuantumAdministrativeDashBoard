@@ -12,7 +12,7 @@ return new class () extends Migration {
     {
         Schema::create('client_references', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('client_id')
+            $table->foreignId('customer_id')
                 ->constrained()
                 ->cascadeOnDelete();
 

@@ -18,7 +18,6 @@ class CustomerFactory extends Factory
      */
     public function definition(): array
     {
-
         // Catálogos
         $actividades = ActividadesEconomicas::activities();
         $departamentos = ElSalvadorCatalogo::departments();
@@ -27,13 +26,27 @@ class CustomerFactory extends Factory
         $actividad = fake()->randomElement($actividades);
 
         // Departamento aleatorio
-        $departamento = fake()->randomElement($departamentos);
+        $codigoDepartamento = fake()->randomElement(
+            array_keys($departamentos)
+        );
 
-                // Municipio perteneciente al departamento seleccionado
-        $municipio = fake()->randomElement($departamento['municipios']);
+        // Municipio perteneciente al departamento seleccionado
+        $municipios = ElSalvadorCatalogo::municipalities(
+            $codigoDepartamento
+        );
+
+        $codigoMunicipio = fake()->randomElement(
+            array_keys($municipios)
+        );
 
         // Distrito perteneciente al municipio seleccionado
-        $distrito = fake()->randomElement($municipio['distritos']);
+        $distritos = ElSalvadorCatalogo::districts(
+            $codigoMunicipio
+        );
+
+        $codigoDistrito = fake()->randomElement(
+            array_keys($distritos)
+        );
 
         return [
             // Documento
@@ -58,9 +71,9 @@ class CustomerFactory extends Factory
             'economic_activity' => $actividad['actividad'],
 
             // Ubicación
-            'department' => $departamento['nombre'],
-            'municipality' => $municipio['nombre'],
-            'district' => $distrito['nombre'],
+            'department' => $codigoDepartamento,
+            'municipality' => $codigoMunicipio,
+            'district' => $codigoDistrito,
 
             // Dirección
             'address' => fake()->address(),
