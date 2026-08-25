@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\ArticleUnit;
 use App\Models\Client;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -91,9 +92,7 @@ class CreditFactory extends Factory
 
         return [
 
-            'client_id' => Client::factory(),
-
-            'article_unit_id' => ArticleUnit::factory(),
+            'customer_id' => Customer::factory(),
 
             'refinanced_from_id' => null,
 

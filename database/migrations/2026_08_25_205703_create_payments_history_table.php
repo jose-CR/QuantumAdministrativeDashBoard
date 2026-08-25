@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('payment_histories', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('credit_id')
+            $table->foreignId('customer_id')
                 ->constrained()
                 ->cascadeOnDelete();
 

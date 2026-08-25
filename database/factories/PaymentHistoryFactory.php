@@ -4,6 +4,7 @@ namespace Database\Factories;
 
 use App\Models\Bank;
 use App\Models\Credit;
+use App\Models\Customer;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -30,7 +31,7 @@ class PaymentHistoryFactory extends Factory
         ]);
 
         return [
-            'credit_id' => Credit::factory(),
+            'customer_id' => Customer::factory(),
 
             'user_id' => User::query()->inRandomOrder()->value('id'),
 

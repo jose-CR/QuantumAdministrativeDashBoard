@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Credit;
+use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**

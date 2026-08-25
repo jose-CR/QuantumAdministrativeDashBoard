@@ -17,7 +17,12 @@ return new class () extends Migration {
                 ->constrained()
                 ->restrictOnDelete();
 
+            $table->string('color')->nullable();
+
+            $table->decimal('cash_price', 10, 2);
+
             $table->string('vin', 17)
+                ->nullable()
                 ->unique();
 
             $table->string('engine_number')
@@ -26,9 +31,6 @@ return new class () extends Migration {
             $table->string('plate')
                 ->nullable()
                 ->unique();
-
-            $table->string('color')
-                ->nullable();
 
             $table->enum('status', [
                 'available',

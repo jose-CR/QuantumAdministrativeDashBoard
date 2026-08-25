@@ -27,21 +27,12 @@ class ArticleForm
                     ->label(__('resources.inventary.article.model'))
                     ->required()
                     ->maxLength(255),
-                
-                TextInput::make('color')
-                    ->label(__('resources.inventary.article.color')),
 
                 TextInput::make('year')
                     ->label(__('resources.inventary.article.year'))
                     ->numeric()
                     ->minValue(1900)
                     ->maxValue(date('Y') + 1),
-
-                TextInput::make('cash_price')
-                    ->label(__('resources.inventary.article.cash_price'))
-                    ->numeric()
-                    ->prefix('$')
-                    ->required(),
 
                 RichEditor::make('description')
                     ->label(__('resources.inventary.article.description'))

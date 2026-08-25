@@ -20,11 +20,12 @@ class DatabaseSeeder extends Seeder
             ArticleUnitSeeder::class,
 
             CustomerSeeder::class,
+            CreditItemSeeder::class,
             //ClientSeeder::class,
             ClientReferenceSeeder::class,
 
             CreditSeeder::class,
-            InstallmentSeeder::class,
+            //InstallmentSeeder::class,
             BankSeeder::class,
             //PaymentHistorySeeder::class,
         ]);

@@ -2,9 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\ArticleUnit;
-use App\Models\Client;
 use App\Models\Credit;
+use App\Models\Customer;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,27 +11,12 @@ class CreditSeeder extends Seeder
 {
     public function run(): void
     {
-        $clients = Client::all();
+        $customers = Customer::all();
 
-        $units = ArticleUnit::query()
-            ->where('status', 'available')
-            ->get();
-
-        foreach ($clients as $client) {
-
-            if ($units->isEmpty()) {
-                break;
-            }
-
-            $unit = $units->shift();
+        foreach ($customers as $customer) {
 
             Credit::factory()->create([
-                'client_id' => $client->id,
-                'article_unit_id' => $unit->id,
-            ]);
-
-            $unit->update([
-                'status' => 'sold',
+                'customer_id' => $customer->id,
             ]);
         }
     }

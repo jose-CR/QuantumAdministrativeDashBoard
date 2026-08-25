@@ -10,24 +10,21 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ArticleFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
             'category_id' => Category::factory(),
 
             'brand' => fake()->company(),
-            'model' => strtoupper(fake()->bothify('???-###')),
 
-            'year' => fake()->numberBetween(2020, now()->year),
+            'model' => strtoupper(
+                fake()->bothify('???-###')
+            ),
 
-            'color' => fake()->safeColorName(),
-
-            'cash_price' => fake()->randomFloat(2, 1000, 15000),
+            'year' => fake()->numberBetween(
+                2020,
+                now()->year
+            ),
 
             'description' => fake()->sentence(),
         ];
