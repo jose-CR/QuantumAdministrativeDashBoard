@@ -43,4 +43,13 @@ class CreateLoans extends CreateRecord
                 assignedUser: $assignedUser,
         );
     }
+
+    public function mount(): void
+    {
+        parent::mount();
+
+        $this->form->fill([
+            'customer_id' => request('customer'),
+        ]);
+    }
 }

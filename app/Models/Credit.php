@@ -17,7 +17,6 @@ class Credit extends Model
      */
     protected $fillable = [
         'customer_id',              // Cliente dueño del crédito
-        'article_unit_id',       // Vehículo o artículo financiado
         'refinanced_from_id',    // Crédito del cual proviene (si es refinanciamiento)
 
         'initial_amount',        // Monto inicial del crédito (precio base)

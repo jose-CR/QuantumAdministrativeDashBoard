@@ -2,8 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Tables;
 
+use App\Models\Customer;
 use App\Support\ElSalvadorCatalogo;
+use Filament\Actions\Action;
+use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
@@ -15,7 +19,9 @@ class CustomersTable
     {
         return $table
             ->columns([
-                TextColumn::make('full_name'),
+                TextColumn::make('full_name')
+                    ->searchable(),
+
                 TextColumn::make('email'),
                 TextColumn::make('phone_primary')
                     ->formatStateUsing(function ($state, $record) {
@@ -44,7 +50,17 @@ class CustomersTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                ActionGroup::make([
+                    EditAction::make(),
+                    DeleteAction::make(),
+                    Action::make('createCredit')
+                        ->url(fn (Customer $record): string => route(
+                            'filament.admin.resources.creditos.loans.create',
+                            [
+                                'customer' => $record->id,
+                            ],
+                        )),
+                ])
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
