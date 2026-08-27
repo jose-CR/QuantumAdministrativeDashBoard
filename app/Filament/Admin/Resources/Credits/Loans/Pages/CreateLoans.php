@@ -26,21 +26,8 @@ class CreateLoans extends CreateRecord
 
     protected function afterCreate(): void
     {
-
-        $creator = Filament::auth()->user();
-        $assignedUser = null;
-        if (! empty($data['assigned_user_id'])) {
-            $assignedUser = User::findOrFail(
-                $data['assigned_user_id']
-            );
-        }
-
-        app(
-            InstallmentGeneratorService::class
-        )->generate(
-                credit: $this->record,
-                creator: $creator,
-                assignedUser: $assignedUser,
+        app(InstallmentGeneratorService::class)->generate(
+            credit: $this->record,
         );
     }
 

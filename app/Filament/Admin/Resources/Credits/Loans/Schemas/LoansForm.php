@@ -14,6 +14,8 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class LoansForm
@@ -45,6 +47,16 @@ class LoansForm
                                                 Repeater::make('items')
                                                     ->label('Vehículo')
                                                     ->relationship('items')
+                                                    ->live()
+                                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                                        $items = $get('items') ?? [];
+
+                                                        $total = collect($items)->sum(
+                                                            fn ($item) => (float) ($item['price'] ?? 0)
+                                                        );
+
+                                                        $set('initial_amount', $total);
+                                                    })
                                                     ->schema([
                                                         Select::make('article_unit_id')
                                                             ->label(__('resources.credits.clients.vehicle'))
@@ -74,20 +86,35 @@ class LoansForm
                                                                             ])
                                                                             ->toArray();
                                                                     })
-                                                            ->live()
-                                                            ->afterStateUpdated(function ($state, callable $set) {
-                                                                $articleUnit = ArticleUnit::find($state);
-
-                                                                $set('price', $articleUnit?->cash_price);
-                                                            })
                                                             ->preload()
+                                                            ->live()
+                                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+
+                                                                $price = ArticleUnit::find($state)?->cash_price ?? 0;
+
+                                                                $set('price', $price);
+
+                                                                $set(
+                                                                    '../../initial_amount',
+                                                                    round(
+                                                                        collect($get('../../items') ?? [])
+                                                                            ->map(function ($item) use ($state, $price) {
+                                                                                return $item['article_unit_id'] == $state
+                                                                                    ? $price
+                                                                                    : ($item['price'] ?? 0);
+                                                                            })
+                                                                            ->sum(),
+                                                                        2
+                                                                    )
+                                                                );
+                                                            })
                                                             ->required(),
 
                                                         TextInput::make('price')
                                                             ->label('Precio')
                                                             ->numeric()
                                                             ->prefix('$')
-                                                            ->disabled()
+                                                            ->readOnly()
                                                             ->required(),
                                                     ])
                                                     ->columns(2)
@@ -98,14 +125,14 @@ class LoansForm
                                                     ->deletable(true)
                                                     ->reorderable(false),
 
-                                                Select::make('assigned_user_id')
+/*                                                 Select::make('assigned_user_id')
                                                     ->label(__('resources.alert.assigned_user'))
                                                     ->options(
                                                         User::query()->pluck('name', 'id')
                                                     )
                                                     ->searchable()
                                                     ->preload()
-                                                    ->required(),
+                                                    ->required(), */
                                             ])
                                             ->columnSpanFull(),
                                     ]),
@@ -120,10 +147,11 @@ class LoansForm
                                             ->label(__('resources.credits.credits.initial_amount'))
                                             ->numeric()
                                             ->prefix('$')
+                                            ->readOnly()
                                             ->required(),
 
                                         TextInput::make('down_payment')
-                                                ->label(__('resources.credits.credits.down_payment'))
+                                            ->label(__('resources.credits.credits.down_payment'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),

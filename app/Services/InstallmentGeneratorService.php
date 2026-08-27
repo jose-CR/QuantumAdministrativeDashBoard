@@ -5,12 +5,10 @@ namespace App\Services;
 use Carbon\Carbon;
 use App\Models\Credit;
 use App\Models\Installment;
-use App\Models\User;
-use App\Services\Alerts\AlertService;
 
 class InstallmentGeneratorService
 {
-    public function generate(Credit $credit, User $creator, ?User $assignedUser,): void
+    public function generate(Credit $credit): void
     {
         $credit->loadMissing('installments');
 
@@ -22,18 +20,8 @@ class InstallmentGeneratorService
 
         $amount = (float) $credit->installment_amount;
 
-        $alertService = app(AlertService::class);
-
-        /*dd(
-            $credit->installments,
-            gettype($credit->installments)
-        ); */
-
-        $firstInstallment = null;
-
         for ($i = 1; $i <= $credit->installments; $i++) {
-
-            $installment = Installment::create([
+            Installment::create([
                 'credit_id' => $credit->id,
                 'number' => $i,
                 'amount' => $amount,
@@ -42,21 +30,11 @@ class InstallmentGeneratorService
                 'status' => 'pending',
             ]);
 
-            if ($firstInstallment === null) {
-                $firstInstallment = $installment;
-            }
-
             match ($credit->periodicity) {
                 'weekly' => $dueDate->addWeek(),
                 'monthly' => $dueDate->addMonth(),
                 'yearly' => $dueDate->addYear(),
             };
         }
-
-        $alertService->createUpcoming(
-            installment: $firstInstallment,
-            creator: $creator,
-            assignedUser: $assignedUser,
-        );
     }
 }
