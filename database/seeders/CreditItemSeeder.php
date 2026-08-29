@@ -9,9 +9,6 @@ use Illuminate\Database\Seeder;
 
 class CreditItemSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         $credits = Credit::all();
@@ -19,42 +16,31 @@ class CreditItemSeeder extends Seeder
         $articleUnits = ArticleUnit::where('status', 'available')
             ->get();
 
-        if ($credits->isEmpty() || $articleUnits->isEmpty()) {
+        if ($credits->isEmpty()) {
+            return;
+        }
+
+        if ($articleUnits->count() < $credits->count()) {
+            $this->command->error(
+                'No hay suficientes ArticleUnit disponibles para todos los créditos.'
+            );
+
             return;
         }
 
         foreach ($credits as $credit) {
 
-            $numberOfUnits = min(
-                rand(1, 2),
-                $articleUnits->count()
-            );
+            $unit = $articleUnits->shift();
 
-            $units = $articleUnits->random($numberOfUnits);
+            CreditItem::create([
+                'credit_id' => $credit->id,
+                'article_unit_id' => $unit->id,
+                'price' => $unit->cash_price,
+            ]);
 
-            foreach ($units as $unit) {
-
-                CreditItem::create([
-                    'credit_id' => $credit->id,
-                    'article_unit_id' => $unit->id,
-                    'price' => $unit->cash_price,
-                ]);
-
-                $unit->update([
-                    'status' => 'sold',
-                ]);
-            }
-
-            $articleUnits = $articleUnits
-                ->reject(
-                    fn ($articleUnit) =>
-                        $units->contains('id', $articleUnit->id)
-                )
-                ->values();
-
-            if ($articleUnits->isEmpty()) {
-                break;
-            }
+            $unit->update([
+                'status' => 'sold',
+            ]);
         }
     }
 }

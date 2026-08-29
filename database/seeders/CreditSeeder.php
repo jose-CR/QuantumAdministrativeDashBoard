@@ -10,14 +10,13 @@ use Illuminate\Database\Seeder;
 class CreditSeeder extends Seeder
 {
     public function run(): void
-    {
-        $customers = Customer::all();
+    { 
+        $customers = Customer::all(); 
+        
+        foreach ($customers as $customer) { 
 
-        foreach ($customers as $customer) {
-
-            Credit::factory()->create([
-                'customer_id' => $customer->id,
-            ]);
-        }
+            Credit::factory()->create([ 'customer_id' => $customer->id, ]); 
+            
+        } 
     }
 }

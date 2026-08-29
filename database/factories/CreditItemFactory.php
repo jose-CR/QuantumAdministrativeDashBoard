@@ -11,21 +11,24 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class CreditItemFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
-        $credit = Credit::factory();
-        $articleUnit = ArticleUnit::factory();
-        $price = fake()->randomFloat(2, 100, 5000);
+        $articleUnit = ArticleUnit::where('status', 'available')
+            ->inRandomOrder()
+            ->first();
+
+        if (! $articleUnit) {
+            throw new \RuntimeException(
+                'No hay ArticleUnit disponibles para crear el CreditItem.'
+            );
+        }
 
         return [
-            'credit_id' => $credit,
-            'article_unit_id' => $articleUnit,
-            'price' => $price,
+            'credit_id' => Credit::factory(),
+
+            'article_unit_id' => $articleUnit->id,
+
+            'price' => $articleUnit->cash_price,
         ];
     }
 }

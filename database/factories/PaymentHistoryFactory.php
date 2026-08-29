@@ -31,7 +31,7 @@ class PaymentHistoryFactory extends Factory
         ]);
 
         return [
-            'customer_id' => Customer::factory(),
+            'credit_id' => Credit::factory(),
 
             'user_id' => User::query()->inRandomOrder()->value('id'),
 

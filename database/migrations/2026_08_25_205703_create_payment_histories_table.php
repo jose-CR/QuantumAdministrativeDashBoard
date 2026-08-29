@@ -13,7 +13,7 @@ return new class () extends Migration {
         Schema::create('payment_histories', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('customer_id')
+            $table->foreignId('credit_id')
                 ->constrained()
                 ->cascadeOnDelete();
 
@@ -65,6 +65,6 @@ return new class () extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('payments');
+        Schema::dropIfExists('payment_histories');
     }
 };

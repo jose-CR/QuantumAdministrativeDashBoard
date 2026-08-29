@@ -2,8 +2,8 @@
 
 namespace Database\Factories;
 
-use App\Models\ArticleUnit;
-use App\Models\Client;
+use App\Models\Credit;
+use App\Models\CreditItem;
 use App\Models\Customer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,17 +14,9 @@ class CreditFactory extends Factory
 {
     public function definition(): array
     {
-        $initialAmount = fake()->randomFloat(
-            2,
-            3000,
-            15000
-        );
+        $initialAmount = fake()->randomFloat(2, 3000, 15000);
 
-        $downPayment = fake()->randomFloat(
-            2,
-            500,
-            2000
-        );
+        $downPayment = fake()->randomFloat(2, 500, 2000);
 
         $financedAmount = $initialAmount - $downPayment;
 
@@ -41,11 +33,7 @@ class CreditFactory extends Factory
             'yearly',
         ]);
 
-        $interestRate = fake()->randomFloat(
-            2,
-            5,
-            25
-        );
+        $interestRate = fake()->randomFloat(2, 5, 25);
 
         $totalInterest = round(
             $financedAmount * ($interestRate / 100),
@@ -66,32 +54,17 @@ class CreditFactory extends Factory
         $paymentMonth = null;
 
         match ($periodicity) {
+            'weekly' => $paymentDay = fake()->numberBetween(1, 7),
 
-            'weekly' => $paymentDay = fake()->numberBetween(
-                1,
-                7
-            ),
-
-            'monthly' => $paymentDay = fake()->numberBetween(
-                1,
-                28
-            ),
+            'monthly' => $paymentDay = fake()->numberBetween(1, 28),
 
             'yearly' => [
-                $paymentDay = fake()->numberBetween(
-                    1,
-                    28
-                ),
-
-                $paymentMonth = fake()->numberBetween(
-                    1,
-                    12
-                ),
+                $paymentDay = fake()->numberBetween(1, 28),
+                $paymentMonth = fake()->numberBetween(1, 12),
             ],
         };
 
         return [
-
             'customer_id' => Customer::factory(),
 
             'refinanced_from_id' => null,

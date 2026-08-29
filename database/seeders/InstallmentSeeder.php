@@ -16,25 +16,8 @@ class InstallmentSeeder extends Seeder
     {
         $generator = app(InstallmentGeneratorService::class);
 
-        $creator = User::first(); // O User::find(1)
-
-        if (! $creator) {
-            $this->command->error('No existe ningún usuario.');
-
-            $creator = User::factory()->create([
-                'name' => 'Administrador',
-                'email' => 'admin@example.com',
-            ]);
-
-            $this->command->info('El usuario se a creado para el seeder.');
-        }
-
-        Credit::all()->each(function (Credit $credit) use ($generator, $creator) {
-            $generator->generate(
-                credit: $credit,
-                creator: $creator,
-                assignedUser: null,
-            );
+        Credit::all()->each(function (Credit $credit) use ($generator) {
+            $generator->generate($credit);
         });
     }
 }

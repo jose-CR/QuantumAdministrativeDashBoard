@@ -4,75 +4,66 @@ namespace Database\Seeders;
 
 use App\Models\Bank;
 use App\Models\Credit;
-use App\Models\PaymentHistory;
-use App\Services\ApplyPaymentService;
+use App\Models\Installment;
+use App\Services\RegisterPaymentService;
 use Illuminate\Database\Seeder;
 
 class PaymentHistorySeeder extends Seeder
 {
     public function run(): void
     {
-        Credit::all()->each(function (Credit $credit) {
+        Installment::withoutEvents(function () {
 
-            $scenario = fake()->randomElement([
-                'none',
-                'partial',
-                'full',
-            ]);
+            $registerPayment = app(RegisterPaymentService::class);
 
-            if ($scenario === 'none') {
-                return;
-            }
+            Credit::query()
+                ->where('status', 'active')
+                ->each(function (Credit $credit) use ($registerPayment) {
 
-            if ($scenario === 'partial') {
+                    $scenario = fake()->randomElement([
+                        'none',
+                        'partial',
+                        'full',
+                    ]);
 
-                $amount = fake()->randomFloat(
-                    2,
-                    1,
-                    $credit->pending_balance - 1
-                );
+                    if ($scenario === 'none') {
+                        return;
+                    }
 
-                $previousBalance = $credit->pending_balance;
+                    $amount = match ($scenario) {
+                        'partial' => fake()->randomFloat(
+                            2,
+                            1,
+                            $credit->pending_balance - 1
+                        ),
 
-                $paymentMethod = fake()->randomElement([
-                    'cash',
-                    'bank_transfer',
-                    'card',
-                ]);
+                        'full' => $credit->pending_balance,
+                    };
 
-                PaymentHistory::create([
-                    'credit_id' => $credit->id,
-                    'amount' => $amount,
-                    'payment_method' => $paymentMethod,
+                    $paymentMethod = fake()->randomElement([
+                        'cash',
+                        'bank_transfer',
+                        'card',
+                    ]);
 
-                    'bank_id' => $paymentMethod === 'cash'
+                    $bankId = $paymentMethod === 'cash'
                         ? null
                         : Bank::query()
                             ->inRandomOrder()
-                            ->value('id'),
+                            ->value('id');
 
-                    'payment_date' => now(),
-                    'receipt_number' => fake()->numerify(
-                        'REC-#####'
-                    ),
-                    'previous_balance' => $previousBalance,
-
-                    'new_balance' => max(
-                        0,
-                        $previousBalance - $amount
-                    ),
-                    'notes' => fake()->sentence(),
-                ]);
-
-                app(
-                    ApplyPaymentService::class
-                )->apply(
-                    $credit,
-                    $credit->pending_balance
-                );
-
-                return;
-            }
+                    $registerPayment->execute(
+                        credit: $credit,
+                        amount: $amount,
+                        paymentMethod: $paymentMethod,
+                        receiptNumber: fake()->numerify('REC-#####'),
+                        notes: fake()->sentence(),
+                        mode: 'auto',
+                        installmentId: null,
+                        bankId: $bankId,
+                        paymentDate: now()->toDateString(),
+                    );
+                });
         });
     }
 }
