@@ -103,4 +103,9 @@ class Credit extends Model
     {
         return $this->hasMany(CreditItem::class);
     }
+
+    public function firstItem()
+    {
+        return $this->hasOne(CreditItem::class);
+    }
 }

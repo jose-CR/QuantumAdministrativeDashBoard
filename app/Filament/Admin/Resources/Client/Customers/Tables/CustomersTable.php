@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Tables;
 
+use App\Filament\Admin\Actions\PayInstallmentAction;
 use App\Models\Customer;
 use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Action;
@@ -55,6 +56,7 @@ class CustomersTable
                     ViewAction::make(),
                     EditAction::make(),
                     DeleteAction::make(),
+                    PayInstallmentAction::make(),
                     Action::make('createCredit')
                         ->url(fn (Customer $record): string => route(
                             'filament.admin.resources.creditos.loans.create',

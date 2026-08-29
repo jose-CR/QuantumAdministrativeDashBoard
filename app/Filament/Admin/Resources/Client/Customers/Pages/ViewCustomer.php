@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
+use App\Filament\Admin\Actions\PayInstallmentAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Models\Customer;
 use Filament\Actions\Action;
@@ -16,6 +17,7 @@ class ViewCustomer extends ViewRecord
     {
         return [
             EditAction::make(),
+            PayInstallmentAction::make(),
             Action::make('createCredit')
                 ->url(fn (Customer $record): string => route(
                     'filament.admin.resources.creditos.loans.create',

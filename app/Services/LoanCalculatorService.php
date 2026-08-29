@@ -10,10 +10,13 @@ class LoanCalculatorService
     {
         $initialAmount = $this->resolveInitialAmount($data);
 
-        $downPayment = round(
-            (float) ($data['down_payment'] ?? 0),
-            2
-        );
+        if ($initialAmount <= 0) {
+            throw new InvalidArgumentException(
+                'El monto inicial debe ser mayor que cero.'
+            );
+        }
+
+        $downPayment = round((float) ($data['down_payment'] ?? 0), 2);
 
         if ($downPayment < 0) {
             throw new InvalidArgumentException(
@@ -27,17 +30,10 @@ class LoanCalculatorService
             );
         }
 
-        $financedAmount = round(
-            $initialAmount - $downPayment,
-            2
-        );
+        $financedAmount = round($initialAmount - $downPayment, 2);
 
         $installments = (int) ($data['installments'] ?? 0);
-
-        $installmentAmount = round(
-            (float) ($data['installment_amount'] ?? 0),
-            2
-        );
+        $installmentAmount = round((float) ($data['installment_amount'] ?? 0), 2);
 
         if ($installments <= 0) {
             throw new InvalidArgumentException(
@@ -51,27 +47,19 @@ class LoanCalculatorService
             );
         }
 
-        $totalAmount = round(
-            $installments * $installmentAmount,
-            2
-        );
+        $totalAmount = round($installments * $installmentAmount, 2);
 
-        if ($totalAmount < $financedAmount) {
-            throw new InvalidArgumentException(
-                'El total de las cuotas no puede ser menor al monto financiado.'
-            );
-        }
+        // H12 del motor financiero: (cuota * plazo) - financiado.
+        // Si es <= 0, el motor lo trata como crédito sin interés (0%),
+        // no como error: el saldo se sigue abonando con pagos reales
+        // hasta llegar a 0, aunque tome más cuotas que "installments".
+        $totalInterest = max(0, round($totalAmount - $financedAmount, 2));
 
-        $totalInterest = round(
-            $totalAmount - $financedAmount,
-            2
-        );
-
-        $interestRate = $financedAmount > 0
-            ? round(
-                ($totalInterest / $financedAmount) * 100,
-                2
-            )
+        // Tasa MENSUAL, igual que tasaMensual() del motor JS:
+        // (interesesTotales / plazo) / financiado. Ojo: esto ya NO es
+        // la tasa total del crédito, es la tasa por período.
+        $interestRate = ($financedAmount > 0 && $totalInterest > 0)
+            ? round((($totalInterest / $installments) / $financedAmount) * 100, 2)
             : 0;
 
         return [
@@ -81,7 +69,9 @@ class LoanCalculatorService
             'total_amount'    => $totalAmount,
             'total_interest'  => $totalInterest,
             'interest_rate'   => $interestRate,
-            'pending_balance' => $totalAmount,
+            // Saldo a capital real (lo que consume el motor de amortización),
+            // NO el total de cuotas cotizadas.
+            'pending_balance' => $financedAmount,
         ];
     }
 
@@ -93,10 +83,7 @@ class LoanCalculatorService
     protected function resolveInitialAmount(array $data): float
     {
         if (empty($data['items'])) {
-            return round(
-                (float) ($data['initial_amount'] ?? 0),
-                2
-            );
+            return round((float) ($data['initial_amount'] ?? 0), 2);
         }
 
         return round(

@@ -79,7 +79,8 @@ class CustomerInfoList
                         TextEntry::make('latestCredit.pending_balance')
                             ->label(__('resources.clients.fields.pending_balance'))
                             ->money('USD')
-                            ->color('danger'),
+                            ->color('danger')
+                            ->live(),
 
                         TextEntry::make('latestCredit.installment_amount')
                             ->label(__('resources.clients.fields.installment_amount'))
@@ -140,14 +141,14 @@ class CustomerInfoList
                     ])
                     ->columns(3),
 
-/*                 Section::make(__('resources.clients.sections.latest_payments'))
+                Section::make(__('resources.clients.sections.latest_payments'))
                     ->description(__('resources.clients.sections.latest_payments_description'))
                     ->schema([
                         RepeatableEntry::make('payments')
                             ->state(function (Customer $record) {
                                 return $record->latestCredit?->paymentHistories()
                                     ->latest('payment_date')
-                                    ->take(12)
+                                    ->take(37)
                                     ->get();
                             })
                             ->label(__('resources.clients.fields.recent_payments'))
@@ -175,7 +176,7 @@ class CustomerInfoList
                                     ->label(__('resources.clients.fields.receipt_number')),
                             ])
                             ->columns(4),
-                    ]), */
+                    ]),
             ])
         ;
     }
