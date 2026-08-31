@@ -21,7 +21,6 @@ class DatabaseSeeder extends Seeder
 
             CustomerSeeder::class,
             CreditItemSeeder::class,
-            //ClientSeeder::class,
             ClientReferenceSeeder::class,
 
             CreditSeeder::class,
