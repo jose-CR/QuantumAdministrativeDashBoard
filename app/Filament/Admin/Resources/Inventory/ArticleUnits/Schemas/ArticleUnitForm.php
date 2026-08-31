@@ -63,8 +63,7 @@ class ArticleUnitForm
                     ),
 
                 TextInput::make('vin')
-                    ->label(__('resources.inventary.article_units.vin'))
-                    ->required(),
+                    ->label(__('resources.inventary.article_units.vin')),
 
                 TextInput::make('engine_number')
                     ->label(__('resources.inventary.article_units.engine_number')),

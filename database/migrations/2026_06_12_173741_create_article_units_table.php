@@ -21,7 +21,7 @@ return new class () extends Migration {
 
             $table->decimal('cash_price', 10, 2);
 
-            $table->string('vin', 17)
+            $table->string('vin', 20)
                 ->nullable()
                 ->unique();
 
