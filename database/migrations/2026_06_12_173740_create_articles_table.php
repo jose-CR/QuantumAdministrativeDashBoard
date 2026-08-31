@@ -18,14 +18,8 @@ return new class () extends Migration {
                 ->restrictOnDelete();
 
             $table->string('brand');
-            
             $table->string('model');
-
             $table->year('year');
-
-            $table->string('color')->nullable();
-
-            $table->decimal('cash_price', 10, 2);
 
             $table->text('description')->nullable();
 
@@ -33,7 +27,7 @@ return new class () extends Migration {
                 'category_id',
                 'brand',
                 'model',
-                'year'
+                'year',
             ]);
 
             $table->timestamps();

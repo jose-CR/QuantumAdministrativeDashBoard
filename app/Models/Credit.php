@@ -16,8 +16,7 @@ class Credit extends Model
      * @var list<string>
      */
     protected $fillable = [
-        'client_id',              // Cliente dueño del crédito
-        'article_unit_id',       // Vehículo o artículo financiado
+        'customer_id',              // Cliente dueño del crédito
         'refinanced_from_id',    // Crédito del cual proviene (si es refinanciamiento)
 
         'initial_amount',        // Monto inicial del crédito (precio base)
@@ -67,12 +66,7 @@ class Credit extends Model
 
     public function client()
     {
-        return $this->belongsTo(Client::class);
-    }
-
-    public function articleUnit()
-    {
-        return $this->belongsTo(ArticleUnit::class);
+        return $this->belongsTo(Customer::class, 'customer_id');
     }
 
     public function installments()
@@ -103,5 +97,15 @@ class Credit extends Model
     public function refinancings()
     {
         return $this->hasMany(Credit::class, 'refinanced_from_id');
+    }
+
+    public function items()
+    {
+        return $this->hasMany(CreditItem::class);
+    }
+
+    public function firstItem()
+    {
+        return $this->hasOne(CreditItem::class);
     }
 }

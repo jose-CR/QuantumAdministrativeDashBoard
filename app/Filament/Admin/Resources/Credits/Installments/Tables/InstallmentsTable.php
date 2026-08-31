@@ -16,7 +16,7 @@ class InstallmentsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with([
                 'credit.client',
-                'credit.articleUnit',
+                'credit.items.articleUnit',
             ]))
             ->columns([
                 TextColumn::make('id')
@@ -29,8 +29,11 @@ class InstallmentsTable
                     ->label(__('resources.credits.installment.credit'))
                     ->searchable(),
 
-                TextColumn::make('credit.articleUnit.display_name')
-                    ->label(__('resources.credits.installment.vehicle')),
+                TextColumn::make('credit.items.articleUnit.display_name')
+                    ->label(__('resources.credits.installment.vehicle'))
+                        ->state(fn ($record) => $record->credit->items
+                                ->map(fn ($item) => $item->articleUnit->display_name)
+                                ->join(', ')),
 
                 TextColumn::make('number')
                     ->label(__('resources.credits.installment.number')),
@@ -67,6 +70,7 @@ class InstallmentsTable
                         'active'    => 'Activo',
                         'paid'      => 'Pagado',
                         'cancelled' => 'Cancelado',
+                        'completed' => 'Completado',
                         default     => $state,
                     })
                     ->color(fn (string $state) => match ($state) {

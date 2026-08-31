@@ -19,13 +19,16 @@ class DatabaseSeeder extends Seeder
             ArticleSeeder::class,
             ArticleUnitSeeder::class,
 
-            ClientSeeder::class,
+            CustomerSeeder::class,
+            CreditItemSeeder::class,
+            //ClientSeeder::class,
             ClientReferenceSeeder::class,
 
             CreditSeeder::class,
             InstallmentSeeder::class,
             BankSeeder::class,
             PaymentHistorySeeder::class,
+            CreditItemSeeder::class,
         ]);
     }
 }

@@ -26,6 +26,11 @@ class ArticleUnitsTable
                     ->label(__('resources.inventary.article_units.brand'))
                     ->searchable()
                     ->sortable(),
+                
+                TextColumn::make('cash_price')
+                    ->label(__('resources.inventary.article.cash_price'))
+                    ->money('USD')
+                    ->sortable(),
 
                 TextColumn::make('article.model')
                     ->label(__('resources.inventary.article_units.model'))

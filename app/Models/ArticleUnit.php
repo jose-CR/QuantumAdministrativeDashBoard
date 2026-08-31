@@ -17,12 +17,20 @@ class ArticleUnit extends Model
      */
     protected $fillable = [
         'article_id',
+        'color',
+        'cash_price', // precio al contado
         'vin',
         'engine_number', // Motor
         'plate', // Placa
-        'color',
         'status',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'cash_price' => 'decimal:2',
+        ];
+    }
 
     public function getDisplayNameAttribute(): string
     {
@@ -40,8 +48,8 @@ class ArticleUnit extends Model
         return $this->belongsTo(Article::class);
     }
 
-    public function credits()
+    public function creditItems()
     {
-        return $this->hasMany(Credit::class);
+        return $this->hasMany(CreditItem::class);
     }
 }

@@ -4,13 +4,18 @@ namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 
 use App\Models\ArticleUnit;
 use App\Models\Client;
+use App\Models\Customer;
 use App\Models\User;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class LoansForm
@@ -26,35 +31,110 @@ class LoansForm
                             ->schema([
                                 Grid::make(2)
                                     ->schema([
+                                        Section::make()
+                                            ->description('Información del cliente y del vehículo asociado al crédito')
+                                            ->schema([
+                                                Select::make('customer_id')
+                                                    ->label(__('resources.credits.clients.client'))
+                                                    ->relationship('client', 'full_name')
+                                                    ->getOptionLabelFromRecordUsing(
+                                                        fn (Customer $record): string => $record->full_name
+                                                    )
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->required(),
 
-                                        Select::make('client_id')
-                                            ->label(__('resources.credits.clients.client'))
-                                            ->relationship('client', 'full_name')
-                                            ->getOptionLabelFromRecordUsing(
-                                                fn (Client $record): string =>
-                                                    "{$record->full_name}"
-                                            )
-                                            ->preload()
-                                            ->required(),
+                                                Repeater::make('items')
+                                                    ->label('Vehículo')
+                                                    ->relationship('items')
+                                                    ->live()
+                                                    ->afterStateUpdated(function (Get $get, Set $set) {
+                                                        $items = $get('items') ?? [];
 
-                                        Select::make('article_unit_id')
-                                            ->label(__('resources.credits.clients.vehicle'))
-                                            ->relationship('articleUnit', 'vin')
-                                            ->getOptionLabelFromRecordUsing(
-                                                fn (ArticleUnit $record): string =>
-                                                    $record->display_name
-                                            )
-                                            ->preload()
-                                            ->required(),
+                                                        $total = collect($items)->sum(
+                                                            fn ($item) => (float) ($item['price'] ?? 0)
+                                                        );
 
-                                        Select::make('assigned_user_id')
-                                            ->label(__('resources.alert.assigned_user'))
-                                            ->options(
-                                                User::query()
-                                                    ->pluck('name', 'id')
-                                            )
-                                            ->searchable()
-                                            ->required(),
+                                                        $set('initial_amount', $total);
+                                                    })
+                                                    ->schema([
+                                                        Select::make('article_unit_id')
+                                                            ->label(__('resources.credits.clients.vehicle'))
+                                                            ->relationship('articleUnit', 'id')
+                                                            ->getOptionLabelFromRecordUsing(
+                                                                fn (ArticleUnit $record): string => $record->display_name
+                                                            )
+                                                            ->searchable()
+                                                                ->getSearchResultsUsing(function (string $search): array {
+                                                                        return ArticleUnit::query()
+                                                                            ->with('article')
+                                                                            ->where(function ($query) use ($search) {
+                                                                                $query
+                                                                                    ->where('vin', 'ILIKE', "%{$search}%")
+                                                                                    ->orWhere('color', 'ILIKE', "%{$search}%")
+                                                                                    ->orWhere('plate', 'ILIKE', "%{$search}%")
+                                                                                    ->orWhereHas('article', function ($query) use ($search) {
+                                                                                        $query
+                                                                                            ->where('brand', 'ILIKE', "%{$search}%")
+                                                                                            ->orWhere('model', 'ILIKE', "%{$search}%");
+                                                                                    });
+                                                                            })
+                                                                            ->limit(50)
+                                                                            ->get()
+                                                                            ->mapWithKeys(fn (ArticleUnit $unit) => [
+                                                                                $unit->id => $unit->display_name,
+                                                                            ])
+                                                                            ->toArray();
+                                                                    })
+                                                            ->preload()
+                                                            ->live()
+                                                            ->afterStateUpdated(function ($state, Set $set, Get $get) {
+
+                                                                $price = ArticleUnit::find($state)?->cash_price ?? 0;
+
+                                                                $set('price', $price);
+
+                                                                $set(
+                                                                    '../../initial_amount',
+                                                                    round(
+                                                                        collect($get('../../items') ?? [])
+                                                                            ->map(function ($item) use ($state, $price) {
+                                                                                return $item['article_unit_id'] == $state
+                                                                                    ? $price
+                                                                                    : ($item['price'] ?? 0);
+                                                                            })
+                                                                            ->sum(),
+                                                                        2
+                                                                    )
+                                                                );
+                                                            })
+                                                            ->required(),
+
+                                                        TextInput::make('price')
+                                                            ->label('Precio')
+                                                            ->numeric()
+                                                            ->prefix('$')
+                                                            ->readOnly()
+                                                            ->required(),
+                                                    ])
+                                                    ->columns(2)
+                                                    ->minItems(1)
+                                                    ->maxItems(10)
+                                                    ->defaultItems(1)
+                                                    ->addable(true)
+                                                    ->deletable(true)
+                                                    ->reorderable(false),
+
+/*                                                 Select::make('assigned_user_id')
+                                                    ->label(__('resources.alert.assigned_user'))
+                                                    ->options(
+                                                        User::query()->pluck('name', 'id')
+                                                    )
+                                                    ->searchable()
+                                                    ->preload()
+                                                    ->required(), */
+                                            ])
+                                            ->columnSpanFull(),
                                     ]),
                             ]),
 
@@ -67,10 +147,11 @@ class LoansForm
                                             ->label(__('resources.credits.credits.initial_amount'))
                                             ->numeric()
                                             ->prefix('$')
+                                            ->readOnly()
                                             ->required(),
 
                                         TextInput::make('down_payment')
-                                                ->label(__('resources.credits.credits.down_payment'))
+                                            ->label(__('resources.credits.credits.down_payment'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required(),

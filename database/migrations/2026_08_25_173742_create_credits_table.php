@@ -13,14 +13,9 @@ return new class () extends Migration {
         Schema::create('credits', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('client_id')
+            $table->foreignId('customer_id')
                 ->constrained()
                 //->restrictOnDelete()
-                ->cascadeOnDelete();
-
-            $table->foreignId('article_unit_id')
-                ->constrained()
-                //->restrictOnDelete();
                 ->cascadeOnDelete();
 
             $table->foreignId('refinanced_from_id')

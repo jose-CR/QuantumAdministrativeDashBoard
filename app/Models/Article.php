@@ -20,8 +20,6 @@ class Article extends Model
         'brand', // marca
         'model',
         'year',
-        'color',
-        'cash_price', // Precio Contado
         'description'
     ];
 

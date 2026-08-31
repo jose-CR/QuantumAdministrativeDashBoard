@@ -10,23 +10,30 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class ArticleUnitFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
             'article_id' => Article::factory(),
 
-            'vin' => strtoupper(fake()->bothify('#################')),
-
-            'engine_number' => strtoupper(fake()->bothify('ENG-########')),
-
-            'plate' => strtoupper(fake()->bothify('P###-###')),
-
             'color' => fake()->safeColorName(),
+
+            'cash_price' => fake()->randomFloat(
+                2,
+                1000,
+                15000
+            ),
+
+            'vin' => strtoupper(
+                fake()->bothify('#################')
+            ),
+
+            'engine_number' => strtoupper(
+                fake()->bothify('ENG-########')
+            ),
+
+            'plate' => strtoupper(
+                fake()->bothify('P###-###')
+            ),
 
             'status' => fake()->randomElement([
                 'available',
