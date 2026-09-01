@@ -10,6 +10,19 @@ class CreateArticleUnit extends CreateRecord
 {
     protected static string $resource = ArticleUnitResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        $select_price = $data['selected_price'];
+
+        if ($select_price !== 'new') {
+            $data['cash_price'] = $select_price;
+        }
+
+        unset($data['selected_price']);
+
+        return $data;
+    }
+
     protected function getCreatedNotification(): ?Notification
     {
         return Notification::make()
