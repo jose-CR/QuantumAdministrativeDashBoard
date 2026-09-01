@@ -21,8 +21,9 @@ class ArticleUnitForm
                     ->getOptionLabelFromRecordUsing(
                         fn ($record) => $record->full_name
                     )
-                    ->live()
-                    ->searchable(['brand', 'model']),
+                    ->searchable(['brand', 'model'])
+                    ->optionsLimit(50)
+                    ->live(),
                 
                 Select::make('selected_price')
                         ->label(__('resources.inventary.article_units.cash_price'))

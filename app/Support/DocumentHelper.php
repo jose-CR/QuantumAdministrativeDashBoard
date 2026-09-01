@@ -13,6 +13,7 @@ class DocumentHelper {
         return match ($type) {
             'DUI' => '99999999-9',
             'NIT' => '9999-999999-999-9',
+            'PHONE' => '9999-9999',
             default => null,
         };
     }

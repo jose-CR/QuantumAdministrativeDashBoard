@@ -65,10 +65,12 @@ class CustomerForm
                                             ->email(),
 
                                         TextInput::make('phone_primary')
-                                            ->label('Teléfono principal'),
+                                            ->label('Teléfono principal')
+                                            ->mask(fn () => DocumentHelper::mask('PHONE')),
 
                                         TextInput::make('phone_secondary')
-                                            ->label('Teléfono secundario'),
+                                            ->label('Teléfono secundario')
+                                            ->mask(fn () => DocumentHelper::mask('PHONE')),
 
                                         TextInput::make('nrc')
                                             ->label('NRC'),
