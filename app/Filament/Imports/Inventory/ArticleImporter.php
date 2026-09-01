@@ -32,13 +32,9 @@ class ArticleImporter extends Importer
                 ->requiredMapping()
                 ->rules(ArticleRules::import()['year']),
 
-            ImportColumn::make('color')
+            ImportColumn::make('description')
                 ->requiredMapping()
-                ->rules(ArticleRules::import()['color']),
-
-            ImportColumn::make('cash_price')
-                ->requiredMapping()
-                ->rules(ArticleRules::import()['cash_price']),
+                ->rules(ArticleRules::import()['description']),
         ];
     }
 

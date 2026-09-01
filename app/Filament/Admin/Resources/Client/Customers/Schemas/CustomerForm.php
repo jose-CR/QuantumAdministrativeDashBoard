@@ -163,7 +163,8 @@ class CustomerForm
 
                                         // Dirección
                                         TextInput::make('address')
-                                            ->label('Dirección'),
+                                            ->label('Dirección')
+                                            ->required(),
                                     ]),
                             ]),
 

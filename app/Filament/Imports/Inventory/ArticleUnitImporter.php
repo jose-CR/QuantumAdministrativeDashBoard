@@ -20,21 +20,21 @@ class ArticleUnitImporter extends Importer
                 ->requiredMapping()
                 ->rules(ArticleUnitRules::import()['article_id']),
 
-            ImportColumn::make('vin')
+            ImportColumn::make('color')
+                ->rules(ArticleUnitRules::import()['color']),
+
+            ImportColumn::make('cash_price')
                 ->requiredMapping()
+                ->rules(ArticleUnitRules::import()['cash_price']),
+
+            ImportColumn::make('vin')
                 ->rules(ArticleUnitRules::import()['vin']),
 
             ImportColumn::make('engine_number')
-                ->requiredMapping()
                 ->rules(ArticleUnitRules::import()['engine_number']),
 
             ImportColumn::make('plate')
-                ->requiredMapping()
                 ->rules(ArticleUnitRules::import()['plate']),
-
-            ImportColumn::make('color')
-                ->requiredMapping()
-                ->rules(ArticleUnitRules::import()['color']),
 
             ImportColumn::make('status')
                 ->requiredMapping()

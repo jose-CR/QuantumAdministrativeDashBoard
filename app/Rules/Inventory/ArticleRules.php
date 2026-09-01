@@ -27,22 +27,10 @@ class ArticleRules
                 'max:255',
             ],
 
-            'color' => [
-                'nullable',
-                'string',
-                'max:255',
-            ],
-
             'year' => [
                 'required',
                 'integer',
                 'between:1900,' . (date('Y') + 1),
-            ],
-
-            'cash_price' => [
-                'required',
-                'numeric',
-                'min:0.01',
             ],
 
             'description' => [

@@ -20,10 +20,10 @@ class UnitArticlesExporter extends Exporter
 
             ExportColumn::make('article_id')
                 ->label(__('resources.inventary.article_units.article')),
-            
+
             ExportColumn::make('article.brand')
                 ->label(__('resources.inventary.article_units.brand')),
-            
+
             ExportColumn::make('article.model')
                 ->label(__('resources.inventary.article_units.model')),
 
@@ -38,6 +38,9 @@ class UnitArticlesExporter extends Exporter
 
             ExportColumn::make('color')
                 ->label(__('resources.inventary.article_units.color')),
+
+            ExportColumn::make('cash_price')
+                ->label(__('resources.inventary.article_units.cash_price')),
 
             ExportColumn::make('status')
                 ->label(__('resources.inventary.article_units.status')),

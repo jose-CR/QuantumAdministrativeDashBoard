@@ -15,10 +15,22 @@ class ArticleUnitRules
                 'exists:articles,id',
             ],
 
-            'vin' => [
-                'required',
+            'color' => [
+                'nullable',
                 'string',
-                'size:17',
+                'max:255',
+            ],
+
+            'cash_price' => [
+                'required',
+                'numeric',
+                'min:0.01',
+            ],
+
+            'vin' => [
+                'nullable',
+                'string',
+                'size:20',
                 'unique:article_units,vin',
             ],
 
@@ -33,12 +45,6 @@ class ArticleUnitRules
                 'string',
                 'max:255',
                 'unique:article_units,plate',
-            ],
-
-            'color' => [
-                'nullable',
-                'string',
-                'max:255',
             ],
 
             'status' => [
