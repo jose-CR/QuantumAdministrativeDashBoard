@@ -2,14 +2,11 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\RelationManagers;
 
-use App\Filament\Exports\Credits\ClientRelationsExporter;
-use App\Filament\Imports\Credits\ReferenceClientImporter;
-use Filament\Actions\AssociateAction;
+use App\Support\DocumentHelper;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
-use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportAction;
@@ -26,6 +23,11 @@ class ReferencesRelationManager extends RelationManager
 {
     protected static string $relationship = 'references';
 
+    public function isReadOnly(): bool
+    {
+        return false;
+    }
+
     public function form(Schema $schema): Schema
     {
         return $schema
@@ -35,7 +37,6 @@ class ReferencesRelationManager extends RelationManager
                     ->label(__('resources.clients.fields.full_name'))
                     ->maxLength(255),
                 Select::make('reference_type')
-                    ->required()
                     ->label(__('resources.clients.fields.type'))
                     ->options([
                         'family' => __('resources.clients.reference_types.family'),
@@ -43,16 +44,14 @@ class ReferencesRelationManager extends RelationManager
                 TextInput::make('phone')
                     ->required()
                     ->label(__('resources.clients.fields.phone'))
-                    ->suffixIcon(Heroicon::Phone),
+                    ->suffixIcon(Heroicon::Phone)
+                    ->mask(fn () => DocumentHelper::mask('PHONE')),
                 TextInput::make('address')
-                    ->required()
                     ->label(__('resources.clients.fields.address'))
                     ->maxLength(300),
                 TextInput::make('relationship')
-                    ->label(__('resources.clients.fields.relationship'))
-                    ->required(),
+                    ->label(__('resources.clients.fields.relationship')),
                 TextInput::make('occupation')
-                    ->required()
                     ->label(__('resources.clients.fields.occupation'))
                     ->maxLength(255),
             ]);
@@ -91,17 +90,14 @@ class ReferencesRelationManager extends RelationManager
                 TextColumn::make('phone')
                     ->label(__('resources.clients.fields.phone')),
                 TextColumn::make('occupation')
-                    ->label(__('resources.clients.fields.occupation')),
+                    ->label(__('resources.clients.fields.occupation'))
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->headerActions([
                 CreateAction::make(),
-                ExportAction::make()
-                    ->exporter(ClientRelationsExporter::class),
-                ImportAction::make()
-                    ->importer(ReferenceClientImporter::class),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -170,7 +170,7 @@ class CustomerForm
                                     ]),
                             ]),
 
-                        Tab::make('references')
+/*                         Tab::make('references')
                             ->visible(function (Get $get, string $operation): bool {
                                 return $operation === 'create'
                                     && $get('document_type') === 'DUI';
@@ -217,7 +217,7 @@ class CustomerForm
                                                     ->columnSpanFull(),
                                             ])
                                     ])
-                            ]),
+                            ]), */
                     ])
                     ->columnSpanFull(),
             ]);

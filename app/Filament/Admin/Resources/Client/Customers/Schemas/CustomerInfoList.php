@@ -27,7 +27,7 @@ class CustomerInfoList
                                     return $state . '/' . $record->phone_secondary; 
                                 }),
                                 
-                        TextEntry::make('identity_document')
+                        TextEntry::make('document_number')
                                 ->label(__('resources.clients.fields.identity_document')),
                             
                         TextEntry::make('email')
