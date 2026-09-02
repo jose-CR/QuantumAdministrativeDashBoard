@@ -25,24 +25,50 @@ class CustomersTable
                     ->searchable(),
 
                 TextColumn::make('email'),
+
                 TextColumn::make('phone_primary')
                     ->formatStateUsing(function ($state, $record) {
                         return $state . ' / ' . $record->phone_secondary;
                     }),
+
+                TextColumn::make('phone_secondary')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('document_type')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('document_number')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('address'),
 
                 TextColumn::make('department')
-                ->formatStateUsing(fn ($state, $record) =>
-                    ElSalvadorCatalogo::locationLabel(
-                        $record->department,
-                        $record->municipality,
-                        $record->district
-                    )
-                ),
+                    ->formatStateUsing(fn ($state, $record) =>
+                        ElSalvadorCatalogo::locationLabel(
+                            $record->department,
+                            $record->municipality,
+                            $record->district
+                        )
+                    ),
 
-                TextColumn::make('nrc'),
-                
+                TextColumn::make('municipality')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('district')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('nrc')
+                    ->label('NRC'),
+
                 TextColumn::make('economic_activity'),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
+
+                TextColumn::make('updated_at')
+                    ->dateTime()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->groups([
                 'document_type',
