@@ -8,37 +8,63 @@ use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
+use Filament\Support\Enums\TextSize;
+use Filament\Support\Icons\Heroicon;
 
 class CustomerInfoList
 {
+
+    private static function hasActiveCredit(Customer $record): bool {
+        return $record->activeCredit !== null;
+    }
 
     public static function configure(Schema $schema): Schema
     {
         return $schema
             ->components([
                 Section::make(__('resources.clients.sections.client'))
+                    ->description(fn (Customer $record) =>
+                        $record->activeCredit()->exists()
+                            ? 'Información general del cliente'
+                            : 'Este cliente no tiene un crédito activo actualmente.'
+                    )
+                    ->icon(fn (Customer $record) =>
+                        $record->activeCredit()->exists()
+                            ? Heroicon::UserCircle
+                            : Heroicon::InformationCircle
+                    )
                     ->schema([
                         TextEntry::make('full_name')
-                            ->label(__('resources.clients.fields.full_name')),
+                            ->label(__('resources.clients.fields.full_name'))
+                            ->size(TextSize::Large)
+                            ->weight(FontWeight::Bold)
+                            ->icon(Heroicon::UserCircle)
+                            ->columnSpanFull(),
 
-                        TextEntry::make('phone_primary') 
-                                ->label(__('resources.clients.fields.phones'))
-                                ->formatStateUsing(function ($state, $record){ 
-                                    return $state . '/' . $record->phone_secondary; 
-                                }),
-                                
+                        TextEntry::make('phone_primary')
+                            ->label(__('resources.clients.fields.phones'))
+                            ->formatStateUsing(function ($state, $record) {
+                                return $state . ' / ' . $record->phone_secondary;
+                            })
+                            ->icon(Heroicon::Phone),
+
                         TextEntry::make('document_number')
-                                ->label(__('resources.clients.fields.identity_document')),
-                            
+                            ->label(__('resources.clients.fields.identity_document'))
+                            ->icon(Heroicon::Identification),
+
                         TextEntry::make('email')
-                                ->label(__('resources.clients.fields.email')),
-                            
+                            ->label(__('resources.clients.fields.email'))
+                            ->icon(Heroicon::Envelope),
+
                         TextEntry::make('address')
-                                ->label(__('resources.clients.fields.address')), 
+                            ->label(__('resources.clients.fields.address'))
+                            ->icon(Heroicon::MapPin)
+                            ->columnSpanFull(),
                     ])
                     ->columns(4),
 
                 Section::make(__('resources.clients.sections.financed_article'))
+                    ->visible(fn (Customer $record) => self::hasActiveCredit($record))
                     ->schema([
                         RepeatableEntry::make('latestCredit.items')
                             ->label(__('resources.clients.fields.vehicle'))
@@ -66,6 +92,7 @@ class CustomerInfoList
                     ->columns(3),
 
                 Section::make(__('resources.clients.sections.credit_summary'))
+                    ->visible(fn (Customer $record) => self::hasActiveCredit($record))
                     ->schema([
                         TextEntry::make('latestCredit.start_date')
                             ->label(__('resources.clients.fields.start_date'))
@@ -89,6 +116,7 @@ class CustomerInfoList
                     ->columns(2),
 
                 Section::make(__('resources.clients.sections.credit_status'))
+                    ->visible(fn (Customer $record) => self::hasActiveCredit($record))
                     ->schema([
                         TextEntry::make('remaining_installments')
                             ->label(__('resources.clients.fields.remaining_installments'))
@@ -142,6 +170,7 @@ class CustomerInfoList
                     ->columns(3),
 
                 Section::make(__('resources.clients.sections.latest_payments'))
+                    ->visible(fn (Customer $record) => self::hasActiveCredit($record))
                     ->description(__('resources.clients.sections.latest_payments_description'))
                     ->schema([
                         RepeatableEntry::make('payments')
@@ -180,5 +209,4 @@ class CustomerInfoList
             ])
         ;
     }
-
 }

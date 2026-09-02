@@ -18,6 +18,8 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\Customer;
 
 class ReferencesRelationManager extends RelationManager
 {
@@ -26,6 +28,13 @@ class ReferencesRelationManager extends RelationManager
     public function isReadOnly(): bool
     {
         return false;
+    }
+
+    public static function canViewForRecord(Model $ownerRecord, string $pageClass): bool
+    {
+        /** @var Customer $ownerRecord */
+
+        return $ownerRecord->activeCredit !== null;
     }
 
     public function form(Schema $schema): Schema
