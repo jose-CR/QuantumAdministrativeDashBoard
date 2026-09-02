@@ -3,9 +3,7 @@
 namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 
 use App\Models\ArticleUnit;
-use App\Models\Client;
 use App\Models\Customer;
-use App\Models\User;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -125,6 +123,19 @@ class LoansForm
                                                     ->deletable(true)
                                                     ->reorderable(false),
 
+                                                Select::make('status')
+                                                    ->label(__('resources.credits.clients.status'))
+                                                    ->options([
+                                                        'pending' => 'Pendiente',
+                                                        'active' => 'Activo',
+                                                        'paid' => 'Pagado',
+                                                        'cancelled' => 'Cancelado',
+                                                        'completed' => 'Completado'
+                                                    ])
+                                                    ->default('active')
+                                                    ->disabled()
+                                                    ->dehydrated(),
+
 /*                                                 Select::make('assigned_user_id')
                                                     ->label(__('resources.alert.assigned_user'))
                                                     ->options(
@@ -138,7 +149,7 @@ class LoansForm
                                     ]),
                             ]),
 
-                        Tab::make('Financiamiento')
+                        Tab::make('Creacion del credito')
                             ->schema([
                                 Grid::make(3)
                                     ->schema([
@@ -187,37 +198,6 @@ class LoansForm
                                             ->maxValue(31)
                                             ->required(),
                                     ]),
-                            ]),
-
-                        Tab::make('Refinanciamiento')
-                            ->schema([
-
-                                Select::make('refinanced_from_id')
-                                    ->label(__('resources.credits.clients.refinanced'))
-                                    ->relationship(
-                                        'originalCredit',
-                                        'id'
-                                    )
-                                    ->searchable()
-                                    ->preload()
-                                    ->nullable(),
-                            ]),
-
-                        Tab::make('Estado')
-                            ->schema([
-
-                                Select::make('status')
-                                    ->label(__('resources.credits.clients.status'))
-                                    ->options([
-                                        'pending' => 'Pendiente',
-                                        'active' => 'Activo',
-                                        'paid' => 'Pagado',
-                                        'cancelled' => 'Cancelado',
-                                        'completed' => 'Completado'
-                                    ])
-                                    ->default('pending')
-                                    ->required(),
-
                             ]),
                     ])
                     ->columnSpanFull(),

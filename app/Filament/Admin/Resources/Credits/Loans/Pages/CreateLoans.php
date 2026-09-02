@@ -37,6 +37,7 @@ class CreateLoans extends CreateRecord
 
         $this->form->fill([
             'customer_id' => request('customer'),
+            'status' => 'active',
         ]);
     }
 }
