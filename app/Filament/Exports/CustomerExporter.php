@@ -3,6 +3,8 @@
 namespace App\Filament\Exports;
 
 use App\Models\Customer;
+use App\Support\ActividadesEconomicas;
+use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -18,20 +20,66 @@ class CustomerExporter extends Exporter
         return [
             ExportColumn::make('id')
                 ->label('ID'),
-            ExportColumn::make('document_type'),
-            ExportColumn::make('document_number'),
-            ExportColumn::make('full_name'),
-            ExportColumn::make('email'),
-            ExportColumn::make('phone_primary'),
-            ExportColumn::make('phone_secondary'),
-            ExportColumn::make('nrc'),
-            ExportColumn::make('economic_activity'),
-            ExportColumn::make('department'),
-            ExportColumn::make('municipality'),
-            ExportColumn::make('district'),
-            ExportColumn::make('address'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
+
+            ExportColumn::make('document_type')
+                ->label('Tipo de documento'),
+
+            ExportColumn::make('document_number')
+                ->label('Número de documento'),
+
+            ExportColumn::make('full_name')
+                ->label('Nombre completo'),
+
+            ExportColumn::make('email')
+                ->label('Correo electrónico'),
+
+            ExportColumn::make('phone_primary')
+                ->label('Teléfono principal'),
+
+            ExportColumn::make('phone_secondary')
+                ->label('Teléfono secundario'),
+
+            ExportColumn::make('nrc')
+                ->label('NRC'),
+
+            ExportColumn::make('economic_activity')
+                ->label('Actividad económica')
+                ->formatStateUsing(
+                    fn (string $state) => ActividadesEconomicas::activityName($state)
+                ),
+
+            ExportColumn::make('department')
+                ->label('Departamento')
+                ->formatStateUsing(
+                    fn (string $state) => ElSalvadorCatalogo::departmentName($state)
+                ),
+
+            ExportColumn::make('municipality')
+                ->label('Municipio')
+                ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
+                        $record->department,
+                        $state
+                    )
+                ),
+
+            ExportColumn::make('district')
+                ->label('Distrito')
+                ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::districtName(
+                        $record->municipality,
+                        $state
+                    )
+                ),
+
+            ExportColumn::make('address')
+                ->label('Dirección'),
+
+            ExportColumn::make('created_at')
+                ->label('Fecha de creación'),
+
+            ExportColumn::make('updated_at')
+                ->label('Última actualización'),
         ];
     }
 
