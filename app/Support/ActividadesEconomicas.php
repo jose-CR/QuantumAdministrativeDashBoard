@@ -258,4 +258,13 @@ class ActividadesEconomicas
 
         return $options;
     }
+
+    /**
+     * Obtiene el nombre de una actividad económica por su código.
+     */
+    public static function activityName(string $code): string
+    {
+        return static::find($code)['actividad']
+            ?? "Código desconocido: {$code}";
+    }
 }

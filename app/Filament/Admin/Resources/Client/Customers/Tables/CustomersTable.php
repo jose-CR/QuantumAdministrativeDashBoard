@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Client\Customers\Tables;
 
 use App\Filament\Admin\Actions\PayInstallmentAction;
 use App\Models\Customer;
+use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -60,7 +61,10 @@ class CustomersTable
                 TextColumn::make('nrc')
                     ->label('NRC'),
 
-                TextColumn::make('economic_activity'),
+                TextColumn::make('economic_activity')
+                    ->formatStateUsing(
+                        fn ($state) => ActividadesEconomicas::activityName($state)
+                    ),
 
                 TextColumn::make('created_at')
                     ->dateTime()
