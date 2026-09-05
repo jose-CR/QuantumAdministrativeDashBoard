@@ -5,15 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class CreditItem extends Model
+class Transportation extends Model
 {
-    /** @use HasFactory<\Database\Factories\CreditItemFactory> */
+    /** @use HasFactory<\Database\Factories\TransportationFactory> */
     use HasFactory;
 
     protected $fillable = [
-        'credit_id',
-        'item_type',
-        'item_id',
+        'department',
+        'municipality',
+        'district',
         'price',
     ];
 
@@ -24,13 +24,8 @@ class CreditItem extends Model
         ];
     }
 
-    public function credit()
+    public function creditItems()
     {
-        return $this->belongsTo(Credit::class);
-    }
-
-    public function item()
-    {
-        return $this->morphTo();
+        return $this->morphMany(CreditItem::class, 'item');
     }
 }

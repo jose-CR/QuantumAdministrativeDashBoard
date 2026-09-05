@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             ArticleSeeder::class,
             ArticleUnitSeeder::class,
+            TransportationSeeder::class,
 
             CustomerSeeder::class,
             CreditItemSeeder::class,
