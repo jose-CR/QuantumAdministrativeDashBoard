@@ -149,7 +149,12 @@ class ElSalvadorCatalogo
      */
     public static function departmentName(string $department): string
     {
-        return self::departments()[$department] ?? $department;
+        if (blank($department)) {
+            return 'Sin departamento';
+        }
+
+        return self::departments()[$department]
+            ?? "Código desconocido: {$department}";
     }
 
     /**
@@ -159,7 +164,16 @@ class ElSalvadorCatalogo
         string $department,
         string $municipality
     ): string {
-        return self::municipalities($department)[$municipality] ?? $municipality;
+        if (blank($municipality)) {
+            return 'Sin municipio';
+        }
+
+        if (blank($department)) {
+            return 'Departamento no especificado';
+        }
+
+        return self::municipalities($department)[$municipality]
+            ?? "Código desconocido: {$municipality}";
     }
 
     /**
@@ -169,7 +183,16 @@ class ElSalvadorCatalogo
         string $municipality,
         string $district
     ): string {
-        return self::districts($municipality)[$district] ?? $district;
+        if (blank($district)) {
+            return 'Sin distrito';
+        }
+
+        if (blank($municipality)) {
+            return 'Municipio no especificado';
+        }
+
+        return self::districts($municipality)[$district]
+            ?? "Código desconocido: {$district}";
     }
 
     /**

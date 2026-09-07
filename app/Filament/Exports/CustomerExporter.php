@@ -45,13 +45,13 @@ class CustomerExporter extends Exporter
             ExportColumn::make('economic_activity')
                 ->label('Actividad económica')
                 ->formatStateUsing(
-                    fn (string $state) => ActividadesEconomicas::activityName($state)
+                    fn ($state) => ActividadesEconomicas::activityName($state)
                 ),
 
             ExportColumn::make('department')
                 ->label('Departamento')
                 ->formatStateUsing(
-                    fn (string $state) => ElSalvadorCatalogo::departmentName($state)
+                    fn ($state) => ElSalvadorCatalogo::departmentName($state)
                 ),
 
             ExportColumn::make('municipality')
@@ -59,7 +59,7 @@ class CustomerExporter extends Exporter
                 ->formatStateUsing(
                     fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
                         $record->department,
-                        $state
+                        $state,
                     )
                 ),
 
@@ -68,7 +68,7 @@ class CustomerExporter extends Exporter
                 ->formatStateUsing(
                     fn ($state, $record) => ElSalvadorCatalogo::districtName(
                         $record->municipality,
-                        $state
+                        $state,
                     )
                 ),
 
