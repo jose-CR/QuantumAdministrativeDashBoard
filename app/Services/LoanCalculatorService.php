@@ -16,7 +16,10 @@ class LoanCalculatorService
             );
         }
 
-        $downPayment = round((float) ($data['down_payment'] ?? 0), 2);
+        $downPayment = round(
+            (float) ($data['down_payment'] ?? 0),
+            2
+        );
 
         if ($downPayment < 0) {
             throw new InvalidArgumentException(
@@ -30,10 +33,17 @@ class LoanCalculatorService
             );
         }
 
-        $financedAmount = round($initialAmount - $downPayment, 2);
+        $financedAmount = round(
+            $initialAmount - $downPayment,
+            2
+        );
 
         $installments = (int) ($data['installments'] ?? 0);
-        $installmentAmount = round((float) ($data['installment_amount'] ?? 0), 2);
+
+        $installmentAmount = round(
+            (float) ($data['installment_amount'] ?? 0),
+            2
+        );
 
         if ($installments <= 0) {
             throw new InvalidArgumentException(
@@ -47,19 +57,42 @@ class LoanCalculatorService
             );
         }
 
-        $totalAmount = round($installments * $installmentAmount, 2);
+        /*
+         * Total cotizado por las cuotas.
+         */
+        $totalAmount = round(
+            $installments * $installmentAmount,
+            2
+        );
 
-        // H12 del motor financiero: (cuota * plazo) - financiado.
-        // Si es <= 0, el motor lo trata como crédito sin interés (0%),
-        // no como error: el saldo se sigue abonando con pagos reales
-        // hasta llegar a 0, aunque tome más cuotas que "installments".
-        $totalInterest = max(0, round($totalAmount - $financedAmount, 2));
+        /*
+         * Intereses totales.
+         *
+         * Si el total de cuotas no supera el monto financiado,
+         * el crédito se considera sin intereses.
+         */
+        $totalInterest = max(
+            0,
+            round(
+                $totalAmount - $financedAmount,
+                2
+            )
+        );
 
-        // Tasa MENSUAL, igual que tasaMensual() del motor JS:
-        // (interesesTotales / plazo) / financiado. Ojo: esto ya NO es
-        // la tasa total del crédito, es la tasa por período.
-        $interestRate = ($financedAmount > 0 && $totalInterest > 0)
-            ? round((($totalInterest / $installments) / $financedAmount) * 100, 2)
+        /*
+         * Tasa por período.
+         */
+        $interestRate = (
+            $financedAmount > 0 &&
+            $totalInterest > 0
+        )
+            ? round(
+                (
+                    ($totalInterest / $installments)
+                    / $financedAmount
+                ) * 100,
+                2
+            )
             : 0;
 
         return [
@@ -69,31 +102,32 @@ class LoanCalculatorService
             'total_amount'    => $totalAmount,
             'total_interest'  => $totalInterest,
             'interest_rate'   => $interestRate,
-            // Saldo a capital real (lo que consume el motor de amortización),
-            // NO el total de cuotas cotizadas.
             'pending_balance' => $financedAmount,
         ];
     }
 
     /**
-     * Suma el precio de los items del crédito.
+     * Suma el precio de todos los items del crédito.
      *
-     * Si no vienen items, utiliza initial_amount.
+     * Cada item puede ser un vehículo o un transporte,
+     * pero el cálculo financiero solamente necesita su precio.
      */
     protected function resolveInitialAmount(array $data): float
     {
         if (empty($data['items'])) {
-            return round((float) ($data['initial_amount'] ?? 0), 2);
+            return round(
+                (float) ($data['initial_amount'] ?? 0),
+                2
+            );
         }
 
         return round(
-            collect($data['items'])->sum(
-                fn ($item) => (float) (
-                    is_array($item)
-                        ? ($item['price'] ?? 0)
-                        : ($item->price ?? 0)
-                )
-            ),
+            collect($data['items'])
+                ->sum(
+                    fn ($item) => (float) (
+                        $item['price'] ?? 0
+                    )
+                ),
             2
         );
     }
