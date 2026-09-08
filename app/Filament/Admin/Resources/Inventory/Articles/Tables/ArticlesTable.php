@@ -17,12 +17,10 @@ class ArticlesTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                        ->toggleable(isToggledHiddenByDefault: true),
-                
-                TextColumn::make('category_id')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('year')
+                TextColumn::make('category_id')
+                    ->label(__('resources.inventary.article.category'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('brand')
@@ -35,10 +33,14 @@ class ArticlesTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('year')
+                    ->label(__('resources.inventary.article.year'))
+                    ->sortable(),
+
                 TextColumn::make('description')
                     ->label(__('resources.inventary.article.description'))
                     ->limit(50)
-                    ->tooltip(fn ($record) => $record->descripcion)
+                    ->tooltip(fn ($record) => $record->description)
                     ->formatStateUsing(fn (?string $state) => str_replace(
                         ['<p>', '</p>'],
                         '',
@@ -49,7 +51,12 @@ class ArticlesTable
                     ->label(__('resources.inventary.article.created_at'))
                     ->dateTime('d/m/Y')
                     ->sortable(),
-                //
+
+                TextColumn::make('updated_at')
+                    ->label(__('resources.inventary.article.updated_at'))
+                    ->dateTime('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

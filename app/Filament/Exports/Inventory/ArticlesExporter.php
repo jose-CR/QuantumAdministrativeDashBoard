@@ -30,12 +30,6 @@ class ArticlesExporter extends Exporter
             ExportColumn::make('year')
                 ->label(__('resources.inventary.article.year')),
 
-            ExportColumn::make('color')
-                ->label(__('resources.inventary.article.color')),
-
-            ExportColumn::make('cash_price')
-                ->label(__('resources.inventary.article.cash_price')),
-
             ExportColumn::make('description')
                 ->label(__('resources.inventary.article.description')),
         ];

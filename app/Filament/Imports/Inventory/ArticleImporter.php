@@ -33,7 +33,6 @@ class ArticleImporter extends Importer
                 ->rules(ArticleRules::import()['year']),
 
             ImportColumn::make('description')
-                ->requiredMapping()
                 ->rules(ArticleRules::import()['description']),
         ];
     }

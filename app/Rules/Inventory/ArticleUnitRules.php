@@ -52,6 +52,8 @@ class ArticleUnitRules
                 Rule::in([
                     'available',
                     'reserved',
+                    'rented',
+                    'returned',
                     'sold',
                 ]),
             ],

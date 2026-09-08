@@ -35,6 +35,8 @@ return new class () extends Migration {
             $table->enum('status', [
                 'available',
                 'reserved',
+                'rented',
+                'returned',
                 'sold',
             ])->default('available');
 

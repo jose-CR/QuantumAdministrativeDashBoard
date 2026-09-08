@@ -32,7 +32,6 @@ class Article extends Model
     {
         return [
             'year' => 'integer',
-            'cash_price' => 'decimal:2',
         ];
     }
 
