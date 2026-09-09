@@ -10,6 +10,11 @@ class CustomerRules
     public static function import(): array
     {
         return [
+            'id' => [
+                'nullable',
+                'integer',
+            ],
+
             'document_type' => [
                 'required',
                 'string',

@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Filament\Exports;
+namespace App\Filament\Admin\Resources\Client\Customers\Exports;
 
 use App\Models\Customer;
 use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
+use App\Utils\Filament\FileHelper;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -45,31 +46,43 @@ class CustomerExporter extends Exporter
             ExportColumn::make('economic_activity')
                 ->label('Actividad económica')
                 ->formatStateUsing(
-                    fn ($state) => ActividadesEconomicas::activityName($state)
+                    fn ($state, CustomerExporter $exporter) =>
+                        $exporter->isExcel()
+                            ? ActividadesEconomicas::activityName($state)
+                            : $state
                 ),
 
             ExportColumn::make('department')
                 ->label('Departamento')
                 ->formatStateUsing(
-                    fn ($state) => ElSalvadorCatalogo::departmentName($state)
+                    fn ($state, CustomerExporter $exporter) =>
+                        $exporter->isExcel()
+                            ? ElSalvadorCatalogo::departmentName($state)
+                            : $state
                 ),
 
             ExportColumn::make('municipality')
                 ->label('Municipio')
                 ->formatStateUsing(
-                    fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
-                        $record->department,
-                        $state,
-                    )
+                    fn ($state, $record, CustomerExporter $exporter) =>
+                        $exporter->isExcel()
+                            ? ElSalvadorCatalogo::municipalityName(
+                                $record->department,
+                                $state,
+                            )
+                            : $state
                 ),
 
             ExportColumn::make('district')
                 ->label('Distrito')
                 ->formatStateUsing(
-                    fn ($state, $record) => ElSalvadorCatalogo::districtName(
-                        $record->municipality,
-                        $state,
-                    )
+                    fn ($state, $record, CustomerExporter $exporter) =>
+                        $exporter->isExcel()
+                            ? ElSalvadorCatalogo::districtName(
+                                $record->municipality,
+                                $state,
+                            )
+                            : $state
                 ),
 
             ExportColumn::make('address')
@@ -101,12 +114,32 @@ class CustomerExporter extends Exporter
         ];
     }
 
+    public function getFileExtension(): string
+    {
+        return FileHelper::extension(
+            $this->export->file_name
+        );
+    }
+
+    public function isExcel(): bool
+    {
+        return $this->getFileExtension() === 'xlsx';
+    }
+
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your customer export has completed and ' . Number::format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Your customer export has completed and '
+            . Number::format($export->successful_rows)
+            . ' '
+            . str('row')->plural($export->successful_rows)
+            . ' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' '
+                . Number::format($failedRowsCount)
+                . ' '
+                . str('row')->plural($failedRowsCount)
+                . ' failed to export.';
         }
 
         return $body;

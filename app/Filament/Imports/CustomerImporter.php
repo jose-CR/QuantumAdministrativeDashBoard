@@ -16,6 +16,10 @@ class CustomerImporter extends Importer
     public static function getColumns(): array
     {
         return [
+            ImportColumn::make('id')
+                ->requiredMapping()
+                ->rules(CustomerRules::import()['id']),
+
             ImportColumn::make('document_type')
                 ->requiredMapping()
                 ->rules(CustomerRules::import()['document_type']),
@@ -64,7 +68,7 @@ class CustomerImporter extends Importer
     public function resolveRecord(): Customer
     {
         return Customer::firstOrNew([
-            'email' => $this->data['email'],
+            'id' => $this->data['id'],
         ]);
     }
 
