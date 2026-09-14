@@ -1,10 +1,8 @@
 <?php
 
-namespace App\Filament\Admin\Resources\Client\Customers\Exports;
+namespace App\Filament\Exports;
 
 use App\Models\Customer;
-use App\Support\ActividadesEconomicas;
-use App\Support\ElSalvadorCatalogo;
 use App\Utils\Filament\FileHelper;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;

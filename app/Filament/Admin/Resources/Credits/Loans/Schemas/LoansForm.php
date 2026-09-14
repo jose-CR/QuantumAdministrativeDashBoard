@@ -73,51 +73,49 @@ class LoansForm
                                             ->columnSpan(2)
 
                                             /*
-                                             * VEHÍCULOS
+                                             * BÚSQUEDA (VEHÍCULOS Y TRANSPORTES EN UNA SOLA FUNCIÓN)
+                                             *
+                                             * IMPORTANTE: getSearchResultsUsing() NO es aditivo.
+                                             * Solo puede haber UNA llamada a este método por Select;
+                                             * si se llama dos veces, la segunda sobrescribe a la
+                                             * primera por completo. Por eso ambos casos (vehículos
+                                             * y transportes) van dentro del mismo closure.
                                              */
-                                            ->options(function (Get $get) {
-                                                if (
-                                                    $get('item_type') !==
-                                                    ArticleUnit::class
-                                                ) {
+                                            ->getSearchResultsUsing(function (string $search, Get $get) {
+
+                                                $search = mb_strtolower(trim($search));
+
+                                                if ($search === '') {
                                                     return [];
                                                 }
 
-                                                return ArticleUnit::query()
-                                                    ->with('article')
-                                                    ->where('status', 'available')
-                                                    ->get()
-                                                    ->mapWithKeys(
-                                                        fn (ArticleUnit $unit) => [
+                                                /*
+                                                 * VEHÍCULOS
+                                                 */
+                                                if ($get('item_type') === ArticleUnit::class) {
+                                                    return ArticleUnit::query()
+                                                        ->with('article')
+                                                        ->where('status', 'available')
+                                                        ->where(function ($query) use ($search) {
+                                                            $query->where('vin', 'ilike', "%{$search}%")
+                                                                ->orWhere('color', 'ilike', "%{$search}%")
+                                                                ->orWhere('plate', 'ilike', "%{$search}%")
+                                                                ->orWhereHas('article', function ($query) use ($search) {
+                                                                    $query->where('brand', 'ilike', "%{$search}%")
+                                                                        ->orWhere('model', 'ilike', "%{$search}%");
+                                                                });
+                                                        })
+                                                        ->get()
+                                                        ->mapWithKeys(fn (ArticleUnit $unit) => [
                                                             $unit->id => $unit->display_name,
-                                                        ]
-                                                    )
-                                                    ->toArray();
-                                            })
+                                                        ])
+                                                        ->toArray();
+                                                }
 
-                                            /*
-                                             * TRANSPORTES
-                                             */
-                                            ->getSearchResultsUsing(
-                                                function (
-                                                    string $search,
-                                                    Get $get
-                                                ) {
-                                                    if (
-                                                        $get('item_type') !==
-                                                        Transportation::class
-                                                    ) {
-                                                        return [];
-                                                    }
-
-                                                    $search = mb_strtolower(
-                                                        trim($search)
-                                                    );
-
-                                                    if ($search === '') {
-                                                        return [];
-                                                    }
-
+                                                /*
+                                                 * TRANSPORTES
+                                                 */
+                                                if ($get('item_type') === Transportation::class) {
                                                     return Transportation::query()
                                                         ->get()
                                                         ->filter(
@@ -192,7 +190,9 @@ class LoansForm
                                                         )
                                                         ->toArray();
                                                 }
-                                            )
+
+                                                return [];
+                                            })
 
                                             /*
                                              * MOSTRAR EL ITEM SELECCIONADO
