@@ -44,46 +44,33 @@ class CustomerExporter extends Exporter
                 ->label('NRC'),
 
             ExportColumn::make('economic_activity')
-                ->label('Actividad económica')
-                ->formatStateUsing(
-                    fn ($state, CustomerExporter $exporter) =>
-                        $exporter->isExcel()
-                            ? ActividadesEconomicas::activityName($state)
-                            : $state
-                ),
+                ->label('Actividad económica'),
+/*                 ->formatStateUsing(
+                    fn ($state) => ActividadesEconomicas::activityName($state)
+                ), */
 
             ExportColumn::make('department')
-                ->label('Departamento')
-                ->formatStateUsing(
-                    fn ($state, CustomerExporter $exporter) =>
-                        $exporter->isExcel()
-                            ? ElSalvadorCatalogo::departmentName($state)
-                            : $state
-                ),
+                ->label('Departamento'),               /* ->formatStateUsing(
+                    fn ($state) => ElSalvadorCatalogo::departmentName($state)
+                ), */
 
             ExportColumn::make('municipality')
-                ->label('Municipio')
-                ->formatStateUsing(
-                    fn ($state, $record, CustomerExporter $exporter) =>
-                        $exporter->isExcel()
-                            ? ElSalvadorCatalogo::municipalityName(
-                                $record->department,
-                                $state,
-                            )
-                            : $state
-                ),
+                ->label('Municipio'),
+/*                 ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
+                        $record->department,
+                        $state,
+                    )
+                ), */
 
             ExportColumn::make('district')
-                ->label('Distrito')
-                ->formatStateUsing(
-                    fn ($state, $record, CustomerExporter $exporter) =>
-                        $exporter->isExcel()
-                            ? ElSalvadorCatalogo::districtName(
-                                $record->municipality,
-                                $state,
-                            )
-                            : $state
-                ),
+                ->label('Distrito'),
+/*                 ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::districtName(
+                        $record->municipality,
+                        $state,
+                    )
+                ), */
 
             ExportColumn::make('address')
                 ->label('Dirección'),

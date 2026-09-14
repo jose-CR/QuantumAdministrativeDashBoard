@@ -2,7 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
-use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
+use App\Filament\Admin\Resources\Client\Customers\CustomerResource; 
 use App\Filament\Exports\CustomerExporter;
 use App\Filament\Imports\CustomerImporter;
 use Filament\Actions\CreateAction;

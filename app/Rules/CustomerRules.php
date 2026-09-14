@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
 use Illuminate\Validation\Rule;
 
@@ -18,13 +19,6 @@ class CustomerRules
             'document_type' => [
                 'required',
                 'string',
-                Rule::in([
-                    'DUI',
-                    'NIT',
-                    'Passport',
-                    'Carnet RES',
-                    'OTRO',
-                ]),
             ],
 
             'document_number' => [
@@ -67,6 +61,9 @@ class CustomerRules
                 'nullable',
                 'string',
                 'max:255',
+                Rule::in(array_keys(
+                    ActividadesEconomicas::options()
+                )),
             ],
 
             'department' => [

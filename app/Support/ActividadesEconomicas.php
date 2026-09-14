@@ -275,4 +275,19 @@ class ActividadesEconomicas
         return static::find($code)['actividad']
             ?? "Código desconocido: {$code}";
     }
+
+    public static function codeByName(?string $name): ?string
+    {
+        if (blank($name)) {
+            return null;
+        }
+
+        foreach (static::activities() as $activity) {
+            if ($activity['actividad'] === $name) {
+                return $activity['codigo'];
+            }
+        }
+
+        return null;
+    }
 }
