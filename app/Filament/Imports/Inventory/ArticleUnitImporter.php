@@ -15,38 +15,50 @@ class ArticleUnitImporter extends Importer
 
     public static function getColumns(): array
     {
+        $rules = ArticleUnitRules::import();
+
         return [
+            ImportColumn::make('id')
+                ->requiredMapping()
+                ->rules($rules['id'] ?? ['integer']),
+
             ImportColumn::make('article_id')
                 ->requiredMapping()
-                ->rules(ArticleUnitRules::import()['article_id']),
+                ->rules($rules['article_id']),
 
             ImportColumn::make('color')
-                ->rules(ArticleUnitRules::import()['color']),
+                ->rules($rules['color']),
 
             ImportColumn::make('cash_price')
                 ->requiredMapping()
-                ->rules(ArticleUnitRules::import()['cash_price']),
+                ->rules($rules['cash_price']),
 
             ImportColumn::make('vin')
-                ->rules(ArticleUnitRules::import()['vin']),
+                ->rules($rules['vin']),
 
             ImportColumn::make('engine_number')
-                ->rules(ArticleUnitRules::import()['engine_number']),
+                ->rules($rules['engine_number']),
 
             ImportColumn::make('plate')
-                ->rules(ArticleUnitRules::import()['plate']),
+                ->rules($rules['plate']),
 
             ImportColumn::make('status')
                 ->requiredMapping()
-                ->rules(ArticleUnitRules::import()['status']),
+                ->rules($rules['status']),
         ];
     }
 
     public function resolveRecord(): ArticleUnit
     {
-        return ArticleUnit::firstOrNew([
-            'article_id' => $this->data['article_id'],
-        ]);
+        if (! empty($this->data['id'])) {
+            $record = ArticleUnit::find($this->data['id']);
+
+            if ($record) {
+                return $record;
+            }
+        }
+
+        return new ArticleUnit();
     }
 
     public static function getCompletedNotificationBody(Import $import): string

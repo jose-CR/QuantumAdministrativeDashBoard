@@ -4,6 +4,9 @@ namespace Database\Factories;
 
 use App\Models\ArticleUnit;
 use App\Models\Credit;
+use App\Models\CreditItem;
+use App\Models\Transportation;
+use Database\Factories\Concerns\InteractsWithModels;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -11,24 +14,46 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class CreditItemFactory extends Factory
 {
+    use InteractsWithModels;
+
+    protected $model = CreditItem::class;
+
     public function definition(): array
-    {
-        $articleUnit = ArticleUnit::where('status', 'available')
-            ->inRandomOrder()
-            ->first();
-
-        if (! $articleUnit) {
-            throw new \RuntimeException(
-                'No hay ArticleUnit disponibles para crear el CreditItem.'
-            );
-        }
-
+    { 
         return [
             'credit_id' => Credit::factory(),
-
-            'article_unit_id' => $articleUnit->id,
-
-            'price' => $articleUnit->cash_price,
+            'item_type' => null,
+            'item_id' => null,
+            'price' => 0,
         ];
+    }
+    
+    public function vehicle(): static
+    {
+        $articleUnit = $this->randomItem(
+            ArticleUnit::class,
+            fn ($query) => $query->where('status', 'available')
+        );
+
+        $articleUnit->update([
+            'status' => 'sold',
+        ]);
+
+        return $this->state([
+            'item_type' => ArticleUnit::class,
+            'item_id' => $articleUnit->id,
+            'price' => $articleUnit->cash_price,
+        ]);
+    }
+
+    public function transportation(): static
+    {
+        $transportation = Transportation::factory()->create();
+
+        return $this->state([
+            'item_type' => Transportation::class,
+            'item_id' => $transportation->id,
+            'price' => $transportation->price,
+        ]);
     }
 }

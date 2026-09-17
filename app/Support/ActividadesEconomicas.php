@@ -234,6 +234,10 @@ class ActividadesEconomicas
      */
     public static function find(string $code): ?array
     {
+        if (blank($code)) {
+            return null;
+        }
+
         foreach (static::activities() as $activity) {
             if ($activity['codigo'] === $code) {
                 return $activity;
@@ -257,5 +261,33 @@ class ActividadesEconomicas
         }
 
         return $options;
+    }
+
+    /**
+     * Obtiene el nombre de una actividad económica por su código.
+     */
+    public static function activityName(?string $code): string
+    {
+        if (blank($code)) {
+            return 'Sin actividad económica';
+        }
+
+        return static::find($code)['actividad']
+            ?? "Código desconocido: {$code}";
+    }
+
+    public static function codeByName(?string $name): ?string
+    {
+        if (blank($name)) {
+            return null;
+        }
+
+        foreach (static::activities() as $activity) {
+            if ($activity['actividad'] === $name) {
+                return $activity['codigo'];
+            }
+        }
+
+        return null;
     }
 }

@@ -50,6 +50,6 @@ class ArticleUnit extends Model
 
     public function creditItems()
     {
-        return $this->hasMany(CreditItem::class);
+        return $this->morphMany(CreditItem::class, 'item');
     }
 }

@@ -9,6 +9,11 @@ class ArticleUnitRules
     public static function import(): array
     {
         return [
+            'id' => [
+                'integer',
+                'nullable',
+            ],
+
             'article_id' => [
                 'required',
                 'integer',
@@ -30,7 +35,7 @@ class ArticleUnitRules
             'vin' => [
                 'nullable',
                 'string',
-                'size:20',
+                'max:20',
                 'unique:article_units,vin',
             ],
 
@@ -52,6 +57,8 @@ class ArticleUnitRules
                 Rule::in([
                     'available',
                     'reserved',
+                    'rented',
+                    'returned',
                     'sold',
                 ]),
             ],

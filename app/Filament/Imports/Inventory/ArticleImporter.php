@@ -33,7 +33,6 @@ class ArticleImporter extends Importer
                 ->rules(ArticleRules::import()['year']),
 
             ImportColumn::make('description')
-                ->requiredMapping()
                 ->rules(ArticleRules::import()['description']),
         ];
     }
@@ -41,7 +40,9 @@ class ArticleImporter extends Importer
     public function resolveRecord(): Article
     {
         return Article::firstOrNew([
-            'category_id' => $this->data['category_id'],
+            'brand' => $this->data['brand'],
+            'model' => $this->data['model'],
+            'year' => $this->data['year'],
         ]);
     }
 

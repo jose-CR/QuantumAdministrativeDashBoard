@@ -36,8 +36,8 @@ class CustomerForm
                                             ->options([
                                                 'DUI' => 'DUI',
                                                 'NIT' => 'NIT',
-                                                'Passport' => 'Passport',
-                                                'Carnet RES' => 'Carnet RES',
+                                                'PASSPORT' => 'Passport',
+                                                'RES CARNET' => 'Carnet RES',
                                                 'OTRO' => 'OTRO',
                                             ])
                                             ->live()

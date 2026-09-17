@@ -4,7 +4,7 @@ namespace App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages;
 
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\ArticleUnitResource;
 use App\Filament\Exports\Inventory\UnitArticlesExporter;
-use App\Filament\Imports\Inventory\ArticleImporter;
+use App\Filament\Imports\Inventory\ArticleUnitImporter;
 use Filament\Actions\CreateAction;
 use Filament\Actions\ExportAction;
 use Filament\Actions\ImportAction;
@@ -21,7 +21,7 @@ class ListArticleUnits extends ListRecords
             ExportAction::make()
                 ->exporter(UnitArticlesExporter::class),
             ImportAction::make()
-                ->importer(ArticleImporter::class),
+                ->importer(ArticleUnitImporter::class),
         ];
     }
 }

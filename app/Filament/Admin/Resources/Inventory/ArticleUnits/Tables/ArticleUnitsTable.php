@@ -17,24 +17,25 @@ class ArticleUnitsTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                        ->toggleable(isToggledHiddenByDefault: true),
-                
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 TextColumn::make('article_id')
-                        ->toggleable(isToggledHiddenByDefault: true),
+                    ->label(__('resources.inventary.article_units.article'))
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('article.brand')
                     ->label(__('resources.inventary.article_units.brand'))
                     ->searchable()
                     ->sortable(),
-                
-                TextColumn::make('cash_price')
-                    ->label(__('resources.inventary.article.cash_price'))
-                    ->money('USD')
-                    ->sortable(),
 
                 TextColumn::make('article.model')
                     ->label(__('resources.inventary.article_units.model'))
                     ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('cash_price')
+                    ->label(__('resources.inventary.article_units.cash_price'))
+                    ->money('USD')
                     ->sortable(),
 
                 TextColumn::make('vin')
@@ -58,22 +59,19 @@ class ArticleUnitsTable
                     ->sortable()
                     ->badge()
                     ->color(fn (string $state) => match ($state) {
-                        'azul'      => 'info',
-                        'rojo'       => 'danger',
-                        'roja'       => 'danger',
-                        'verde'     => 'success',
-                        'amarillo'    => 'warning',
-                        'naranja'    => 'orange',
-                        'purpura'    => 'purple',
-                        'rosa'      => 'pink',
-                        'gris'      => 'gray',
-                        'negro'     => 'zinc',
-                        'negra'     => 'zinc',
-                        'blanco'     => 'slate',
-                        'blanca'     => 'slate',
-                        'cafe'     => 'stone',
+                        'azul' => 'info',
+                        'rojo', 'roja' => 'danger',
+                        'verde' => 'success',
+                        'amarillo' => 'warning',
+                        'naranja' => 'orange',
+                        'purpura' => 'purple',
+                        'rosa' => 'pink',
+                        'gris' => 'gray',
+                        'negro', 'negra' => 'zinc',
+                        'blanco', 'blanca' => 'slate',
+                        'cafe' => 'stone',
                         'naranja con gris' => 'amber',
-                        default     => 'gray',
+                        default => 'gray',
                     }),
 
                 TextColumn::make('status')
@@ -81,21 +79,29 @@ class ArticleUnitsTable
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'available' => 'Disponible',
-                        'reserved'  => 'Reservado',
-                        'sold'      => 'Vendido',
-                        'rented'    => 'Alquilado',
-                        'returned'  => 'Devuelto',
-                        default     => $state,
+                        'reserved' => 'Reservado',
+                        'sold' => 'Vendido',
+                        'rented' => 'Rentado',
+                        'returned' => 'Regresado',
+                        default => $state,
                     })
                     ->color(fn (string $state) => match ($state) {
                         'available' => 'success',
-                        'reserved'  => 'warning',
-                        'sold'      => 'danger',
-                        'rented'    => 'info',
-                        'returned'  => 'gray',
-                        default     => 'gray',
+                        'reserved' => 'warning',
+                        'sold' => 'danger',
+                        default => 'gray',
                     }),
-                //
+
+                TextColumn::make('created_at')
+                    ->label(__('resources.inventary.article_units.created_at'))
+                    ->dateTime('d/m/Y')
+                    ->sortable(),
+
+                TextColumn::make('updated_at')
+                    ->label(__('resources.inventary.article_units.updated_at'))
+                    ->dateTime('d/m/Y')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //

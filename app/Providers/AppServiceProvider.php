@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Observers\InstallmentObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Filament\Actions\Exports\Downloaders\XlsxDownloader;
+use App\Filament\Exports\Downloaders\XlsxDownloader as CustomXlsxDownloader;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -15,6 +17,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->bind(
+            XlsxDownloader::class,
+            CustomXlsxDownloader::class,
+        );
     }
 
     /**

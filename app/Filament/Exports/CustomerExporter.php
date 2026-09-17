@@ -3,6 +3,7 @@
 namespace App\Filament\Exports;
 
 use App\Models\Customer;
+use App\Utils\Filament\FileHelper;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -18,20 +19,65 @@ class CustomerExporter extends Exporter
         return [
             ExportColumn::make('id')
                 ->label('ID'),
-            ExportColumn::make('document_type'),
-            ExportColumn::make('document_number'),
-            ExportColumn::make('full_name'),
-            ExportColumn::make('email'),
-            ExportColumn::make('phone_primary'),
-            ExportColumn::make('phone_secondary'),
-            ExportColumn::make('nrc'),
-            ExportColumn::make('economic_activity'),
-            ExportColumn::make('department'),
-            ExportColumn::make('municipality'),
-            ExportColumn::make('district'),
-            ExportColumn::make('address'),
-            ExportColumn::make('created_at'),
-            ExportColumn::make('updated_at'),
+
+            ExportColumn::make('document_type')
+                ->label('Tipo de documento'),
+
+            ExportColumn::make('document_number')
+                ->label('Número de documento'),
+
+            ExportColumn::make('full_name')
+                ->label('Nombre completo'),
+
+            ExportColumn::make('email')
+                ->label('Correo electrónico'),
+
+            ExportColumn::make('phone_primary')
+                ->label('Teléfono principal'),
+
+            ExportColumn::make('phone_secondary')
+                ->label('Teléfono secundario'),
+
+            ExportColumn::make('nrc')
+                ->label('NRC'),
+
+            ExportColumn::make('economic_activity')
+                ->label('Actividad económica'),
+/*                 ->formatStateUsing(
+                    fn ($state) => ActividadesEconomicas::activityName($state)
+                ), */
+
+            ExportColumn::make('department')
+                ->label('Departamento'),               /* ->formatStateUsing(
+                    fn ($state) => ElSalvadorCatalogo::departmentName($state)
+                ), */
+
+            ExportColumn::make('municipality')
+                ->label('Municipio'),
+/*                 ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
+                        $record->department,
+                        $state,
+                    )
+                ), */
+
+            ExportColumn::make('district')
+                ->label('Distrito'),
+/*                 ->formatStateUsing(
+                    fn ($state, $record) => ElSalvadorCatalogo::districtName(
+                        $record->municipality,
+                        $state,
+                    )
+                ), */
+
+            ExportColumn::make('address')
+                ->label('Dirección'),
+
+            ExportColumn::make('created_at')
+                ->label('Fecha de creación'),
+
+            ExportColumn::make('updated_at')
+                ->label('Última actualización'),
         ];
     }
 
@@ -53,12 +99,32 @@ class CustomerExporter extends Exporter
         ];
     }
 
+    public function getFileExtension(): string
+    {
+        return FileHelper::extension(
+            $this->export->file_name
+        );
+    }
+
+    public function isExcel(): bool
+    {
+        return $this->getFileExtension() === 'xlsx';
+    }
+
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your customer export has completed and ' . Number::format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
+        $body = 'Your customer export has completed and '
+            . Number::format($export->successful_rows)
+            . ' '
+            . str('row')->plural($export->successful_rows)
+            . ' exported.';
 
         if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
+            $body .= ' '
+                . Number::format($failedRowsCount)
+                . ' '
+                . str('row')->plural($failedRowsCount)
+                . ' failed to export.';
         }
 
         return $body;

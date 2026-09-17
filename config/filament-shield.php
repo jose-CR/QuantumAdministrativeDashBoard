@@ -258,16 +258,13 @@ return [
     */
 
     'custom_permissions' => [
-
-        // ClientReference
-        'ViewAny:ClientReference',
-        'View:ClientReference',
-        'Create:ClientReference',
-        'Update:ClientReference',
-        'Delete:ClientReference',
-        'DeleteAny:ClientReference',
-        'Reorder:ClientReference',
-
+    	'ViewAny:ClientReference' => 'View Any Client Reference',
+    	'View:ClientReference' => 'View Client Reference',
+    	'Create:ClientReference' => 'Create Client Reference',
+    	'Update:ClientReference' => 'Update Client Reference',
+    	'Delete:ClientReference' => 'Delete Client Reference',
+    	'DeleteAny:ClientReference' => 'Delete Any Client Reference',
+    	'Reorder:ClientReference' => 'Reorder Client Reference',
     ],
 
     /*

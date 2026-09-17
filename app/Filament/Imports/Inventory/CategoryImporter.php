@@ -21,7 +21,6 @@ class CategoryImporter extends Importer
                 ->rules(CategoryRules::import()['name']),
 
             ImportColumn::make('description')
-                ->requiredMapping()
                 ->rules(CategoryRules::import()['description']),
         ];
     }
