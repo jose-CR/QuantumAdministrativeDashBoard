@@ -2,6 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Filament\Exports\Outflow\OutflowExporter;
+use App\Filament\Imports\Outflow\OutflowImporter;
 use App\Models\Outflow;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -73,8 +75,10 @@ class OutflowsTable extends Component implements HasTable, HasForms, HasActions
                         
                     ]),
                 ExportAction::make()
-                    ->label('exportar salidas'),
-                ImportAction::make(),
+                    ->label('exportar salidas')
+                    ->exporter(OutflowExporter::class),
+                ImportAction::make()
+                    ->importer(OutflowImporter::class),
             ])
             ->actions([
                 EditAction::make()

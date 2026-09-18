@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Filament\Exports\Inflow\InflowExporter;
 use App\Models\Inflow;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -13,6 +14,7 @@ use Filament\Actions\ImportAction;
 use Filament\Forms;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
+use App\Filament\Imports\Inflow\InflowImporter;
 use Filament\Schemas\Components\Utilities\Get;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -76,8 +78,10 @@ class InflowsTable extends Component implements HasTable, HasForms, HasActions
                         Forms\Components\TextInput::make('salesperson')->label('Vendedor')->required(),
                         Forms\Components\Textarea::make('notes')->label('Observaciones'),
                     ]),
-                ExportAction::make(),
-                ImportAction::make(),
+                ExportAction::make()
+                    ->exporter(InflowExporter::class),
+                ImportAction::make()
+                    ->importer(InflowImporter::class),
             ])
             ->actions([
                 EditAction::make()

@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
-/*             CategorySeeder::class,
+            CategorySeeder::class,
             ArticleSeeder::class,
             ArticleUnitSeeder::class,
             TransportationSeeder::class,
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             InstallmentSeeder::class,
             BankSeeder::class,
             PaymentHistorySeeder::class,
-            CreditItemSeeder::class, */
+            CreditItemSeeder::class,
             OutflowSeeder::class,
             InflowSeeder::class,
         ]);

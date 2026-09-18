@@ -4,8 +4,6 @@ namespace App\Filament\Exports\Downloaders;
 
 use App\Models\Bank;
 use App\Models\Customer;
-use App\Support\ActividadesEconomicas;
-use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Exports\Downloaders\XlsxDownloader as BaseXlsxDownloader;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Filesystem\FilesystemAdapter;
@@ -15,7 +13,7 @@ use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class XlsxDownloader extends BaseXlsxDownloader
+class InflowXlsxDownloader extends BaseXlsxDownloader
 {
     public function __invoke(Export $export): StreamedResponse
     {
@@ -41,7 +39,6 @@ class XlsxDownloader extends BaseXlsxDownloader
                 $fileName,
                 $writer,
                 $csvDelimiter,
-                $export,
             ): void {
                 $writer->openToBrowser($fileName);
 
@@ -57,7 +54,6 @@ class XlsxDownloader extends BaseXlsxDownloader
                     $disk,
                     $directory,
                     $csvDelimiter,
-                    $export,
                 );
 
                 $writer->close();
@@ -97,7 +93,6 @@ class XlsxDownloader extends BaseXlsxDownloader
         FilesystemAdapter $disk,
         string $directory,
         string $csvDelimiter,
-        Export $export,
     ): void {
         foreach ($disk->files($directory) as $file) {
             if (str($file)->endsWith('headers.csv')) {
@@ -119,70 +114,17 @@ class XlsxDownloader extends BaseXlsxDownloader
             foreach ($results->getRecords() as $row) {
                 $writer->addRow(
                     Row::fromValues(
-                        $this->transformRow($row, $export),
+                        $this->transformRow($row),
                     ),
                 );
             }
         }
     }
 
-    private function transformRow(
-        array $row,
-        Export $export,
-    ): array {
-        $exporter = $export->exporter;
-
-        if ($exporter === \App\Filament\Exports\CustomerExporter::class) {
-            return $this->transformCustomerRow($row);
-        }
-
-        if ($exporter === \App\Filament\Exports\Inflow\InflowExporter::class) {
-            return $this->transformInflowRow($row);
-        }
-
-        return $row;
-    }
-
-    private function transformCustomerRow(array $row): array
+    private function transformRow(array $row): array
     {
-        $economicActivity = $row[8];
-        $department = $row[9];
-        $municipality = $row[10];
-        $district = $row[11];
-
-        $row[8] = ActividadesEconomicas::activityName(
-            $economicActivity,
-        );
-
-        $row[9] = ElSalvadorCatalogo::departmentName(
-            $department,
-        );
-
-        $row[10] = ElSalvadorCatalogo::municipalityName(
-            $department,
-            $municipality,
-        );
-
-        $row[11] = ElSalvadorCatalogo::districtName(
-            $municipality,
-            $district,
-        );
-
-        return $row;
-    }
-
-    private function transformInflowRow(array $row): array
-    {
-        $customerId = $row[3] ?? null;
-        $bankId = $row[7] ?? null;
-
-        $customer = filled($customerId)
-            ? Customer::find($customerId)
-            : null;
-
-        $bank = filled($bankId)
-            ? Bank::find($bankId)
-            : null;
+        $customer = Customer::find($row[3]);
+        $bank = Bank::find($row[7]);
 
         $row[3] = $customer?->full_name;
         $row[7] = $bank?->name;
