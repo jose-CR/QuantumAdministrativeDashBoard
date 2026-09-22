@@ -15,14 +15,14 @@ class OutflowExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('invoice_date'),
-            ExportColumn::make('company'),
-            ExportColumn::make('invoice_code'),
-            ExportColumn::make('quantity'),
-            ExportColumn::make('amount'),
-            ExportColumn::make('description'),
-            ExportColumn::make('source'),
-            ExportColumn::make('area'),
+            ExportColumn::make('invoice_date')->label('Fecha de factura'),
+            ExportColumn::make('company')->label('Empresa'),
+            ExportColumn::make('invoice_code')->label('Código de factura'),
+            ExportColumn::make('quantity')->label('Cantidad'),
+            ExportColumn::make('amount')->label('Monto'),
+            ExportColumn::make('description')->label('Descripción'),
+            ExportColumn::make('source')->label('Origen'),
+            ExportColumn::make('area')->label('Área'),
         ];
     }
 

@@ -32,10 +32,21 @@ class InflowExporter extends Exporter
                 ->label('Monto'),
 
             ExportColumn::make('payment_method')
-                ->label('Método de pago'),
+                ->label('Método de pago')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'cash' => 'Efectivo',
+                        'transfer' => 'Transferencia',
+                        default => $state,
+                    }),
 
             ExportColumn::make('transfer_number')
-                ->label('Número de transferencia'),
+                ->label('Número de transferencia')
+                    ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'partial' => 'Parcial',
+                        'paid' => 'Pagado',
+                        default => $state,
+                    }),
 
             ExportColumn::make('bank')
                 ->label('Banco')
