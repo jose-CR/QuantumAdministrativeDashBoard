@@ -22,74 +22,96 @@ class CustomerInfoList
     {
         return $schema
             ->components([
-                Section::make(__('resources.clients.sections.client'))
-                    ->description(fn (Customer $record) =>
-                        $record->activeCredit()->exists()
-                            ? 'Información general del cliente'
-                            : 'Este cliente no tiene un crédito activo actualmente.'
-                    )
-                    ->icon(fn (Customer $record) =>
-                        $record->activeCredit()->exists()
-                            ? Heroicon::UserCircle
-                            : Heroicon::InformationCircle
-                    )
-                    ->schema([
-                        TextEntry::make('full_name')
-                            ->label(__('resources.clients.fields.full_name'))
-                            ->size(TextSize::Large)
-                            ->weight(FontWeight::Bold)
-                            ->icon(Heroicon::UserCircle)
-                            ->columnSpanFull(),
+            Section::make(__('resources.clients.sections.client'))
+                ->extraAttributes([
+                            'class' => 'text-center',
+                ])
+                ->description(function (Customer $record): string {
+                    
+                    return $record->activeCredit()->exists()
+                        ? 'Información general del cliente'
+                        : 'Este cliente no tiene un crédito activo actualmente.';
+                })
+                ->icon(function (Customer $record) {
+                    return $record->activeCredit()->exists()
+                        ? Heroicon::UserCircle
+                        : Heroicon::InformationCircle;
+                })
+                ->schema([
+                    TextEntry::make('full_name')
+                        ->label(__('resources.clients.fields.full_name'))
+                        ->size(TextSize::Large)
+                        ->weight(FontWeight::Bold)
+                        ->icon(Heroicon::UserCircle)
+                        ->alignCenter()
+                        ->columnSpanFull(),
 
-                        TextEntry::make('phone_primary')
-                            ->label(__('resources.clients.fields.phones'))
-                            ->formatStateUsing(function ($state, $record) {
-                                return $state . ' / ' . $record->phone_secondary;
-                            })
-                            ->icon(Heroicon::Phone),
-
-                        TextEntry::make('document_number')
-                            ->label(__('resources.clients.fields.identity_document'))
-                            ->icon(Heroicon::Identification),
-
-                        TextEntry::make('email')
-                            ->label(__('resources.clients.fields.email'))
-                            ->icon(Heroicon::Envelope),
-
-                        TextEntry::make('address')
-                            ->label(__('resources.clients.fields.address'))
-                            ->icon(Heroicon::MapPin)
-                            ->columnSpanFull(),
-                    ])
-                    ->columns(4),
-
-                Section::make(__('resources.clients.sections.financed_article'))
-                    ->visible(fn (Customer $record) => self::hasActiveCredit($record))
-                    ->schema([
-                        RepeatableEntry::make('latestCredit.items')
-                            ->label(__('resources.clients.fields.vehicle'))
-                            ->schema([
-                                TextEntry::make('articleUnit.article.full_name')
-                                    ->label('articulo')
-                                    ->weight(FontWeight::SemiBold),
+                    TextEntry::make('phone_primary')
+                        ->label(__('resources.clients.fields.phones'))
+                        ->formatStateUsing(function ($state, $record) {
+                            return collect([
+                                $state,
+                                $record->phone_secondary,
                             ])
-                            ->columns(1)
-                            ->contained(false),
+                                ->filter()
+                                ->implode(' / ');
+                        })
+                        ->icon(Heroicon::Phone),
 
-                        RepeatableEntry::make('latestCredit.items')
-                            ->label(__('Precio de la unidad'))
-                            ->schema([
-                                TextEntry::make('price')
-                                    ->label('Precio')
-                                    ->money('USD'),
-                            ])
-                            ->columns(1)
-                            ->contained(false),
-                        
-                        TextEntry::make('latestCredit.down_payment')
-                            ->label(__('resources.clients.fields.down_payment')),
-                    ])
-                    ->columns(3),
+                    TextEntry::make('document_number')
+                        ->label(__('resources.clients.fields.identity_document'))
+                        ->icon(Heroicon::Identification),
+
+                    TextEntry::make('email')
+                        ->label(__('resources.clients.fields.email'))
+                        ->icon(Heroicon::Envelope),
+
+                    TextEntry::make('nrc')
+                        ->formatStateUsing(fn ($state) => $state ?? 'Sin NRC')
+                        ->visible(fn (Customer $record) => $record->document_type === 'NIT')
+                        ->label('NRC'),
+
+                    TextEntry::make('economic_activity')
+                    ->icon(Heroicon::Briefcase)
+                    ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
+
+                    TextEntry::make('address')
+                        ->label(__('resources.clients.fields.address'))
+                        ->icon(Heroicon::MapPin)
+                        ->columnSpanFull(),
+                ])
+                ->columns(3)
+                ->columnSpanFull(),
+
+                    Section::make(__('resources.clients.sections.financed_article'))
+                        ->extraAttributes([
+                            'class' => 'text-center',
+                        ])
+                        ->visible(fn (Customer $record) => self::hasActiveCredit($record))
+                        ->schema([
+                            RepeatableEntry::make('latestCredit.items')
+                                ->label(__('resources.clients.fields.vehicle'))
+                                ->schema([
+                                    TextEntry::make('display_name')
+                                        ->label('Artículo')
+                                        ->weight(FontWeight::SemiBold),
+
+                                    TextEntry::make('price')
+                                        ->label('Precio')
+                                        ->money('USD')
+                                        ->weight(FontWeight::Medium),
+                                ])
+                                ->columns(2)
+                                ->contained(false)
+                                ->columnSpanFull(),
+
+                            TextEntry::make('latestCredit.down_payment')
+                                ->label(__('resources.clients.fields.down_payment'))
+                                ->money('USD')
+                                ->weight(FontWeight::SemiBold)
+                                ->columnSpanFull(),
+                        ])
+                        ->columnSpanFull(),
 
                 Section::make(__('resources.clients.sections.credit_summary'))
                     ->visible(fn (Customer $record) => self::hasActiveCredit($record))
