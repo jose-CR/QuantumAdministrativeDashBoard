@@ -6,6 +6,8 @@ use App\Support\CashReport;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Notifications\Notification;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 
 class CashReportAction extends Action
 {
@@ -55,7 +57,27 @@ class CashReportAction extends Action
                     return null;
                 }
 
-                return response()->download($path)->deleteFileAfterSend();
+                $url = URL::temporarySignedRoute(
+                    'cash-report.download',
+                    now()->addMinutes(10),
+                    ['filename' => basename($path)],
+                );
+
+                $recipient = Auth::user();
+
+                Notification::make()
+                    ->title('Reporte generado')
+                    ->body('Tu reporte de flujo de caja está listo.')
+                    ->success()
+                    ->actions([
+                        Action::make('download')
+                            ->label('Descargar')
+                            ->url($url)
+                            ->openUrlInNewTab(),
+                    ])
+                    ->sendToDatabase($recipient);
+
+                return null;
             });
     }
 }
