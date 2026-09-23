@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
+use App\Filament\Admin\Actions\CashReportAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource; 
 use App\Filament\Exports\CustomerExporter;
 use App\Filament\Imports\CustomerImporter;
@@ -34,6 +35,7 @@ class ListCustomers extends ListRecords
                         );
                     }
                 }),
+            CashReportAction::make(),
         ];
     }
 }

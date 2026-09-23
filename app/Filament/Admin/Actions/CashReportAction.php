@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Actions;
+namespace App\Filament\Admin\Actions;
 
 use App\Support\CashReport;
 use Filament\Actions\Action;
@@ -18,15 +18,28 @@ class CashReportAction extends Action
     {
         parent::setUp();
 
+        $range = CashReport::dateRange();
+
         $this
             ->label('Reporte de flujo de caja')
             ->icon('heroicon-o-arrow-down-tray')
             ->modalHeading('Reporte de flujo de caja')
-            ->modalDescription('Entradas y salidas en una hoja, con resumen, gráficos y análisis. Sin fechas incluye todo.')
+            ->modalDescription(
+                $range['min'] && $range['max']
+                    ? "Entradas y salidas en una hoja, con resumen, gráficos y análisis. Datos disponibles entre {$range['min']} y {$range['max']}. Sin fechas incluye todo."
+                    : 'Entradas y salidas en una hoja, con resumen, gráficos y análisis. Sin fechas incluye todo.'
+            )
             ->modalSubmitActionLabel('Generar y descargar')
             ->schema([
-                DatePicker::make('from')->label('Desde'),
-                DatePicker::make('until')->label('Hasta'),
+                DatePicker::make('from')
+                    ->label('Desde')
+                    ->minDate($range['min'])
+                    ->maxDate($range['max']),
+                DatePicker::make('until')
+                    ->label('Hasta')
+                    ->minDate($range['min'])
+                    ->maxDate($range['max'])
+                    ->afterOrEqual('from'),
             ])
             ->action(function (array $data) {
                 try {

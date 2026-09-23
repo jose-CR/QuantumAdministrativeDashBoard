@@ -13,8 +13,37 @@ use Illuminate\Support\Str;
 
 class CashReport
 {
+    /**
+     * Earliest/latest date with data across inflows and outflows, used to
+     * bound the DatePicker so the user can't pick a month with nothing in it.
+     */
+    public static function dateRange(): array
+    {
+        $min = collect([
+            Inflow::min('date'),
+            Outflow::min('invoice_date'),
+        ])->filter()->min();
+
+        $max = collect([
+            Inflow::max('date'),
+            Outflow::max('invoice_date'),
+        ])->filter()->max();
+
+        return [
+            'min' => $min ? Carbon::parse($min)->toDateString() : null,
+            'max' => $max ? Carbon::parse($max)->toDateString() : null,
+        ];
+    }
+
     public static function generate(?string $from = null, ?string $until = null): string
     {
+        $inflows = static::inflows($from, $until);
+        $outflows = static::outflows($from, $until);
+
+        if (empty($inflows['rows']) && empty($outflows['rows'])) {
+            throw new \RuntimeException('No hay entradas ni salidas registradas en ese rango de fechas.');
+        }
+
         $out = storage_path('app/private/exports/cash_report_' . now()->format('Ymd_His') . '_' . Str::random(4) . '.xlsx');
         File::ensureDirectoryExists(dirname($out));
 
@@ -22,8 +51,8 @@ class CashReport
             'out' => $out,
             'gap' => 2,
             'projection_months' => 3,
-            'inflows' => static::inflows($from, $until),
-            'outflows' => static::outflows($from, $until),
+            'inflows' => $inflows,
+            'outflows' => $outflows,
         ];
 
         $result = Process::timeout(120)
