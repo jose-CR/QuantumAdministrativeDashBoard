@@ -25,4 +25,14 @@ class Outflow extends Model
         'invoice_date' => 'date',
         'amount' => 'decimal:2',
     ];
+
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    public function receipts()
+    {
+        return $this->attachments()->where('collection', 'receipts');
+    }
 }

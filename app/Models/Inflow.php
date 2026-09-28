@@ -33,4 +33,14 @@ class Inflow extends Model
         return $this->belongsTo(Bank::class);
     }    
 
+    public function attachments()
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    public function receipts()
+    {
+        return $this->attachments()->where('collection', 'receipts');
+    }
+
 }

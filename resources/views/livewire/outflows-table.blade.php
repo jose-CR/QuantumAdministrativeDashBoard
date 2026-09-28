@@ -1,1 +1,0 @@
-<div>{{ $this->table }}</div>
