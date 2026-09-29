@@ -14,6 +14,7 @@
         "laravel/tinker": "^2.9"
     },
     "require-dev": {
+        "barryvdh/laravel-ide-helper": "^3.7",
         "fakerphp/faker": "^1.23",
         "friendsofphp/php-cs-fixer": "^3.95",
         "laracraft-tech/laravel-schema-rules": "^1.6",

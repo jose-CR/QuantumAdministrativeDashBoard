@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Administration\Outflows\Schemas;
 
+use App\Models\Attachment;
 use App\Models\Outflow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -44,23 +45,33 @@ class OutflowForm
                     ->required(),
 
                 FileUpload::make('attachment_uploads')
-                    ->label('Adjuntos')
+                    ->label('Archivos')
                     ->multiple()
-                    ->disk('public')
-                    ->directory('outflows/attachments')
+                    ->disk('attachments')
+                    ->storeFileNamesIn('file_names')
                     ->preserveFilenames()
                     ->downloadable()
                     ->openable()
                     ->previewable()
                     ->maxFiles(10)
                     ->dehydrated(false)
-                    ->afterStateHydrated(function (FileUpload $component, ?Outflow $record) {
-                        if ($record) {
+                    ->afterStateHydrated(
+                        function (
+                            FileUpload $component,
+                            ?Outflow $record
+                        ) {
+                            if (! $record) {
+                                return;
+                            }
+
                             $component->state(
-                                $record->attachments->pluck('path')->toArray()
+                                $record->attachments
+                                    ->pluck('path')
+                                    ->toArray()
                             );
                         }
-                    }),
+                    ),
+
 
             ]);
     }

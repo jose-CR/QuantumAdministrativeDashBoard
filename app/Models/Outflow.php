@@ -26,6 +26,13 @@ class Outflow extends Model
         'amount' => 'decimal:2',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Outflow $outflow) {
+            $outflow->attachments->each->delete();
+        });
+    }
+
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachable');

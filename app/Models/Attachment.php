@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\URL;
 
 class Attachment extends Model
 {
@@ -24,6 +25,13 @@ class Attachment extends Model
         'formatted_size',
     ];
 
+    protected static function booted(): void
+    {
+        static::deleting(function (Attachment $attachment) {
+            Storage::disk($attachment->disk)->delete($attachment->path);
+        });
+    }
+
     public function attachable(): MorphTo
     {
         return $this->morphTo();
@@ -31,7 +39,11 @@ class Attachment extends Model
 
     public function getUrlAttribute(): string
     {
-        return Storage::disk($this->disk)->url($this->path);
+        return URL::temporarySignedRoute(
+            'attachments.show',
+            now()->addMinutes(30),
+            ['attachment' => $this->id],
+        );
     }
 
     public function getExtensionAttribute(): string

@@ -13,6 +13,9 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         //
+        $middleware->alias([
+            'attachments.access' => \App\Http\Middleware\EnsureAttachmentAccess::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

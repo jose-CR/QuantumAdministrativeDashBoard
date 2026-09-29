@@ -17,6 +17,7 @@ class OutflowsTable
     public static function configure(Table $table): Table
     {
         $editUrl = fn (Outflow $record): string => OutflowResource::getUrl('edit', ['record' => $record]);
+        $deleteUrl = fn (Outflow $record): string => OutflowResource::getUrl('delete', ['record' => $record]);
 
         return $table
             ->columns([
@@ -54,7 +55,8 @@ class OutflowsTable
             ->recordActions([
                 EditAction::make()
                     ->url($editUrl),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    ->modalHeading(fn (Outflow $record) => "Eliminar factura {$record->invoice_code}"),
                 Action::make('verAdjuntos')
                     ->label('Ver adjuntos')
                     ->icon('heroicon-o-paper-clip')

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->morphs('attachable'); // attachable_id + attachable_type
             $table->string('collection')->default('default'); // ej: 'receipts', 'avatars', 'documents'
-            $table->string('disk')->default('public');
+            $table->string('disk')->default('attachments');
             $table->string('path');
             $table->string('original_name')->nullable();
             $table->string('mime_type')->nullable();

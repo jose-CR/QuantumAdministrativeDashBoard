@@ -9,6 +9,8 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 use Filament\Actions\Exports\Downloaders\XlsxDownloader;
 use App\Filament\Exports\Downloaders\XlsxDownloader as CustomXlsxDownloader;
+use App\Models\Attachment;
+use Storage;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,5 +39,15 @@ class AppServiceProvider extends ServiceProvider
         //return $user !== null && $user->hasRole('admin');
             return true;
         });
+
+        Storage::disk('attachments')->buildTemporaryUrlsUsing(
+        function (string $path, \DateTimeInterface $expiration) {
+            $attachment = Attachment::where('disk', 'attachments')
+                ->where('path', $path)
+                ->first();
+
+            return $attachment?->url ?? '#';
+        }
+    );
     }
 }
