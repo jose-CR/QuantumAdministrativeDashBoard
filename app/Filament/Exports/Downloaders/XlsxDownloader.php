@@ -2,13 +2,17 @@
 
 namespace App\Filament\Exports\Downloaders;
 
+use App\Filament\Exports\Services\ExportZipService;
 use App\Models\Bank;
 use App\Models\Customer;
+use App\Models\Inflow;
+use App\Models\Outflow;
 use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
-use Filament\Actions\Exports\Downloaders\XlsxDownloader as BaseXlsxDownloader;
+use Filament\Actions\Exports\Downloaders\Contracts\Downloader;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Filesystem\FilesystemAdapter;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Process;
 use Illuminate\Support\Str;
@@ -18,13 +22,8 @@ use OpenSpout\Common\Entity\Row;
 use OpenSpout\Writer\XLSX\Writer;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class XlsxDownloader extends BaseXlsxDownloader
+class XlsxDownloader implements Downloader
 {
-    /**
-     * Exporters that get Resumen + Análisis sheets (duplicates/anomalies + projection)
-     * appended by python/scripts/cash_report.py, in addition to the TOTAL row.
-     * Keys must match the column labels set in each Exporter's getColumns().
-     */
     private const REPORT_META = [
         \App\Filament\Exports\Inflow\InflowExporter::class => [
             'title' => 'Entradas',
@@ -44,74 +43,87 @@ class XlsxDownloader extends BaseXlsxDownloader
         ],
     ];
 
+    private const MODEL_MAP = [
+        \App\Filament\Exports\Inflow\InflowExporter::class => Inflow::class,
+        \App\Filament\Exports\Outflow\OutflowExporter::class => Outflow::class,
+    ];
+
+    public function __construct(
+        private readonly ExportZipService $zipService,
+    ) {}
+
     public function __invoke(Export $export): StreamedResponse
     {
         /** @var FilesystemAdapter $disk */
         $disk = $export->getFileDisk();
-
         $directory = $export->getFileDirectory();
-
-        $fileName = $export->file_name . '.xlsx';
 
         if (! $disk->exists($directory)) {
             abort(404);
         }
 
-        $writer = app(Writer::class);
+        $tmpXlsx = storage_path('app/private/exports/' . Str::uuid() . '.xlsx');
+        File::ensureDirectoryExists(dirname($tmpXlsx));
 
-        $csvDelimiter = $export->exporter::getCsvDelimiter();
+        $recordIds = $this->createXlsx($tmpXlsx, $disk, $directory, $export);
 
-        $tmp = storage_path('app/private/exports/' . Str::uuid() . '.xlsx');
-        File::ensureDirectoryExists(dirname($tmp));
-
-        // 1) Laravel writes the full Excel to a temp file (same logic as before,
-        //    just openToFile instead of openToBrowser so Python can post-process it).
-        $writer->openToFile($tmp);
-
-        $this->writeHeaders(
-            $writer,
-            $disk,
-            $directory,
-            $csvDelimiter,
-        );
-
-        $this->writeDataRows(
-            $writer,
-            $disk,
-            $directory,
-            $csvDelimiter,
-            $export,
-        );
-
-        $writer->close();
-
-        // 2) Python appends TOTAL (+ Resumen/Análisis for exporters listed in REPORT_META)
-        $payload = ['path' => $tmp] + (self::REPORT_META[$export->exporter] ?? []);
+        // Enriquecer con TOTAL / Resumen / Análisis antes de zippear
+        $reportPayload = ['path' => $tmpXlsx] + (self::REPORT_META[$export->exporter] ?? []);
 
         $result = Process::timeout(60)
-            ->input(json_encode($payload, JSON_UNESCAPED_UNICODE))
+            ->input(json_encode($reportPayload, JSON_UNESCAPED_UNICODE))
             ->run([
                 base_path('python/.venv/bin/python'),
                 base_path('python/scripts/cash_report.py'),
             ]);
 
         if ($result->failed()) {
-            @unlink($tmp);
+            @unlink($tmpXlsx);
 
-            throw new \RuntimeException($result->errorOutput() ?: 'cash_report.py falló sin mensaje.');
+            throw new \RuntimeException(
+                $result->errorOutput() ?: 'cash_report.py falló sin mensaje.'
+            );
         }
 
-        // 3) Download the final file and delete the temp copy afterwards
-        return response()->streamDownload(
-            function () use ($tmp): void {
-                readfile($tmp);
-                @unlink($tmp);
-            },
-            $fileName,
-            [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            ],
+        $attachments = $this->getAttachmentsForExport($export, $recordIds);
+
+        $zipPath = $this->zipService->createZip(
+            $export,
+            $tmpXlsx,
+            $export->file_name . '.xlsx',
+            $attachments,
         );
+
+        return response()->streamDownload(
+            function () use ($zipPath, $tmpXlsx): void {
+                readfile($zipPath);
+                @unlink($zipPath);
+                @unlink($tmpXlsx);
+            },
+            $export->file_name . '.zip',
+            ['Content-Type' => 'application/zip'],
+        );
+    }
+
+    private function createXlsx(
+        string $tmpXlsx,
+        FilesystemAdapter $disk,
+        string $directory,
+        Export $export,
+    ): array {
+        $writer = app(Writer::class);
+        $csvDelimiter = $export->exporter::getCsvDelimiter();
+
+        $writer->openToFile($tmpXlsx);
+
+        $hasIdColumn = in_array($export->exporter, array_keys(self::MODEL_MAP), true);
+
+        $this->writeHeaders($writer, $disk, $directory, $csvDelimiter, $hasIdColumn);
+        $recordIds = $this->writeDataRows($writer, $disk, $directory, $csvDelimiter, $export, $hasIdColumn);
+
+        $writer->close();
+
+        return array_values(array_unique($recordIds));
     }
 
     private function writeHeaders(
@@ -119,21 +131,27 @@ class XlsxDownloader extends BaseXlsxDownloader
         FilesystemAdapter $disk,
         string $directory,
         string $csvDelimiter,
+        bool $hasIdColumn,
     ): void {
         $file = $directory . DIRECTORY_SEPARATOR . 'headers.csv';
 
-        $reader = CsvReader::from(
-            $disk->readStream($file),
-        );
+        if (! $disk->exists($file)) {
+            return;
+        }
 
+        $reader = CsvReader::from($disk->readStream($file));
         $reader->setDelimiter($csvDelimiter);
 
         $results = (new Statement)->process($reader);
 
         foreach ($results->getRecords() as $row) {
-            $writer->addRow(
-                Row::fromValues($row),
-            );
+            $row = array_values($row);
+
+            if ($hasIdColumn) {
+                array_pop($row);
+            }
+
+            $writer->addRow(Row::fromValues($row));
         }
     }
 
@@ -143,7 +161,10 @@ class XlsxDownloader extends BaseXlsxDownloader
         string $directory,
         string $csvDelimiter,
         Export $export,
-    ): void {
+        bool $hasIdColumn,
+    ): array {
+        $recordIds = [];
+
         foreach ($disk->files($directory) as $file) {
             if (str($file)->endsWith('headers.csv')) {
                 continue;
@@ -153,28 +174,48 @@ class XlsxDownloader extends BaseXlsxDownloader
                 continue;
             }
 
-            $reader = CsvReader::from(
-                $disk->readStream($file),
-            );
-
+            $reader = CsvReader::from($disk->readStream($file));
             $reader->setDelimiter($csvDelimiter);
 
             $results = (new Statement)->process($reader);
 
             foreach ($results->getRecords() as $row) {
+                $row = array_values($row);
+
+                if ($hasIdColumn) {
+                    $id = array_pop($row);
+
+                    if (filled($id)) {
+                        $recordIds[] = $id;
+                    }
+                }
+
                 $writer->addRow(
-                    Row::fromValues(
-                        $this->transformRow($row, $export),
-                    ),
+                    Row::fromValues($this->transformRow($row, $export)),
                 );
             }
         }
+
+        return $recordIds;
     }
 
-    private function transformRow(
-        array $row,
-        Export $export,
-    ): array {
+    private function getAttachmentsForExport(Export $export, array $recordIds): Collection
+    {
+        $modelClass = self::MODEL_MAP[$export->exporter] ?? null;
+
+        if (! $modelClass || empty($recordIds)) {
+            return collect();
+        }
+
+        return $modelClass::query()
+            ->whereIn('id', $recordIds)
+            ->with('attachments')
+            ->get()
+            ->flatMap(fn ($record) => $record->attachments);
+    }
+
+    private function transformRow(array $row, Export $export): array
+    {
         $exporter = $export->exporter;
 
         if ($exporter === \App\Filament\Exports\CustomerExporter::class) {
@@ -190,28 +231,15 @@ class XlsxDownloader extends BaseXlsxDownloader
 
     private function transformCustomerRow(array $row): array
     {
-        $economicActivity = $row[8];
-        $department = $row[9];
-        $municipality = $row[10];
-        $district = $row[11];
+        $economicActivity = $row[8] ?? null;
+        $department = $row[9] ?? null;
+        $municipality = $row[10] ?? null;
+        $district = $row[11] ?? null;
 
-        $row[8] = ActividadesEconomicas::activityName(
-            $economicActivity,
-        );
-
-        $row[9] = ElSalvadorCatalogo::departmentName(
-            $department,
-        );
-
-        $row[10] = ElSalvadorCatalogo::municipalityName(
-            $department,
-            $municipality,
-        );
-
-        $row[11] = ElSalvadorCatalogo::districtName(
-            $municipality,
-            $district,
-        );
+        $row[8] = ActividadesEconomicas::activityName($economicActivity);
+        $row[9] = ElSalvadorCatalogo::departmentName($department);
+        $row[10] = ElSalvadorCatalogo::municipalityName($department, $municipality);
+        $row[11] = ElSalvadorCatalogo::districtName($municipality, $district);
 
         return $row;
     }
@@ -221,13 +249,8 @@ class XlsxDownloader extends BaseXlsxDownloader
         $customerId = $row[3] ?? null;
         $bankId = $row[7] ?? null;
 
-        $customer = filled($customerId)
-            ? Customer::find($customerId)
-            : null;
-
-        $bank = filled($bankId)
-            ? Bank::find($bankId)
-            : null;
+        $customer = filled($customerId) ? Customer::find($customerId) : null;
+        $bank = filled($bankId) ? Bank::find($bankId) : null;
 
         $row[3] = $customer?->full_name;
         $row[7] = $bank?->name;

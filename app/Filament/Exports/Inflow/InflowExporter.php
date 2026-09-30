@@ -40,13 +40,7 @@ class InflowExporter extends Exporter
                     }),
 
             ExportColumn::make('transfer_number')
-                ->label('Número de transferencia')
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pendiente',
-                        'partial' => 'Parcial',
-                        'paid' => 'Pagado',
-                        default => $state,
-                    }),
+                ->label('Número de transferencia'),
 
             ExportColumn::make('bank')
                 ->label('Banco')
@@ -56,13 +50,22 @@ class InflowExporter extends Exporter
                 ->label('Fecha de transferencia'),
 
             ExportColumn::make('payment_status')
-                ->label('Estado de pago'),
+                ->label('Estado de pago')
+                ->formatStateUsing(fn (string $state): string => match ($state) {
+                        'pending' => 'Pendiente',
+                        'partial' => 'Parcial',
+                        'paid' => 'Pagado',
+                        default => $state,
+                    }),
 
             ExportColumn::make('salesperson')
                 ->label('Vendedor'),
 
             ExportColumn::make('notes')
                 ->label('Notas'),
+            
+            ExportColumn::make('id')
+                ->label('ID interno'),
         ];
     }
 

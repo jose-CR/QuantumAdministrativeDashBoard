@@ -1,5 +1,7 @@
 import json
 import sys
+import os
+import zipfile
 from datetime import date
 
 import numpy as np
@@ -506,9 +508,33 @@ def combined_report(p):
         "flagged": {c["title"]: len(f) for c, f in zip(cfgs, flags)},
     }
 
+def build_zip(payload):
+    zip_path = payload.get("zip_path")
+    attachments = payload.get("attachments") or []
+
+    if not zip_path:
+        return
+
+    xlsx_name = payload.get("xlsx_name") or os.path.basename(payload["path"])
+
+    with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+        zf.write(payload["path"], arcname=xlsx_name)
+
+        for item in attachments:
+            source = item.get("source")
+            target = item.get("target")
+            if source and target and os.path.exists(source):
+                zf.write(source, arcname=target)
+
 
 def main():
     p = json.load(sys.stdin)
+
+    if p.get("zip_only"):
+        build_zip(p)
+        json.dump({"path": p.get("zip_path")}, sys.stdout)
+        return
+
     if "inflows" in p:
         result = combined_report(p)
     elif "amount" in p and "date" in p:

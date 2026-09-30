@@ -23,6 +23,8 @@ class OutflowExporter extends Exporter
             ExportColumn::make('description')->label('Descripción'),
             ExportColumn::make('source')->label('Origen'),
             ExportColumn::make('area')->label('Área'),
+            ExportColumn::make('id')
+                ->label('ID interno'),
         ];
     }
 

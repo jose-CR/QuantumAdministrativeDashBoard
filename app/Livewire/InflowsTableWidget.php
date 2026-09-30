@@ -3,9 +3,13 @@
 namespace App\Livewire;
 
 use App\Filament\Admin\Resources\Administration\Inflows\Tables\InflowsTable;
+use App\Filament\Exports\Inflow\InflowExporter;
+use App\Filament\Imports\Inflow\InflowImporter;
 use App\Models\Inflow;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\ExportAction;
+use Filament\Actions\ImportAction;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
 use Filament\Tables\Concerns\InteractsWithTable;
@@ -22,6 +26,17 @@ class InflowsTableWidget extends Component implements HasActions, HasTable, HasS
     public function table(Table $table): Table
     {
         return InflowsTable::configure($table)->query(Inflow::query());
+    
+    }
+
+    protected function getTableHeaderActions(): array
+    {
+        return[
+            ExportAction::make()
+                ->exporter(InflowExporter::class),
+            ImportAction::make()
+                ->importer(InflowImporter::class),
+        ];
     }
 
     public function render()

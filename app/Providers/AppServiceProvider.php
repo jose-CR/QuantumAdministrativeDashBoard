@@ -7,10 +7,12 @@ use App\Models\User;
 use App\Observers\InstallmentObserver;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
-use Filament\Actions\Exports\Downloaders\XlsxDownloader;
 use App\Filament\Exports\Downloaders\XlsxDownloader as CustomXlsxDownloader;
 use App\Models\Attachment;
 use Storage;
+use App\Filament\Exports\Downloaders\CsvDownloader as CustomCsvDownloader;
+use Filament\Actions\Exports\Downloaders\CsvDownloader as BaseCsvDownloader;
+use Filament\Actions\Exports\Downloaders\XlsxDownloader as BaseXlsxDownloader;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -20,7 +22,12 @@ class AppServiceProvider extends ServiceProvider
     public function register(): void
     {
         $this->app->bind(
-            XlsxDownloader::class,
+            BaseCsvDownloader::class,
+            CustomCsvDownloader::class,
+        );
+
+        $this->app->bind(
+            BaseXlsxDownloader::class,
             CustomXlsxDownloader::class,
         );
     }

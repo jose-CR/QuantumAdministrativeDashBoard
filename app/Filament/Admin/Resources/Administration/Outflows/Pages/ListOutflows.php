@@ -3,11 +3,7 @@
 namespace App\Filament\Admin\Resources\Administration\Outflows\Pages;
 
 use App\Filament\Admin\Resources\Administration\Outflows\OutflowResource;
-use App\Filament\Exports\Outflow\OutflowExporter;
-use App\Filament\Imports\Outflow\OutflowImporter;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOutflows extends ListRecords
@@ -20,11 +16,6 @@ class ListOutflows extends ListRecords
     {
         return [
             CreateAction::make(),
-            ExportAction::make()
-                ->label('exportar salidas')
-                ->exporter(OutflowExporter::class),
-            ImportAction::make()
-                ->importer(OutflowImporter::class),
         ];
     }
 }
