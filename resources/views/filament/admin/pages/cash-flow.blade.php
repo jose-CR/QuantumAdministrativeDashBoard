@@ -28,5 +28,4 @@
         <div x-show="activeTab === 'entrada'" class="mt-4">
             @livewire('inflows-table-widget')
         </div>
-
 </x-filament-panels::page>

@@ -99,7 +99,8 @@ class CustomerForm
                                             ->afterStateUpdated(function (callable $set) {
                                                 $set('municipality', null);
                                                 $set('district', null);
-                                            }),
+                                            })
+                                            ->required(),
 
                                         // Municipio
                                         Select::make('municipality')
@@ -132,7 +133,8 @@ class CustomerForm
                                             ->disabled(fn (Get $get) => !$get('department'))
                                             ->afterStateUpdated(function (callable $set) {
                                                 $set('district', null);
-                                            }),
+                                            })
+                                            ->required(),
 
                                         // Distrito
                                         Select::make('district')
@@ -161,7 +163,8 @@ class CustomerForm
                                                     new DistrictCodeRule($municipality),
                                                 ];
                                             })
-                                            ->disabled(fn (Get $get) => !$get('municipality')),
+                                            ->disabled(fn (Get $get) => !$get('municipality'))
+                                            ->required(),
 
                                         // Dirección
                                         TextInput::make('address')
