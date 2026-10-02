@@ -67,22 +67,26 @@ class XlsxDownloader implements Downloader
 
         $recordIds = $this->createXlsx($tmpXlsx, $disk, $directory, $export);
 
-        // Enriquecer con TOTAL / Resumen / Análisis antes de zippear
-        $reportPayload = ['path' => $tmpXlsx] + (self::REPORT_META[$export->exporter] ?? []);
+        // Solo enriquecer (TOTAL / Resumen / Análisis) para exporters que tengan
+        // metadata de flujo de caja (Inflow/Outflow). Otros exporters (ej. Customer)
+        // se descargan tal cual, sin pasar por cash_report.py.
+        if (array_key_exists($export->exporter, self::REPORT_META)) {
+            $reportPayload = ['path' => $tmpXlsx] + self::REPORT_META[$export->exporter];
 
-        $result = Process::timeout(60)
-            ->input(json_encode($reportPayload, JSON_UNESCAPED_UNICODE))
-            ->run([
-                base_path('python/.venv/bin/python'),
-                base_path('python/scripts/cash_report.py'),
-            ]);
+            $result = Process::timeout(60)
+                ->input(json_encode($reportPayload, JSON_UNESCAPED_UNICODE))
+                ->run([
+                    base_path('python/.venv/bin/python'),
+                    base_path('python/scripts/cash_report.py'),
+                ]);
 
-        if ($result->failed()) {
-            @unlink($tmpXlsx);
+            if ($result->failed()) {
+                @unlink($tmpXlsx);
 
-            throw new \RuntimeException(
-                $result->errorOutput() ?: 'cash_report.py falló sin mensaje.'
-            );
+                throw new \RuntimeException(
+                    $result->errorOutput() ?: 'cash_report.py falló sin mensaje.'
+                );
+            }
         }
 
         $attachments = $this->getAttachmentsForExport($export, $recordIds);
