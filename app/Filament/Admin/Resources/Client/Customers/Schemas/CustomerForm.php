@@ -8,8 +8,8 @@ use App\Rules\MunicipalityCodeRule;
 use App\Support\ActividadesEconomicas;
 use App\Support\DocumentHelper;
 use App\Support\ElSalvadorCatalogo;
-use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieTagsInput;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
@@ -54,6 +54,10 @@ class CustomerForm
                                                 )
                                             )
                                             ->required(),
+                                        
+                                        SpatieTagsInput::make('tags')
+                                            ->type('customer')
+                                            ->label('Etiquetas'),
 
                                         // Información personal
                                         TextInput::make('full_name')

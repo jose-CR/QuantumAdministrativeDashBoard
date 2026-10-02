@@ -13,9 +13,13 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
+use App\Models\Tag;
+use Illuminate\Database\Eloquent\Builder;
 
 class CustomersTable
 {
@@ -40,6 +44,10 @@ class CustomersTable
                     ->label('Número de documento')
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                
+                SpatieTagsColumn::make('tags')
+                    ->type('customer')
+                    ->label('Etiquetas'),
 
                 TextColumn::make('email')
                     ->label('Correo electrónico')
@@ -113,7 +121,13 @@ class CustomersTable
             ])
             ->defaultGroup('document_type')
             ->filters([
-                //
+                SelectFilter::make('tag')
+                    ->label('Etiqueta')
+                    ->multiple()
+                    ->options(fn () => Tag::getWithType('customer')->pluck('name', 'name'))
+                    ->query(fn (Builder $query, array $data): Builder => filled($data['values'] ?? null)
+                        ? $query->withAnyTags($data['values'], 'customer')
+                        : $query),
             ])
             ->recordActions([
                 ActionGroup::make([

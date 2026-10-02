@@ -9,9 +9,11 @@
         "php": "^8.2",
         "bezhansalleh/filament-shield": "^4.3",
         "filament/filament": "^4.0",
+        "filament/spatie-laravel-tags-plugin": "^4.0",
         "kenepa/translation-manager": "^5.0",
         "laravel/framework": "^11.31",
-        "laravel/tinker": "^2.9"
+        "laravel/tinker": "^2.9",
+        "spatie/laravel-tags": "^4.12"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^3.7",
