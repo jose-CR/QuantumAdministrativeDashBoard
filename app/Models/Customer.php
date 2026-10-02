@@ -5,11 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Spatie\Tags\HasTags;
 
 class Customer extends Model
 {
     /** @use HasFactory<\Database\Factories\CustomerFactory> */
-    use HasFactory;
+    use HasFactory, HasTags;
 
         /**
      * The attributes that are mass assignable.
@@ -68,5 +69,10 @@ class Customer extends Model
     public function attachments(): MorphMany
     {
         return $this->morphMany(Attachment::class, 'attachable');
+    }
+
+    public static function getTagClassName(): string
+    {
+        return Tag::class;
     }
 }
