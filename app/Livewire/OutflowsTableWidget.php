@@ -32,7 +32,6 @@ class OutflowsTableWidget extends Component implements HasActions, HasSchemas, H
     {
         return [
             ExportAction::make()
-                ->label('Exportar salidas')
                 ->exporter(OutflowExporter::class)
                 ->columnMapping(false),
             ImportAction::make()

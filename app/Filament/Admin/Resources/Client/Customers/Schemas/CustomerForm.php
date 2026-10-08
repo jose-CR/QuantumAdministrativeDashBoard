@@ -32,19 +32,19 @@ class CustomerForm
 
                                         // Documento
                                         Select::make('document_type')
-                                            ->label('Tipo de documento')
+                                            ->label(__('resources.clients.fields.document_type.document_type'))
                                             ->options([
-                                                'DUI' => 'DUI',
-                                                'NIT' => 'NIT',
-                                                'PASSPORT' => 'Passport',
-                                                'RES CARNET' => 'Carnet RES',
-                                                'OTRO' => 'OTRO',
+                                                'DUI' => __('resources.clients.fields.document_type.DUI'),
+                                                'NIT' => __('resources.clients.fields.document_type.NIT'),
+                                                'PASSPORT' => __('resources.clients.fields.document_type.PASSPORT'),
+                                                'RES CARNET' => __('resources.clients.fields.document_type.RES_CARNET'),
+                                                'OTRO' => __('resources.clients.fields.document_type.otro'),
                                             ])
                                             ->live()
                                             ->required(),
 
                                         TextInput::make('document_number')
-                                            ->label('Número de documento')
+                                            ->label(__('resources.clients.fields.document_number'))
                                             ->key(fn (Get $get) =>
                                                 'document_number_' . $get('document_type')
                                             )
@@ -57,31 +57,31 @@ class CustomerForm
                                         
                                         SpatieTagsInput::make('tags')
                                             ->type('customer')
-                                            ->label('Etiquetas'),
+                                            ->label(__('resources.clients.fields.tags.tags')),
 
                                         // Información personal
                                         TextInput::make('full_name')
-                                            ->label('Nombre completo')
+                                            ->label(__('resources.clients.fields.full_name'))
                                             ->required(),
 
                                         TextInput::make('email')
-                                            ->label('Correo electrónico')
+                                            ->label(__('resources.users.email'))
                                             ->email(),
 
                                         TextInput::make('phone_primary')
-                                            ->label('Teléfono principal')
+                                            ->label(__('resources.clients.fields.phone_primary'))
                                             ->mask(fn () => DocumentHelper::mask('PHONE')),
 
                                         TextInput::make('phone_secondary')
-                                            ->label('Teléfono secundario')
+                                            ->label(__('resources.clients.fields.phone_secondary'))
                                             ->mask(fn () => DocumentHelper::mask('PHONE')),
 
                                         TextInput::make('nrc')
-                                            ->label('NRC'),
+                                            ->label(__('resources.clients.fields.enterprise.nrc')),
 
                                         // Actividad económica
                                         Select::make('economic_activity')
-                                            ->label('Actividad económica')
+                                            ->label(__('resources.clients.fields.enterprise.economic_activity'))
                                             ->options(
                                                 ActividadesEconomicas::options()
                                             )
@@ -90,7 +90,7 @@ class CustomerForm
 
                                         // Departamento
                                         Select::make('department')
-                                            ->label('Departamento')
+                                            ->label(__('resources.clients.fields.enterprise.departament'))
                                             ->options(
                                                 ElSalvadorCatalogo::departments()
                                             )
@@ -108,7 +108,7 @@ class CustomerForm
 
                                         // Municipio
                                         Select::make('municipality')
-                                            ->label('Municipio')
+                                            ->label(__('resources.clients.fields.enterprise.municipality'))
                                             ->options(function (Get $get) {
                                                 $department = $get('department');
 
@@ -142,7 +142,7 @@ class CustomerForm
 
                                         // Distrito
                                         Select::make('district')
-                                            ->label('Distrito')
+                                            ->label(__('resources.clients.fields.enterprise.distric'))
                                             ->options(function (Get $get) {
                                                 $municipality = $get('municipality');
 
@@ -172,7 +172,7 @@ class CustomerForm
 
                                         // Dirección
                                         TextInput::make('address')
-                                            ->label('Dirección')
+                                            ->label(__('resources.clients.fields.address'))
                                             ->required(),
                                     ]),
                             ]),

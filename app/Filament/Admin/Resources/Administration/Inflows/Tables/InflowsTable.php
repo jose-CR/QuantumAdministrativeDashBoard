@@ -22,41 +22,46 @@ class InflowsTable
         return $table
             ->columns([
                 TextColumn::make('invoice_number')
-                    ->label('N° Factura'),
+                    ->label(__('resources.flow.inflow.cod_invoice')),
                 
                 TextColumn::make('date')
                     ->date()
-                    ->label('Fecha'),
+                    ->label(__('resources.flow.inflow.date')),
 
                 TextColumn::make('customer.full_name')
-                    ->label('Cliente'),
+                    ->label(__('resources.flow.inflow.client')),
 
                 TextColumn::make('amount')
                     ->money('usd')
-                    ->label('Monto'),
+                    ->label(__('resources.flow.inflow.amount')),
 
                 TextColumn::make('payment_method')
-                    ->label('Forma de Pago'),
+                    ->label(__('resources.flow.inflow.payment_method')),
 
                 TextColumn::make('transfer_number')
-                    ->label('N° Transferencia'),
+                    ->label(__('resources.flow.inflow.transfer_number')),
 
                 TextColumn::make('bank.name')
-                    ->label('Banco'),
+                    ->label(__('resources.clients.fields.bank')),
 
                 TextColumn::make('transfer_date')
                     ->date()
-                    ->label('Fecha de Transsaccion'),
+                    ->label(__('resources.flow.inflow.transfer_date')),
 
                 TextColumn::make('payment_status')
                     ->badge()
-                    ->label('Estado de Pago'),
+                    ->label(__('resources.flow.inflow.payment_status'))
+                    ->color(fn (string $state): string => match ($state) {
+                        'partial' => 'warning',
+                        'pending' => 'danger',
+                        default => 'gray',
+                    }),
 
                 TextColumn::make('salesperson')
-                    ->label('Vendedor'),
+                    ->label(__('resources.flow.inflow.salesperson')),
 
                 TextColumn::make('attachments_count')
-                    ->label('Adjuntos')
+                    ->label(__('resources.flow.attachment'))
                     ->counts('attachments')
                     ->badge()
                     ->color(fn (int $state) => $state > 0 ? 'success' : 'gray')
@@ -71,14 +76,14 @@ class InflowsTable
                         ->url($editUrl),
                     DeleteAction::make(),
                     Action::make('verAdjuntos')
-                        ->label('Ver adjuntos')
+                        ->label(__('resources.flow.attachment'))
                         ->icon('heroicon-o-paper-clip')
-                        ->modalHeading('Adjuntos')
+                        ->modalHeading(__('resources.flow.attachment'))
                         ->modalContent(fn (Inflow $record) => view('filament.modals.attachments', [
                             'attachments' => $record->attachments,
                         ]))
                         ->modalSubmitAction(false)
-                        ->modalCancelActionLabel('Cerrar'),
+                        ->modalCancelActionLabel(__('resources.flow.close')),
                 ])
             ])
             ->toolbarActions([
