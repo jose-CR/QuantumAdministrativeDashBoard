@@ -1,24 +1,27 @@
+
 <?php
 
 return [
+
     'users' => [
+
         'user' => 'User',
         'name' => 'Name',
         'email' => 'Email',
         'password' => 'Password',
-        'last_seen' => 'Last conexion',
+        'last_seen' => 'Last Connection',
     ],
 
     'clients' => [
 
         'sections' => [
+
             'client' => 'Client',
             'financed_article' => 'Financed Article',
             'credit_summary' => 'Credit Summary',
             'credit_status' => 'Credit Status',
             'latest_payments' => 'Latest Payments',
             'latest_payments_description' => 'Recent payment history for the credit.',
-
             'personal_information' => 'Personal Information',
             'contact' => 'Contact',
             'references' => 'References',
@@ -26,66 +29,93 @@ return [
         ],
 
         'fields' => [
+
             'full_name' => 'Full Name',
             'phones' => 'Phone',
-
             'identity_document' => 'Identity Document',
-            'identity_document_placeholder' => 'Enter identity document',
 
+            'document_type' => [
+
+                'document_type' => 'Document Type',
+                'DUI' => 'DUI',
+                'NIT' => 'NIT',
+                'PASSPORT' => 'Passport',
+                'RES_CARNET' => 'Residence Card',
+                'Otro' => 'Other',
+            ],
+
+            'document_number' => 'Document Number',
+            'identity_document_placeholder' => 'Enter identity document',
             'birth_date' => 'Birth Date',
             'gender' => 'Gender',
             'nationality' => 'Nationality',
-
             'phone_primary' => 'Primary Phone',
             'phone_secondary' => 'Secondary Phone',
             'email' => 'Email',
             'address' => 'Address',
-
             'vehicle' => 'Vehicle',
-
             'article' => 'Article',
-
             'initial_amount' => 'Initial Amount',
             'down_payment' => 'Down Payment',
             'installments' => 'Installments',
             'installment_amount' => 'Installment Amount',
             'total_amount' => 'Total Amount',
             'pending_balance' => 'Pending Balance',
-
             'start_date' => 'Start Date',
             'payment_day' => 'Payment Day',
-            'periodicity' => 'Periodicity',
+            'periodicity' => 'Payment Frequency',
 
-            'status' => 'Status',
+            'status' => [
+
+                'status' => 'Status',
+                'active' => 'Active',
+                'refinanced' => 'Refinanced',
+                'closed' => 'Closed',
+            ],
+
             'refinanced_from' => 'Refinanced From',
-
             'reference_type' => 'Reference Type',
             'relationship' => 'Relationship',
             'phone' => 'Phone',
             'occupation' => 'Occupation',
-
             'remaining_installments' => 'Remaining Installments',
             'credit_progress' => 'Progress',
-
             'recent_payments' => 'Recent Payments',
-
             'payment_date' => 'Payment Date',
             'amount' => 'Amount',
             'payment_method' => 'Payment Method',
             'receipt_number' => 'Receipt Number',
             'marital_status' => 'Marital Status',
-
             'type' => 'Type',
-
             'bank' => 'Bank',
+            'price' => 'Price',
+
+            'tags' => [
+
+                'tags' => 'Tags',
+            ],
+
+            'enterprise' => [
+
+                'nrc' => 'NRC',
+                'economic_activity' => 'Economic Activity',
+                'location' => 'Location',
+                'departament' => 'Department',
+                'municipality' => 'Municipality',
+                'distric' => 'District',
+                'create_at' => 'Created At',
+                'updated_at' => 'Updated At',
+            ],
         ],
 
         'genders' => [
+
             'male' => 'Male',
             'female' => 'Female',
         ],
 
         'marital_statuses' => [
+
             'single' => 'Single',
             'married' => 'Married',
             'divorced' => 'Divorced',
@@ -93,18 +123,22 @@ return [
         ],
 
         'reference_types' => [
+
             'family' => 'Family',
             'friend' => 'Friend',
         ],
 
         'periodicities' => [
+
             'weekly' => 'Weekly',
             'biweekly' => 'Biweekly',
             'monthly' => 'Monthly',
         ],
 
         'statuses' => [
+
             'pending' => 'Pending',
+            'partial' => 'Partial',
             'active' => 'Active',
             'paid' => 'Paid',
             'cancelled' => 'Cancelled',
@@ -112,6 +146,7 @@ return [
         ],
 
         'messages' => [
+
             'no_credits' => 'No credits registered',
             'progress_empty' => '0%',
             'remaining_installments_format' => ':remaining of :total',
@@ -119,78 +154,85 @@ return [
         ],
 
         'actions' => [
+
             'add_reference' => 'Add Reference',
         ],
     ],
 
     'inventary' => [
         'category' => [
-            'id' => 'Id',
+
+            'id' => 'ID',
             'name' => 'Category',
-            'description' => 'description',
+            'description' => 'Description',
         ],
 
         'article_units' => [
-            'id' => 'Id',
+
+            'id' => 'ID',
             'article' => 'Article',
             'brand' => 'Brand',
             'model' => 'Model',
-            'vin' => 'Vin',
-            'engine_number' => 'Engine number',
-            'cash_price' => 'Cash price',
-            'plate' => 'Plate',
+            'vin' => 'VIN',
+            'engine_number' => 'Engine Number',
+            'cash_price' => 'Cash Price',
+            'plate' => 'License Plate',
             'color' => 'Color',
             'status' => 'Status',
         ],
 
         'article' => [
-            'id' => 'Id',
+
+            'id' => 'ID',
             'category' => 'Category',
             'article' => 'Article',
             'brand' => 'Brand',
             'model' => 'Model',
             'year' => 'Year',
             'color' => 'Color',
-            'cash_price' => 'Cash price',
-            'description' => 'description',
-            'created_at' => 'created',
-        ]
+            'cash_price' => 'Cash Price',
+            'description' => 'Description',
+            'created_at' => 'Created At',
+        ],
     ],
 
     'credits' => [
         'clients' => [
+
             'client' => 'Client',
             'identity_document' => 'DUI',
-            'phone_primary' => 'Telephones',
+            'phone_primary' => 'Primary Phone',
             'address' => 'Address',
             'vehicle' => 'Vehicle',
             'refinanced' => 'Refinance Credit',
             'status' => 'Status',
 
             'pay_installment' => [
+
                 'installment' => 'Installment',
                 'installment_to_pay' => 'Installment to Pay',
                 'amount' => 'Amount to Pay',
                 'payment_method' => 'Payment Method',
 
                 'payment_methods' => [
+
                     'cash' => 'Cash',
                     'card' => 'Card',
                     'bank_transfer' => 'Bank Transfer',
+                    'transfer' => 'Transfer'
                 ],
 
                 'bank' => 'Bank',
                 'receipt_number' => 'Receipt Number',
                 'payment_date' => 'Payment Date',
-
                 'installment_format' => 'Installment #:number - Balance: $:balance',
             ],
 
             'refinance' => [
+
                 // Sections
                 'current_credit_section' => 'Current Credit',
                 'current_credit_description' => 'Information about the credit that will be refinanced.',
-
                 'new_credit_section' => 'New Credit',
                 'new_credit_description' => 'Enter the information for the new credit.',
 
@@ -203,8 +245,7 @@ return [
                 'down_payment' => 'Down Payment',
                 'installments' => 'Installments',
                 'installment_amount' => 'Installment Amount',
-
-                'periodicity' => 'Periodicity',
+                'periodicity' => 'Payment Frequency',
                 'start_date' => 'Start Date',
                 'payment_day' => 'Payment Day',
 
@@ -220,16 +261,18 @@ return [
         ],
 
         'payment_histories' => [
+
             'amount' => 'Amount',
             'payment_method' => 'Payment Method',
             'bank' => 'Bank',
-            'payment_date' => ' Dia de pago',
+            'payment_date' => 'Payment Date',
             'receipt_number' => 'Receipt Number',
             'previous_balance' => 'Previous Balance',
             'new_balance' => 'New Balance',
         ],
 
         'credits' => [
+
             'vehicle' => 'Vehicle',
             'down_payment' => 'Down Payment',
             'financed_amount' => 'Financed Amount',
@@ -241,14 +284,15 @@ return [
             'interest_rate' => 'Interest Rate',
             'total_interest' => 'Total Interest',
             'total_amount' => 'Total Amount',
-            'periodicity' => 'Periodicity',
+            'periodicity' => 'Payment Frequency',
             'start_date' => 'Start Date',
             'payment_day' => 'Payment Day',
             'payment_month' => 'Payment Month',
-            'originalCredit' => 'Refinanciamiento',
+            'originalCredit' => 'Original Credit',
         ],
 
         'installment' => [
+
             'credit' => 'Credit',
             'vehicle' => 'Vehicle',
             'number' => 'Installment',
@@ -262,29 +306,60 @@ return [
     ],
 
     'alert' => [
-        'label' => 'Alert',
 
-        'assigned_user' => 'Assign To',
+        'label' => 'Alert',
+        'assigned_user' => 'Assigned User',
         'installment' => 'Installment',
         'type' => 'Alert Type',
         'title' => 'Title',
         'alert_at' => 'Alert Date and Time',
-        'message' => 'Content',
-
+        'message' => 'Message',
         'upcoming_message' => '%s must pay installment #%d on %s.',
-
-        'upcoming_payment' => 'Upcoming payment',
-
-
+        'upcoming_payment' => 'Upcoming Payment',
         'title_placeholder' => 'E.g. Remember to call the client',
         'message_placeholder' => 'Write the alert message...',
-
         'installment_format' => 'Installment #%d • Due: %s • Balance: $%s',
     ],
 
     'payment_history' => [
+
         'cash' => 'Cash',
         'card' => 'Card',
-        'bank_transfer' => 'Bank Transfer'
-    ]
+        'bank_transfer' => 'Bank Transfer',
+    ],
+
+    'flow' => [
+
+        'attachment' => 'Attachment',
+        'delete' => 'Delete this invoice',
+        'see_attachment' => 'View Attachment',
+        'close' => 'Close',
+
+        'outflow' => [
+            'date' => 'Date',
+            'company' => 'Company',
+            'cod_invoice' => 'Invoice Number',
+            'quantity' => 'Quantity',
+            'amount' => 'Amount',
+            'source' => 'Cash Register',
+            'area' => 'Area',
+            'description' => 'Description',
+        ],
+
+        'inflow' => [
+            'date' => 'Date',
+            'client' => 'Client',
+            'cod_invoice' => 'Invoice Number',
+            'amount' => 'Amount',
+            'description' => 'Description',
+            'payment_method' => 'Payment Method',
+            'transfer_number' => 'Transfer Number',
+            'transfer_date' => 'Transfer Date',
+            'payment_status' => 'Payment Status',
+            'salesperson' => 'Sales Person',
+            'notes' => 'Notes'
+        ],
+
+    ],
+
 ];

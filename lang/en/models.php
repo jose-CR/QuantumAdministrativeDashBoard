@@ -7,6 +7,12 @@ return [
         'plural' => 'Users',
     ],
 
+    'clients' => [
+        'navigation' => 'Clients',  
+        'singular' => 'Client',
+        'plural' => 'Clients', 
+    ],
+
     'banks' => [
         'navigation' => 'Banks',
         'singular' => 'bank',
@@ -34,12 +40,6 @@ return [
     ],
 
     'credits' => [
-        'clients' => [
-            'navigation' => 'Clients',  
-            'singular' => 'Client',
-            'plural' => 'Clients', 
-        ],
-
         'payment_histories' => [
             'navigation' => 'Payment Histories',
             'singular' => 'Payment History',
@@ -59,6 +59,20 @@ return [
         ],
     ],
 
+    'flow' => [
+        'outflow' => [
+            'navigation' => 'Outflows',
+            'singular' => 'Outflow',
+            'plural' => 'Outflows', 
+        ],
+
+        'inflow' => [
+            'navigation' => 'Inflows',
+            'singular' => 'Inflow',
+            'plural' => 'Inflows', 
+        ]
+    ],
+
     'admin_panels' => [
         'translate' => 'Translations'
     ],
@@ -68,4 +82,5 @@ return [
         'inventary' => 'Inventary',
         'credits' => 'Credits',
     ],
+
 ];

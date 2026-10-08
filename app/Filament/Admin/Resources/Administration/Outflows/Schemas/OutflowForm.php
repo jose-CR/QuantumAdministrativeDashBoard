@@ -17,35 +17,36 @@ class OutflowForm
         return $schema
             ->components([
                 DatePicker::make('invoice_date')
-                    ->label('Fecha')
+                    ->label(__('resources.flow.outflow.date'))
                     ->required(),
                 
                 TextInput::make('company')
-                    ->label('Empresa')
+                    ->label(__('resources.flow.outflow.company'))
                     ->required(),
 
                 TextInput::make('invoice_code')
-                    ->label('Cod. Factura')
+                    ->label(__('resources.flow.outflow.cod_invoice'))
                     ->required(),
 
-                RichEditor::make('description'),
+                RichEditor::make('description')
+                    ->label(__('resources.flow.outflow.description')),
 
                 TextInput::make('quantity')
-                    ->label('Cant')
+                    ->label(__('resources.flow.outflow.quantity'))
                     ->numeric()
                     ->required(),
 
                 TextInput::make('amount')
-                    ->label('Monto')
+                    ->label(__('resources.flow.outflow.amount'))
                     ->numeric()
                     ->required(),
 
                 TextInput::make('area')
-                    ->label('Área')
+                    ->label(__('resources.flow.outflow.area'))
                     ->required(),
 
                 FileUpload::make('attachment_uploads')
-                    ->label('Archivos')
+                    ->label(__('resources.flow.attachment'))
                     ->multiple()
                     ->disk('attachments')
                     ->storeFileNamesIn('file_names')

@@ -19,61 +19,69 @@ class InflowForm
         return $schema
             ->components([
                 TextInput::make('invoice_number')
-                    ->label('N° Factura')
+                    ->label(__('resources.flow.inflow.cod_invoice'))
                     ->required(),
 
                 DatePicker::make('date')
-                    ->label('Fecha')
+                    ->label(__('resources.flow.inflow.date'))
                     ->required(),
 
                 Textarea::make('description')
-                    ->label('Descripción'),
+                    ->label(__('resources.flow.inflow.description')),
 
                 Select::make('customer_id')
-                    ->label('Cliente')
+                    ->label(__('resources.flow.inflow.client'))
                     ->relationship('customer', 'full_name')
                     ->searchable()
                     ->required(),
 
                 TextInput::make('amount')
-                    ->label('Monto')
+                    ->label(__('resources.flow.inflow.amount'))
                     ->numeric()
                     ->required(),
 
                 Select::make('payment_method')
-                    ->label('Forma de Pago')
-                    ->options(['cash' => 'Efectivo', 'transfer' => 'Transferencia'])
+                    ->label(__('resources.flow.inflow.payment_method'))
+                    ->options([
+                        'cash' => __('resources.credits.clients.pay_installment.payment_methods.cash'),
+                        'card' => __('resources.credits.clients.pay_installment.payment_methods.card'),
+                        'bank_transfer' => __('resources.credits.clients.pay_installment.payment_methods.bank_transfer'),
+                        'transfer' => __('resources.credits.clients.pay_installment.payment_methods.transfer'),
+                    ])
                     ->required()
                     ->live(),
 
                 TextInput::make('transfer_number')
-                    ->label('N° Transferencia')
+                    ->label(__('resources.flow.inflow.transfer_number'))
                     ->visible(fn (Get $get) => $get('payment_method') === 'transfer'),
 
                 Select::make('bank_id')
-                    ->label('Banco')
+                    ->label(__('resources.clients.fields.bank'))
                     ->relationship('bank', 'name')
                     ->visible(fn (Get $get) => $get('payment_method') === 'transfer'),
 
                 DatePicker::make('transfer_date')
-                    ->label('Fecha Transacción')
+                    ->label(__('resources.flow.inflow.transfer_date'))
                     ->visible(fn (Get $get) => $get('payment_method') === 'transfer'),
 
                 Select::make('payment_status')
-                    ->label('Estado de Pago')
-                    ->options(['pending' => 'Pendiente', 'partial' => 'Parcial', 'paid' => 'Pagado'])
+                    ->label(__('resources.flow.inflow.payment_status'))
+                    ->options([
+                        'pending' => __('resources.clients.statuses.pending'),
+                        'partial' => __('resources.clients.statuses.partial'),
+                        'paid' => __('resources.clients.statuses.paid'),
+                    ])
                     ->required(),
 
                 TextInput::make('salesperson')
-                    ->label('Vendedor')
+                    ->label(__('resources.flow.inflow.salesperson'))
                     ->required(),
 
                 Textarea::make('notes')
-                    ->label('Observaciones')
-                    ->required(),
+                    ->label(__('resources.flow.inflow.notes')),
                 
                 FileUpload::make('attachment_uploads')
-                    ->label('Archivos')
+                    ->label(__('resources.flow.attachment'))
                     ->multiple()
                     ->disk('attachments')
                     ->storeFileNamesIn('file_names')

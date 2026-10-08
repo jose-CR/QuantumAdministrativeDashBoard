@@ -32,29 +32,29 @@ class CustomersTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('full_name')
-                    ->label('Nombre completo')
+                    ->label(__('resources.clients.fields.full_name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('document_type')
-                    ->label('Tipo de documento')
+                    ->label(__('resources.clients.fields.document_type.document_type'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('document_number')
-                    ->label('Número de documento')
+                    ->label(__('resources.clients.fields.document_number'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 
                 SpatieTagsColumn::make('tags')
                     ->type('customer')
-                    ->label('Etiquetas'),
+                    ->label(__('resources.clients.fields.tags.tags')),
 
                 TextColumn::make('email')
-                    ->label('Correo electrónico')
+                    ->label(__('resources.users.email'))
                     ->searchable(),
 
                 TextColumn::make('phone_primary')
-                    ->label('Teléfonos')
+                    ->label(__('resources.clients.fields.phones'))
                     ->formatStateUsing(
                         fn ($state, $record) => collect([
                             $state,
@@ -65,23 +65,23 @@ class CustomersTable
                     ),
 
                 TextColumn::make('phone_secondary')
-                    ->label('Teléfono secundario')
+                    ->label(__('resources.clients.fields.phone_secondary'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('nrc')
-                    ->label('NRC')
+                    ->label(__('resources.clients.fields.enterprise.nrc'))
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('economic_activity')
-                    ->label('Actividad económica')
+                    ->label(__('resources.clients.fields.enterprise.economic_activity'))
                     ->formatStateUsing(
                         fn ($state) => ActividadesEconomicas::activityName($state)
                     )
                     ->searchable(),
 
                 TextColumn::make('department')
-                    ->label('Ubicación')
+                    ->label(__('resources.clients.fields.enterprise.location'))
                     ->formatStateUsing(
                         fn ($state, $record) => ElSalvadorCatalogo::locationLabel(
                             $record->department,
@@ -92,37 +92,37 @@ class CustomersTable
                     ->searchable(),
 
                 TextColumn::make('municipality')
-                    ->label('Municipio')
+                    ->label(__('resources.clients.fields.enterprise.municipality'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('district')
-                    ->label('Distrito')
+                    ->label(__('resources.clients.fields.enterprise.distric'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('address')
-                    ->label('Dirección')
+                    ->label(__('resources.clients.fields.address'))
                     ->searchable(),
 
                 TextColumn::make('created_at')
-                    ->label('Fecha de creación')
+                    ->label(__('resources.clients.fields.enterprise.created_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
-                    ->label('Última actualización')
+                    ->label(__('resources.clients.fields.enterprise.updated_at'))
                     ->dateTime('d/m/Y H:i')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->groups([
                 Group::make('document_type')
-                    ->label('Tipo de documento'),
+                    ->label(__('resources.clients.fields.document_type')),
             ])
             ->defaultGroup('document_type')
             ->filters([
                 SelectFilter::make('tag')
-                    ->label('Etiqueta')
+                    ->label(__('resources.clients.fields.tags.tags'))
                     ->multiple()
                     ->options(fn () => Tag::getWithType('customer')->pluck('name', 'name'))
                     ->query(fn (Builder $query, array $data): Builder => filled($data['values'] ?? null)
