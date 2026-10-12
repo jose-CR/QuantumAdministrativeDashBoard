@@ -17,33 +17,32 @@ class OutflowsTable
     public static function configure(Table $table): Table
     {
         $editUrl = fn (Outflow $record): string => OutflowResource::getUrl('edit', ['record' => $record]);
-        $deleteUrl = fn (Outflow $record): string => OutflowResource::getUrl('delete', ['record' => $record]);
 
         return $table
             ->columns([
                 TextColumn::make('invoice_date')
                     ->date()
-                    ->label('Fecha'),
+                    ->label(__('resources.flow.outflow.date')),
 
                 TextColumn::make('company')
-                    ->label('Empresa'),
+                    ->label(__('resources.flow.outflow.company')),
 
                 TextColumn::make('invoice_code')
-                    ->label('Cod. Factura'),
+                    ->label(__('resources.flow.outflow.cod_invoice')),
 
                 TextColumn::make('quantity')
-                    ->label('Cant'),
+                    ->label(__('resources.flow.outflow.quantity')),
 
                 TextColumn::make('amount')
                     ->money('usd')
-                    ->label('Monto'),
+                    ->label(__('resources.flow.outflow.amount')),
 
-                TextColumn::make('source')->label('Caja'),
+                TextColumn::make('source')->label(__('resources.flow.outflow.source')),
 
-                TextColumn::make('area')->label('Área'),
+                TextColumn::make('area')->label(__('resources.flow.outflow.area')),
 
                 TextColumn::make('attachments_count')
-                    ->label('Adjuntos')
+                    ->label(__('resources.flow.attachment'))
                     ->counts('attachments')
                     ->badge()
                     ->color(fn (int $state) => $state > 0 ? 'success' : 'gray')
@@ -56,16 +55,16 @@ class OutflowsTable
                 EditAction::make()
                     ->url($editUrl),
                 DeleteAction::make()
-                    ->modalHeading(fn (Outflow $record) => "Eliminar factura {$record->invoice_code}"),
+                    ->modalHeading(fn (Outflow $record) => "__('resources.flow.delete') {$record->invoice_code}"),
                 Action::make('verAdjuntos')
-                    ->label('Ver adjuntos')
+                    ->label(__('resources.flow.see_attachment'))
                     ->icon('heroicon-o-paper-clip')
-                    ->modalHeading('Adjuntos')
+                    ->modalHeading(__('resources.flow.attachment'))
                     ->modalContent(fn (Outflow $record) => view('filament.modals.attachments', [
                         'attachments' => $record->attachments,
                     ]))
                 ->modalSubmitAction(false)
-                ->modalCancelActionLabel('Cerrar'),
+                ->modalCancelActionLabel(__('resources.flow.close')),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

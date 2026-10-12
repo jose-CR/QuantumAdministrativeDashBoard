@@ -3,33 +3,28 @@
 namespace App\Services;
 
 use App\Models\Attachment;
+use App\Services\Attachments\AttachmentPathResolver;
+use App\Services\Attachments\AttachmentStorage;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class AttachmentService
 {
+    public function __construct(
+        protected AttachmentPathResolver $paths,
+        protected AttachmentStorage $files,
+    ) {}
+
     public function store(
         Model $record,
         UploadedFile $file,
         string $collection = 'default',
         string $disk = 'attachments',
     ): Attachment {
-        $directory = $this->getDirectory($record);
         $originalName = $file->getClientOriginalName();
-        $storage = Storage::disk($disk);
-        $filename = $this->getUniqueFilename($storage, $directory, $originalName);
-        $path = $file->storeAs($directory, $filename, $disk);
+        $path = $this->files->putUploaded($disk, $file, $this->paths->directory($record), $originalName);
 
-        return $record->attachments()->create([
-            'collection' => $collection,
-            'disk' => $disk,
-            'path' => $path,
-            'original_name' => $originalName,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-        ]);
+        return $this->register($record, $path, $originalName, $collection, $disk);
     }
 
     public function storeFromPath(
@@ -39,88 +34,10 @@ class AttachmentService
         string $collection = 'default',
         string $disk = 'attachments',
     ): Attachment {
-        $storage = Storage::disk($disk);
-
-        if (! $storage->exists($temporaryPath)) {
-            throw new \RuntimeException("El archivo no existe: {$temporaryPath}");
-        }
-
-        $directory = $this->getDirectory($record);
         $originalName ??= basename($temporaryPath);
-        $filename = $this->getUniqueFilename($storage, $directory, $originalName);
-        $finalPath = $directory . '/' . $filename;
+        $path = $this->files->moveIn($disk, $temporaryPath, $this->paths->directory($record), $originalName);
 
-        $storage->move($temporaryPath, $finalPath);
-
-        return $record->attachments()->create([
-            'collection' => $collection,
-            'disk' => $disk,
-            'path' => $finalPath,
-            'original_name' => $originalName,
-            'mime_type' => $storage->mimeType($finalPath),
-            'size' => $storage->size($finalPath),
-        ]);
-    }
-
-    public function replace(
-        Attachment $attachment,
-        UploadedFile $file,
-    ): Attachment {
-        $disk = Storage::disk($attachment->disk);
-
-        if ($disk->exists($attachment->path)) {
-            $disk->delete($attachment->path);
-        }
-
-        $directory = dirname($attachment->path);
-        $originalName = $file->getClientOriginalName();
-        $filename = $this->getUniqueFilename($disk, $directory, $originalName);
-        $path = $file->storeAs($directory, $filename, $attachment->disk);
-
-        $attachment->update([
-            'path' => $path,
-            'original_name' => $originalName,
-            'mime_type' => $file->getMimeType(),
-            'size' => $file->getSize(),
-        ]);
-
-        return $attachment->refresh();
-    }
-
-    /**
-     * Reemplaza el archivo físico de un adjunto existente,
-     * a partir de un path temporal (flujo FileUpload de Filament).
-     */
-    public function replaceFromPath(
-        Attachment $attachment,
-        string $temporaryPath,
-        ?string $originalName = null,
-    ): Attachment {
-        $storage = Storage::disk($attachment->disk);
-
-        if (! $storage->exists($temporaryPath)) {
-            throw new \RuntimeException("El archivo no existe: {$temporaryPath}");
-        }
-
-        if ($storage->exists($attachment->path)) {
-            $storage->delete($attachment->path);
-        }
-
-        $directory = dirname($attachment->path);
-        $originalName ??= basename($temporaryPath);
-        $filename = $this->getUniqueFilename($storage, $directory, $originalName);
-        $finalPath = $directory . '/' . $filename;
-
-        $storage->move($temporaryPath, $finalPath);
-
-        $attachment->update([
-            'path' => $finalPath,
-            'original_name' => $originalName,
-            'mime_type' => $storage->mimeType($finalPath),
-            'size' => $storage->size($finalPath),
-        ]);
-
-        return $attachment->refresh();
+        return $this->register($record, $path, $originalName, $collection, $disk);
     }
 
     public function attachFromPath(
@@ -129,72 +46,72 @@ class AttachmentService
         string $disk = 'attachments',
         string $collection = 'default',
     ): Attachment {
-        $storage = Storage::disk($disk);
+        $this->files->assertExists($disk, $path);
 
-        if (! $storage->exists($path)) {
-            throw new \RuntimeException("El archivo no existe: {$path}");
-        }
+        return $this->register($record, $path, basename($path), $collection, $disk);
+    }
 
-        return $record->attachments()->create([
-            'collection' => $collection,
-            'disk' => $disk,
-            'path' => $path,
-            'original_name' => basename($path),
-            'mime_type' => $storage->mimeType($path),
-            'size' => $storage->size($path),
-        ]);
+    public function replace(Attachment $attachment, UploadedFile $file): Attachment
+    {
+        $originalName = $file->getClientOriginalName();
+
+        $this->files->delete($attachment->disk, $attachment->path);
+
+        $path = $this->files->putUploaded($attachment->disk, $file, dirname($attachment->path), $originalName);
+
+        return $this->updateFile($attachment, $path, $originalName);
+    }
+
+    /**
+     * Reemplaza el archivo físico a partir de un temporal (flujo FileUpload de Filament).
+     */
+    public function replaceFromPath(
+        Attachment $attachment,
+        string $temporaryPath,
+        ?string $originalName = null,
+    ): Attachment {
+        // Se valida antes de borrar el archivo actual para no perderlo si el temporal falta.
+        $this->files->assertExists($attachment->disk, $temporaryPath);
+
+        $originalName ??= basename($temporaryPath);
+
+        $this->files->delete($attachment->disk, $attachment->path);
+
+        $path = $this->files->moveIn($attachment->disk, $temporaryPath, dirname($attachment->path), $originalName);
+
+        return $this->updateFile($attachment, $path, $originalName);
     }
 
     public function delete(Attachment $attachment): void
     {
-        $disk = Storage::disk($attachment->disk);
-
-        if ($disk->exists($attachment->path)) {
-            $disk->delete($attachment->path);
-        }
-
+        $this->files->delete($attachment->disk, $attachment->path);
         $attachment->delete();
     }
 
-    protected function getDirectory(Model $record): string
-    {
-        $model = Str::snake(class_basename($record));
-        $identifier = $this->getRecordIdentifier($record);
-
-        return $model . '/' . $record->getKey() . '-' . $identifier;
+    protected function register(
+        Model $record,
+        string $path,
+        string $originalName,
+        string $collection,
+        string $disk,
+    ): Attachment {
+        return $record->attachments()->create([
+            'collection' => $collection,
+            'disk' => $disk,
+            'path' => $path,
+            'original_name' => $originalName,
+            ...$this->files->metadata($disk, $path),
+        ]);
     }
 
-    protected function getRecordIdentifier(Model $record): string
+    protected function updateFile(Attachment $attachment, string $path, string $originalName): Attachment
     {
-        $attributes = ['full_name', 'name', 'title', 'description', 'code'];
+        $attachment->update([
+            'path' => $path,
+            'original_name' => $originalName,
+            ...$this->files->metadata($attachment->disk, $path),
+        ]);
 
-        foreach ($attributes as $attribute) {
-            if (isset($record->{$attribute}) && filled($record->{$attribute})) {
-                return Str::slug($record->{$attribute});
-            }
-        }
-
-        return 'record';
-    }
-
-    protected function getUniqueFilename($storage, string $directory, string $originalName): string
-    {
-        $originalName = basename($originalName);
-        $name = pathinfo($originalName, PATHINFO_FILENAME);
-        $extension = pathinfo($originalName, PATHINFO_EXTENSION);
-        $filename = $originalName;
-        $counter = 1;
-
-        while ($storage->exists($directory . '/' . $filename)) {
-            $filename = $name . '-' . $counter;
-
-            if ($extension) {
-                $filename .= '.' . $extension;
-            }
-
-            $counter++;
-        }
-
-        return $filename;
+        return $attachment->refresh();
     }
 }

@@ -69,11 +69,12 @@ class CustomerInfoList
                     TextEntry::make('nrc')
                         ->formatStateUsing(fn ($state) => $state ?? 'Sin NRC')
                         ->visible(fn (Customer $record) => $record->document_type === 'NIT')
-                        ->label('NRC'),
+                        ->label(__('resources.clients.fields.enterprise.nrc')),
 
                     TextEntry::make('economic_activity')
-                    ->icon(Heroicon::Briefcase)
-                    ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
+                        ->label(__('resources.clients.fields.enterprise.economic_activity'))
+                        ->icon(Heroicon::Briefcase)
+                        ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
 
                     TextEntry::make('address')
                         ->label(__('resources.clients.fields.address'))
@@ -83,7 +84,7 @@ class CustomerInfoList
                 ->columns(3)
                 ->columnSpanFull(),
 
-                    Section::make(__('resources.clients.sections.financed_article'))
+                Section::make(__('resources.clients.sections.financed_article'))
                         ->extraAttributes([
                             'class' => 'text-center',
                         ])
@@ -93,11 +94,11 @@ class CustomerInfoList
                                 ->label(__('resources.clients.fields.vehicle'))
                                 ->schema([
                                     TextEntry::make('display_name')
-                                        ->label('Artículo')
+                                        ->label(__('resources.inventary.article.article'))
                                         ->weight(FontWeight::SemiBold),
 
                                     TextEntry::make('price')
-                                        ->label('Precio')
+                                        ->label(__('resources.clients.fields.price'))
                                         ->money('USD')
                                         ->weight(FontWeight::Medium),
                                 ])
@@ -180,12 +181,12 @@ class CustomerInfoList
                             }),
 
                         TextEntry::make('latestCredit.status')
-                            ->label(__('resources.clients.fields.status'))
+                            ->label(__('resources.clients.fields.status.status'))
                             ->badge()
                             ->color(fn (string $state) => match ($state) {
-                                'active' => 'success',
-                                'refinanced' => 'warning',
-                                'closed' => 'gray',
+                                __('resources.clients.fields.status.active') => 'success',
+                                __('resources.clients.fields.status.refinanced') => 'warning',
+                                __('resources.clients.fields.status.closed') => 'gray',
                                 default => 'primary',
                             }),
                     ])

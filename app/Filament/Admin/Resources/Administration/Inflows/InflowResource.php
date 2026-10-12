@@ -8,6 +8,7 @@ use App\Filament\Admin\Resources\Administration\Inflows\Pages\ListInflows;
 use App\Filament\Admin\Resources\Administration\Inflows\Schemas\InflowForm;
 use App\Filament\Admin\Resources\Administration\Inflows\Tables\InflowsTable;
 use App\Models\Inflow;
+use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,11 +17,20 @@ use Filament\Tables\Table;
 
 class InflowResource extends Resource
 {
+    use HasTranslatedLabels;
+
+    protected static function getTranslationKey(): string
+    {
+        return 'models.flow.inflow';
+    }
+
     protected static ?string $model = Inflow::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowUp;
 
     protected static ?string $recordTitleAttribute = 'invoice_number';
+
+    protected static ?string $modelLabel = null;
 
     public static function form(Schema $schema): Schema
     {
