@@ -40,7 +40,6 @@ return [
     ],
 
     'credits' => [
-
         'payment_histories' => [
             'navigation' => 'Historial de Pagos',
             'singular' => 'Historial de Pago',
@@ -60,8 +59,22 @@ return [
         ],
     ],
 
+    'flow' => [
+        'outflow' => [
+            'navigation' => 'Egresos',
+            'singular' => 'Egreso',
+            'plural' => 'Egresos',
+        ],
+
+        'inflow' => [
+            'navigation' => 'Ingresos',
+            'singular' => 'Ingreso',
+            'plural' => 'Ingresos',
+        ],
+    ],
+
     'admin_panels' => [
-        'translate' => 'Traducciones'
+        'translate' => 'Traducciones',
     ],
 
     'others' => [

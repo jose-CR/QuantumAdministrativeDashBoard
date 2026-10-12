@@ -117,7 +117,7 @@ class CustomersTable
             ])
             ->groups([
                 Group::make('document_type')
-                    ->label(__('resources.clients.fields.document_type')),
+                    ->label(__('resources.clients.fields.document_type.document_type')),
             ])
             ->defaultGroup('document_type')
             ->filters([

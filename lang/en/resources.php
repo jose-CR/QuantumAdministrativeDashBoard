@@ -91,7 +91,6 @@ return [
             'price' => 'Price',
 
             'tags' => [
-
                 'tags' => 'Tags',
             ],
 
