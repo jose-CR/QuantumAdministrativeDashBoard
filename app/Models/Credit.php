@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Credit extends Model
 {
@@ -64,6 +66,11 @@ class Credit extends Model
         ];
     }
 
+    public function scopeOverdue(Builder $query): Builder
+    {
+        return $query->whereHas('installments', fn (Builder $q) => $q->overdue());
+    }
+
     public function client()
     {
         return $this->belongsTo(Customer::class, 'customer_id');
@@ -107,5 +114,10 @@ class Credit extends Model
     public function firstItem()
     {
         return $this->hasOne(CreditItem::class);
+    }
+
+    public function customer(): BelongsTo
+    {
+        return $this->belongsTo(Customer::class);
     }
 }

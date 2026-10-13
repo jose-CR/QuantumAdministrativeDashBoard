@@ -3,6 +3,7 @@
 namespace App\Filament\Imports\Credits;
 
 use App\Models\Client;
+use App\Models\Customer;
 use App\Rules\Credits\ClientRules;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
@@ -11,7 +12,7 @@ use Illuminate\Support\Number;
 
 class ClientImporter extends Importer
 {
-    protected static ?string $model = Client::class;
+    protected static ?string $model = Customer::class;
 
     public static function getColumns(): array
     {
@@ -61,9 +62,9 @@ class ClientImporter extends Importer
         ];
     }
 
-    public function resolveRecord(): Client
+    public function resolveRecord(): Customer
     {
-        return Client::firstOrNew([
+        return Customer::firstOrNew([
             'email' => $this->data['email'],
         ]);
     }
