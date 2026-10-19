@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
 use App\Filament\Admin\Actions\PayInstallmentAction;
+use App\Filament\Admin\Actions\RefinanceCreditAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Models\Customer;
 use Filament\Actions\Action;

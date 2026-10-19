@@ -6,6 +6,7 @@ use App\Filament\Admin\Resources\Client\Customers\Pages\CreateCustomer;
 use App\Filament\Admin\Resources\Client\Customers\Pages\EditCustomer;
 use App\Filament\Admin\Resources\Client\Customers\Pages\ListCustomers;
 use App\Filament\Admin\Resources\Client\Customers\Pages\ViewCustomer;
+use App\Filament\Admin\Resources\Client\Customers\RelationManagers\CreditsRelationManager;
 use App\Filament\Admin\Resources\Client\Customers\RelationManagers\ReferencesRelationManager;
 use App\Filament\Admin\Resources\Client\Customers\Schemas\CustomerForm;
 use App\Filament\Admin\Resources\Client\Customers\Schemas\CustomerInfoList;
@@ -58,6 +59,7 @@ class CustomerResource extends Resource
         return [
             ReferencesRelationManager::class,
             AttachmentsRelationManager::class,
+            CreditsRelationManager::class,
         ];
     }
 
