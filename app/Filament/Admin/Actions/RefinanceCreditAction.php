@@ -10,12 +10,25 @@ use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
+use Illuminate\Database\Eloquent\Model;
 
 class RefinanceCreditAction extends Action
 {
     public static function getDefaultName(): ?string
     {
         return 'refinance';
+    }
+
+    protected function resolveCredit(Model $record): ?Credit
+    {
+        if ($record instanceof Credit) {
+            return $record->status === 'active' ? $record : null;
+        }
+
+        return $record->credits()
+            ->where('status', 'active')
+            ->latest()
+            ->first();
     }
 
     protected function setUp(): void
@@ -26,27 +39,25 @@ class RefinanceCreditAction extends Action
             ->label('Refinanciar')
             ->icon('heroicon-o-arrow-path')
             ->color('warning')
-            ->visible(fn (Credit $record): bool => $record->status === 'active')
+            ->visible(fn (Model $record): bool => $this->resolveCredit($record) !== null)
             ->modalHeading('Refinanciar crédito')
             ->modalDescription('El crédito actual se cerrará como refinanciado y se creará uno nuevo con el saldo pendiente y la misma prima.')
-            ->fillForm(fn (Credit $record): array => [
-                'initial_amount' => $record->pending_balance,
-                'start_date' => today()->addMonth(),
-                'periodicity' => $record->periodicity,
-                'payment_day' => $record->payment_day,
-            ])
+            ->fillForm(function (Model $record): array {
+                $credit = $this->resolveCredit($record);
+
+                return [
+                    'initial_amount' => $credit?->pending_balance,
+                    'start_date'     => today()->addMonth(),
+                    'periodicity'    => $credit?->periodicity,
+                    'payment_day'    => $credit?->payment_day,
+                ];
+            })
             ->schema([
                 TextInput::make('initial_amount')
                     ->label('Saldo a refinanciar')
                     ->prefix('$')
-                    ->disabled(),
-                    
-                TextInput::make('down_payment')
-                    ->label('Pago de refinanciamiento')
-                    ->numeric()
-                    ->prefix('$')
-                    ->default(0)
-                    ->required(),
+                    ->disabled()
+                    ->dehydrated(false),
 
                 TextInput::make('installments')
                     ->label('Número de cuotas')
@@ -54,19 +65,26 @@ class RefinanceCreditAction extends Action
                     ->minValue(1)
                     ->required(),
 
+                TextInput::make('installment_amount')
+                    ->label('Monto de cada cuota')
+                    ->numeric()
+                    ->minValue(0.01)
+                    ->prefix('$')
+                    ->required(),
+
                 Select::make('periodicity')
                     ->label('Periodicidad')
                     ->options([
-                        'weekly' => 'Semanal',
+                        'weekly'  => 'Semanal',
                         'monthly' => 'Mensual',
-                        'yearly' => 'Anual',
+                        'yearly'  => 'Anual',
                     ])
                     ->required(),
 
                 DatePicker::make('start_date')
                     ->label('Vencimiento de la primera cuota')
                     ->required(),
-                    
+
                 TextInput::make('payment_day')
                     ->label('Día de pago')
                     ->numeric()
@@ -74,16 +92,35 @@ class RefinanceCreditAction extends Action
                     ->maxValue(31)
                     ->required(),
             ])
-            ->action(function (array $data, Credit $record): void {
-                try {
-                    app(RefinancingService::class)->execute($record->client, $record, $data);
-                } catch (Exception $e) {
-                    Notification::make()->title('No se pudo refinanciar')->body($e->getMessage())->danger()->send();
+            ->action(function (array $data, Model $record): void {
+                $credit = $this->resolveCredit($record);
+
+                if (! $credit) {
+                    Notification::make()
+                        ->title('No se pudo refinanciar')
+                        ->body('No hay un crédito activo para refinanciar.')
+                        ->danger()
+                        ->send();
 
                     $this->halt();
                 }
 
-                Notification::make()->title('Crédito refinanciado')->success()->send();
+                try {
+                    app(RefinancingService::class)->execute($credit->client, $credit, $data);
+                } catch (Exception $e) {
+                    Notification::make()
+                        ->title('No se pudo refinanciar')
+                        ->body($e->getMessage())
+                        ->danger()
+                        ->send();
+
+                    $this->halt();
+                }
+
+                Notification::make()
+                    ->title('Crédito refinanciado')
+                    ->success()
+                    ->send();
             });
     }
 }

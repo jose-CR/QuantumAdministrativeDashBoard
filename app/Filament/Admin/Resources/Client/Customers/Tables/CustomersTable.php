@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Client\Customers\Tables;
 
 use App\Filament\Admin\Actions\PayInstallmentAction;
+use App\Filament\Admin\Actions\RefinanceCreditAction;
 use App\Models\Customer;
 use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
@@ -135,6 +136,7 @@ class CustomersTable
                     EditAction::make(),
                     DeleteAction::make(),
                     PayInstallmentAction::make(),
+                    RefinanceCreditAction::make(),
                     Action::make('createCredit')
                         ->url(fn (Customer $record): string => route(
                             'filament.admin.resources.creditos.loans.create',

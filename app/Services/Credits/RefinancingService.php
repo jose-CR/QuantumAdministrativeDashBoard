@@ -22,13 +22,13 @@ class RefinancingService
 
             $data = array_merge($data, [
                 'initial_amount' => $oldCredit->pending_balance,
-                'down_payment' => $oldCredit->down_payment,
+                'down_payment'   => $oldCredit->down_payment,
             ]);
 
             $newCredit = $client->credits()->create(array_merge(
                 $data,
                 [
-                    'status' => 'active',
+                    'status'             => 'active',
                     'refinanced_from_id' => $oldCredit->id,
                 ],
                 app(LoanCalculatorService::class)->calculate($data),
@@ -39,7 +39,7 @@ class RefinancingService
             app(InstallmentGeneratorService::class)->generate($newCredit);
 
             $oldCredit->update([
-                'status' => 'refinanced',
+                'status'          => 'refinanced',
                 'pending_balance' => 0,
             ]);
 
