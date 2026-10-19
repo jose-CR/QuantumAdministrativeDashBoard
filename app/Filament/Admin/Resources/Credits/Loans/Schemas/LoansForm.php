@@ -32,6 +32,7 @@ class LoansForm
                                     ->columnSpanFull(),
 
                                 Repeater::make('items')
+                                    ->relationship('items')
                                     ->label('Bienes / Servicios')
                                     ->schema([
                                         Select::make('item_type')
