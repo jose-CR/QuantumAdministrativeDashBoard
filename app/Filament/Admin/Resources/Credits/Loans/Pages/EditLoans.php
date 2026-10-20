@@ -3,12 +3,15 @@
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
-use App\Models\User;
-use App\Services\InstallmentGeneratorService;
+use App\Services\Credits\InstallmentSyncService;
 use App\Services\LoanCalculatorService;
 use Filament\Actions\DeleteAction;
-use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 class EditLoans extends EditRecord
 {
@@ -16,35 +19,50 @@ class EditLoans extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-
-        $calculator = app(LoanCalculatorService::class);
-
-        return array_merge(
+        $data = array_merge(
             $data,
-            $calculator->calculate($data)
+            app(LoanCalculatorService::class)->calculate($data)
         );
+
+        // El saldo se calcula después de sincronizar las cuotas.
+        unset($data['pending_balance']);
+
+        return $data;
     }
 
-    protected function afterSave(): void
-    {
+    protected function handleRecordUpdate(
+        Model $record,
+        array $data
+    ): Model {
+        // Capturar los valores originales antes de guardar.
+        $oldInstallmentAmount = (float) $record->installment_amount;
+        $oldInstallments = (int) $record->installments;
 
-        $creator = Filament::auth()->user();
+        try {
+            return DB::transaction(function () use (
+                $record,
+                $data,
+                $oldInstallmentAmount,
+                $oldInstallments,
+            ): Model {
+                $record = parent::handleRecordUpdate($record, $data);
 
-        $assignedUser = null;
+                app(InstallmentSyncService::class)->sync(
+                    $record,
+                    $oldInstallmentAmount,
+                    $oldInstallments,
+                );
 
-        if (! empty($data['assigned_user_id'])) {
-            $assignedUser = User::findOrFail(
-                $data['assigned_user_id']
-            );
+                return $record;
+            });
+        } catch (InvalidArgumentException $e) {
+            Notification::make()
+                ->danger()
+                ->title($e->getMessage())
+                ->send();
+
+            throw new Halt();
         }
-
-        app(
-            InstallmentGeneratorService::class
-        )->generate(
-                credit: $this->record,
-                creator: $creator,
-                assignedUser: $assignedUser,
-        );
     }
 
     protected function getHeaderActions(): array
