@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Services\Credits\InstallmentSyncService;
 use App\Services\LoanCalculatorService;
@@ -70,5 +71,12 @@ class EditLoans extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return CustomerResource::getUrl('view', [
+            'record' => $this->record->customer_id,
+        ]);
     }
 }

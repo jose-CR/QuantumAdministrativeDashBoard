@@ -121,6 +121,8 @@ class RefinanceCreditAction extends Action
                     ->title('Crédito refinanciado')
                     ->success()
                     ->send();
+
+                $record->refresh();
             });
     }
 }

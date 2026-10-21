@@ -122,6 +122,8 @@ class PayInstallmentAction extends Action
                     bankId: $data['bank_id'] ?? null,
                     paymentDate: $data['payment_date'],
                 );
+
+                $record->refresh();
             });
     }
 

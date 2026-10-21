@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Models\User;
 use App\Services\InstallmentGeneratorService;
@@ -38,6 +39,13 @@ class CreateLoans extends CreateRecord
         $this->form->fill([
             'customer_id' => request('customer'),
             'status' => 'active',
+        ]);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return CustomerResource::getUrl('view', [
+            'record' => $this->record->customer_id,
         ]);
     }
 }
