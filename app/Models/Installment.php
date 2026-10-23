@@ -11,7 +11,7 @@ class Installment extends Model
     /** @use HasFactory<\Database\Factories\InstallmentFactory> */
     use HasFactory;
 
-    private const UNPAID_STATUSES = ['pending', 'late'];
+    public const UNPAID_STATUSES = ['pending', 'late'];
 
     /**
      * The attributes that are mass assignable.

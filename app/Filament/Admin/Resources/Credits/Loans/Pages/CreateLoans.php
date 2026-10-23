@@ -30,6 +30,10 @@ class CreateLoans extends CreateRecord
         app(InstallmentGeneratorService::class)->generate(
             credit: $this->record,
         );
+
+        $this->record->update([
+        'pending_balance' => round((float) $this->record->installments()->sum('remaining_balance'), 2),
+        ]);
     }
 
     public function mount(): void

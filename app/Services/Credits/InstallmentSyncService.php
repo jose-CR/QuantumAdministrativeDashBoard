@@ -9,128 +9,96 @@ use InvalidArgumentException;
 
 class InstallmentSyncService
 {
-    private const EDITABLE_STATUSES = ['pending', 'late'];
+    private const EDITABLE = ['pending', 'late', 'partial'];
 
-    public function sync(
-        Credit $credit,
-        float $oldInstallmentAmount,
-        int $oldInstallments,
-    ): void {
-        $amountChanged = round((float) $credit->installment_amount, 2)
-            !== round($oldInstallmentAmount, 2);
-
-        $installmentsChanged = (int) $credit->installments
-            !== $oldInstallments;
-
-        $this->syncInstallments(
-            $credit,
-            $amountChanged,
-            $installmentsChanged,
-        );
-
-        $this->recalculatePendingBalance($credit);
-    }
-
-    private function syncInstallments(
-        Credit $credit,
-        bool $amountChanged,
-        bool $installmentsChanged,
-    ): void {
+    public function sync(Credit $credit): void
+    {
         $newAmount = round((float) $credit->installment_amount, 2);
-        $newCount = (int) $credit->installments;
+        $count     = (int) $credit->installments;
+        $financed  = (float) $credit->financed_amount;
 
-        $last = $credit->installments()
-            ->orderByDesc('number')
-            ->first();
+        $last = $credit->installments()->orderByDesc('number')->first();
 
         if (! $last) {
-            app(InstallmentGeneratorService::class)->generate($credit);
-
+            app(InstallmentGeneratorService
+            ::class)->generate($credit);
+            $this->refreshTotals($credit);
             return;
         }
 
-        if ($newCount < (int) $last->number) {
+        if ($count < $last->number) {
             throw new InvalidArgumentException(
                 'No se puede reducir el número de cuotas de un crédito ya generado.'
             );
         }
 
-        // 1.1 Actualizar únicamente las cuotas pending y late.
-        // Se conserva el importe que ya se abonó a cada cuota.
-        if ($amountChanged) {
-            $credit->installments()
-                ->whereIn('status', self::EDITABLE_STATUSES)
-                ->get()
-                ->each(function (Installment $installment) use ($newAmount) {
-                    $currentAmount = round(
-                        (float) $installment->amount,
-                        2
-                    );
+        // 1. Cuotas faltantes
+        $dueDate = $last->due_date->copy();
 
-                    if ($currentAmount === $newAmount) {
-                        return;
-                    }
+        for ($n = $last->number + 1; $n <= $count; $n++) {
+            $dueDate = match ($credit->periodicity) {
+                'weekly'  => $dueDate->copy()->addWeek(),
+                'monthly' => $dueDate->copy()->addMonth(),
+                'yearly'  => $dueDate->copy()->addYear(),
+            };
 
-                    $alreadyPaid = max(
-                        round(
-                            $currentAmount
-                            - (float) $installment->remaining_balance,
-                            2
-                        ),
-                        0
-                    );
-
-                    $installment->update([
-                        'amount' => $newAmount,
-                        'remaining_balance' => max(
-                            round($newAmount - $alreadyPaid, 2),
-                            0
-                        ),
-                    ]);
-                });
+            Installment::create([
+                'credit_id'         => $credit->id,
+                'number'            => $n,
+                'amount'            => $newAmount,
+                'remaining_balance' => $newAmount,
+                'due_date'          => $dueDate->copy(),
+                'status'            => 'pending',
+            ]);
         }
 
-        // 1.2 Crear las cuotas faltantes.
-        // Si cambió la cantidad, el número nuevo se compara con
-        // la última cuota existente, no con el total de filas.
-        if ($installmentsChanged && $newCount > (int) $last->number) {
-            $dueDate = $last->due_date->copy();
+        // 2. Monto nuevo en las cuotas no pagadas anteriores a la última
+        $credit->installments()
+            ->whereIn('status', self::EDITABLE)
+            ->where('number', '<', $count)
+            ->where('amount', '!=', $newAmount)
+            ->get()
+            ->each(fn (Installment $i) => $this->setAmount($i, $newAmount));
 
-            for (
-                $number = (int) $last->number + 1;
-                $number <= $newCount;
-                $number++
-            ) {
-                $dueDate = match ($credit->periodicity) {
-                    'weekly' => $dueDate->copy()->addWeek(),
-                    'monthly' => $dueDate->copy()->addMonth(),
-                    'yearly' => $dueDate->copy()->addYear(),
-                    default => throw new InvalidArgumentException(
-                        'La periodicidad del crédito no es válida.'
-                    ),
-                };
+        // 3. La última absorbe la diferencia si las cuotas no cubren lo financiado
+        $others     = (float) $credit->installments()->where('number', '<', $count)->sum('amount');
+        $lastAmount = round(max($newAmount, $financed - $others), 2);
+        $final      = $credit->installments()->where('number', $count)->first();
 
-                Installment::create([
-                    'credit_id' => $credit->id,
-                    'number' => $number,
-                    'amount' => $newAmount,
-                    'remaining_balance' => $newAmount,
-                    'due_date' => $dueDate->copy(),
-                    'status' => 'pending',
-                ]);
-            }
+        if ($final
+            && in_array($final->status, self::EDITABLE)
+            && abs((float) $final->amount - $lastAmount) > 0.004) {
+            $this->setAmount($final, $lastAmount);
         }
+
+        // 4. Recalcular el crédito desde las cuotas reales
+        $this->refreshTotals($credit);
     }
 
-    private function recalculatePendingBalance(Credit $credit): void
+    private function setAmount(Installment $installment, float $amount): void
     {
-        $pendingBalance = round(
-            (float) $credit->installments()->sum('remaining_balance'),
-            2
-        );
+        $paid = (float) $installment->amount - (float) $installment->remaining_balance;
+
+        $installment->update([
+            'amount'            => $amount,
+            'remaining_balance' => max(round($amount - $paid, 2), 0),
+        ]);
+    }
+
+    private function refreshTotals(Credit $credit): void
+    {
+        $total    = round((float) $credit->installments()->sum('amount'), 2);
+        $financed = (float) $credit->financed_amount;
+        $count    = (int) $credit->installments;
+        $interest = max(0, round($total - $financed, 2));
 
         $credit->update([
-            'pending_balance' => $pendingBalance,
+            'total_amount'    => $total,
+            'total_interest'  => $interest,
+            'interest_rate'   => ($financed > 0 && $interest > 0 && $count > 0)
+                ? round((($interest / $count) / $financed) * 100, 2)
+                : 0,
+            'pending_balance' => round((float) $credit->installments()->sum('remaining_balance'), 2),
         ]);
     }
 }

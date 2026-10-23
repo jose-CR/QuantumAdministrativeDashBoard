@@ -20,47 +20,26 @@ class EditLoans extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-        $data = array_merge(
-            $data,
-            app(LoanCalculatorService::class)->calculate($data)
-        );
-
-        // El saldo se calcula después de sincronizar las cuotas.
-        unset($data['pending_balance']);
-
         return $data;
     }
 
-    protected function handleRecordUpdate(
-        Model $record,
-        array $data
-    ): Model {
-        // Capturar los valores originales antes de guardar.
-        $oldInstallmentAmount = (float) $record->installment_amount;
-        $oldInstallments = (int) $record->installments;
-
+    protected function handleRecordUpdate(Model $record, array $data): Model
+    {
         try {
-            return DB::transaction(function () use (
-                $record,
-                $data,
-                $oldInstallmentAmount,
-                $oldInstallments,
-            ): Model {
+            return DB::transaction(function () use ($record, $data): Model {
+                $data = array_merge($data, app(LoanCalculatorService::class)->calculate($data));
+
+                // El saldo se calcula después de sincronizar las cuotas.
+                unset($data['pending_balance']);
+
                 $record = parent::handleRecordUpdate($record, $data);
 
-                app(InstallmentSyncService::class)->sync(
-                    $record,
-                    $oldInstallmentAmount,
-                    $oldInstallments,
-                );
+                app(InstallmentSyncService::class)->sync($record);
 
                 return $record;
             });
         } catch (InvalidArgumentException $e) {
-            Notification::make()
-                ->danger()
-                ->title($e->getMessage())
-                ->send();
+            Notification::make()->danger()->title($e->getMessage())->send();
 
             throw new Halt();
         }

@@ -352,6 +352,7 @@ class LoansForm
                                     ->label('Número de cuotas')
                                     ->numeric()
                                     ->minValue(1)
+                                    ->maxValue((int) config('quantum.installments.max', 100))
                                     ->required(),
 
                                 TextInput::make('installment_amount')

@@ -53,6 +53,7 @@ class Credit extends Model
             'initial_amount'     => 'decimal:2',
             'down_payment'       => 'decimal:2',
             'financed_amount'    => 'decimal:2',
+            'installments' => 'integer',
             'installment_amount' => 'decimal:2',
             'interest_rate'      => 'decimal:2',
             'total_interest'     => 'decimal:2',

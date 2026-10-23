@@ -21,8 +21,8 @@ class RefinancingService
             }
 
             $data = array_merge($data, [
-                'initial_amount' => $oldCredit->pending_balance,
                 'down_payment'   => $oldCredit->down_payment,
+                'initial_amount' => round((float) $oldCredit->pending_balance + (float) $oldCredit->down_payment, 2),
             ]);
 
             $newCredit = $client->credits()->create(array_merge(
@@ -38,13 +38,17 @@ class RefinancingService
 
             app(InstallmentGeneratorService::class)->generate($newCredit);
 
+            $newCredit->update([
+                'pending_balance' => round((float) $newCredit->installments()->sum('remaining_balance'), 2),
+            ]);
+
             $oldCredit->update([
                 'status'          => 'refinanced',
                 'pending_balance' => 0,
             ]);
 
             $oldCredit->installments()
-                ->whereIn('status', ['pending', 'late'])
+                ->whereIn('status', ['pending', 'partial', 'late'])
                 ->update(['status' => 'refinanced']);
 
             return $newCredit;
