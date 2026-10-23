@@ -57,13 +57,33 @@ class LoanCalculatorService
             );
         }
 
+        $maxInstallments = (int) config('quantum.installments.max');
+
+        if ($installments > $maxInstallments) {
+            throw new InvalidArgumentException(
+                "El número de cuotas no puede ser mayor a {$maxInstallments}."
+            );
+        }
+        
         /*
-         * Total cotizado por las cuotas.
-         */
-        $totalAmount = round(
-            $installments * $installmentAmount,
-            2
-        );
+        * Total cotizado por las cuotas.
+        */
+        $quotedTotal = round($installments * $installmentAmount, 2);
+
+        // Si las cuotas no cubren lo financiado, la última cuota absorbe la diferencia
+        $totalAmount = max($quotedTotal, $financedAmount);
+
+        // Tope de razón: evita errores de captura (cuota con un cero de más)
+        $maxRatio = (float) config('quantum.installments.max_total_ratio', 3);
+
+        if ($financedAmount > 0 && $totalAmount > $financedAmount * $maxRatio) {
+            throw new InvalidArgumentException(
+                "El total de las cuotas ({$totalAmount}) supera {$maxRatio} veces lo financiado. Revisa el monto de la cuota."
+            );
+        }
+
+        /*
+        * Intereses totales.
 
         /*
          * Intereses totales.
@@ -114,6 +134,10 @@ class LoanCalculatorService
      */
     protected function resolveInitialAmount(array $data): float
     {
+        if (! empty($data['refinanced_from_id'])) {
+            return round((float) ($data['initial_amount'] ?? 0), 2);
+        }
+
         if (empty($data['items'])) {
             return round(
                 (float) ($data['initial_amount'] ?? 0),

@@ -3,16 +3,19 @@
 namespace App\Filament\Admin\Actions;
 
 use App\Models\Bank;
-use App\Models\Client\Customer;
 use App\Models\Credit;
 use App\Models\Customer as ModelsCustomer;
+use App\Models\Installment;
 use App\Services\RegisterPaymentService;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Support\Exceptions\Halt;
+use InvalidArgumentException;
 
 class PayInstallmentAction extends Action
 {
@@ -40,7 +43,7 @@ class PayInstallmentAction extends Action
                                 }
 
                                 return $credit->installments()
-                                    ->where('status', 'pending')
+                                    ->whereIn('status', Installment::UNPAID_STATUSES)
                                     ->orderBy('number')
                                     ->get()
                                     ->mapWithKeys(fn ($installment) => [
@@ -63,6 +66,7 @@ class PayInstallmentAction extends Action
                         TextInput::make('amount')
                             ->label(__('resources.credits.clients.pay_installment.amount'))
                             ->numeric()
+                            ->minValue(0.01)
                             ->required(),
                     ])
                     ->columns(2),
@@ -111,17 +115,25 @@ class PayInstallmentAction extends Action
                     return;
                 }
 
-                app(RegisterPaymentService::class)->execute(
-                    credit: $credit,
-                    amount: $data['amount'],
-                    paymentMethod: $data['payment_method'],
-                    receiptNumber: $data['receipt_number'],
-                    notes: null,
-                    mode: 'single',
-                    installmentId: $data['installment_id'],
-                    bankId: $data['bank_id'] ?? null,
-                    paymentDate: $data['payment_date'],
-                );
+                try {
+                    app(RegisterPaymentService::class)->execute(
+                        credit: $credit,
+                        amount: (float) $data['amount'],
+                        paymentMethod: $data['payment_method'],
+                        receiptNumber: $data['receipt_number'],
+                        notes: null,
+                        mode: 'single',
+                        installmentId: (int) $data['installment_id'],
+                        bankId: $data['bank_id'] ?? null,
+                        paymentDate: $data['payment_date'],
+                    );
+                } catch (InvalidArgumentException $e) {
+                    Notification::make()->danger()->title($e->getMessage())->send();
+
+                    throw new Halt();
+                }
+
+                $record->refresh();
             });
     }
 

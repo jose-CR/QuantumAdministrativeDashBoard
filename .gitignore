@@ -22,4 +22,4 @@ yarn-error.log
 /.vscode
 /.zed
 python/.venv
-python/__pycache__
+python/__pycache__backup_*.sql

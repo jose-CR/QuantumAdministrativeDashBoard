@@ -22,67 +22,67 @@ class CustomerInfoList
     {
         return $schema
             ->components([
-            Section::make(__('resources.clients.sections.client'))
-                ->extraAttributes([
-                            'class' => 'text-center',
-                ])
-                ->description(function (Customer $record): string {
-                    
-                    return $record->activeCredit()->exists()
-                        ? 'Información general del cliente'
-                        : 'Este cliente no tiene un crédito activo actualmente.';
-                })
-                ->icon(function (Customer $record) {
-                    return $record->activeCredit()->exists()
-                        ? Heroicon::UserCircle
-                        : Heroicon::InformationCircle;
-                })
-                ->schema([
-                    TextEntry::make('full_name')
-                        ->label(__('resources.clients.fields.full_name'))
-                        ->size(TextSize::Large)
-                        ->weight(FontWeight::Bold)
-                        ->icon(Heroicon::UserCircle)
-                        ->alignCenter()
-                        ->columnSpanFull(),
+                Section::make(__('resources.clients.sections.client'))
+                    ->extraAttributes([
+                                'class' => 'text-center',
+                    ])
+                    ->description(function (Customer $record): string {
+                        
+                        return $record->activeCredit()->exists()
+                            ? 'Información general del cliente'
+                            : 'Este cliente no tiene un crédito activo actualmente.';
+                    })
+                    ->icon(function (Customer $record) {
+                        return $record->activeCredit()->exists()
+                            ? Heroicon::UserCircle
+                            : Heroicon::InformationCircle;
+                    })
+                    ->schema([
+                        TextEntry::make('full_name')
+                            ->label(__('resources.clients.fields.full_name'))
+                            ->size(TextSize::Large)
+                            ->weight(FontWeight::Bold)
+                            ->icon(Heroicon::UserCircle)
+                            ->alignCenter()
+                            ->columnSpanFull(),
 
-                    TextEntry::make('phone_primary')
-                        ->label(__('resources.clients.fields.phones'))
-                        ->formatStateUsing(function ($state, $record) {
-                            return collect([
-                                $state,
-                                $record->phone_secondary,
-                            ])
-                                ->filter()
-                                ->implode(' / ');
-                        })
-                        ->icon(Heroicon::Phone),
+                        TextEntry::make('phone_primary')
+                            ->label(__('resources.clients.fields.phones'))
+                            ->formatStateUsing(function ($state, $record) {
+                                return collect([
+                                    $state,
+                                    $record->phone_secondary,
+                                ])
+                                    ->filter()
+                                    ->implode(' / ');
+                            })
+                            ->icon(Heroicon::Phone),
 
-                    TextEntry::make('document_number')
-                        ->label(__('resources.clients.fields.identity_document'))
-                        ->icon(Heroicon::Identification),
+                        TextEntry::make('document_number')
+                            ->label(__('resources.clients.fields.identity_document'))
+                            ->icon(Heroicon::Identification),
 
-                    TextEntry::make('email')
-                        ->label(__('resources.clients.fields.email'))
-                        ->icon(Heroicon::Envelope),
+                        TextEntry::make('email')
+                            ->label(__('resources.clients.fields.email'))
+                            ->icon(Heroicon::Envelope),
 
-                    TextEntry::make('nrc')
-                        ->formatStateUsing(fn ($state) => $state ?? 'Sin NRC')
-                        ->visible(fn (Customer $record) => $record->document_type === 'NIT')
-                        ->label(__('resources.clients.fields.enterprise.nrc')),
+                        TextEntry::make('nrc')
+                            ->formatStateUsing(fn ($state) => $state ?? 'Sin NRC')
+                            ->visible(fn (Customer $record) => $record->document_type === 'NIT')
+                            ->label(__('resources.clients.fields.enterprise.nrc')),
 
-                    TextEntry::make('economic_activity')
-                        ->label(__('resources.clients.fields.enterprise.economic_activity'))
-                        ->icon(Heroicon::Briefcase)
-                        ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
+                        TextEntry::make('economic_activity')
+                            ->label(__('resources.clients.fields.enterprise.economic_activity'))
+                            ->icon(Heroicon::Briefcase)
+                            ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
 
-                    TextEntry::make('address')
-                        ->label(__('resources.clients.fields.address'))
-                        ->icon(Heroicon::MapPin)
-                        ->columnSpanFull(),
-                ])
-                ->columns(3)
-                ->columnSpanFull(),
+                        TextEntry::make('address')
+                            ->label(__('resources.clients.fields.address'))
+                            ->icon(Heroicon::MapPin)
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(3)
+                    ->columnSpanFull(),
 
                 Section::make(__('resources.clients.sections.financed_article'))
                         ->extraAttributes([

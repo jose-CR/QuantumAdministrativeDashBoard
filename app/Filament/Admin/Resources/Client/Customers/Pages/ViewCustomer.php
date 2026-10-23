@@ -19,6 +19,7 @@ class ViewCustomer extends ViewRecord
         return [
             EditAction::make(),
             PayInstallmentAction::make(),
+            RefinanceCreditAction::make(),
             Action::make('createCredit')
                 ->url(fn (Customer $record): string => route(
                     'filament.admin.resources.creditos.loans.create',

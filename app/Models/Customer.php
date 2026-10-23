@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Spatie\Tags\HasTags;
+use Illuminate\Database\Eloquent\Builder;
 
 class Customer extends Model
 {
@@ -33,16 +34,10 @@ class Customer extends Model
     ];
 
     /**
-     * Get the attributes that should be cast.
      *
-     * @return array<string, string>
+     *
+     *
      */
-    protected function casts(): array
-    {
-        return [
-            
-        ];
-    }
 
     public function references()
     {

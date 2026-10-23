@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Credits\Installments\Tables;
 
+use App\Models\ArticleUnit;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -16,7 +17,7 @@ class InstallmentsTable
         return $table
             ->modifyQueryUsing(fn ($query) => $query->with([
                 'credit.client',
-                'credit.items.articleUnit',
+                'credit.items.item',
             ]))
             ->columns([
                 TextColumn::make('id')
@@ -31,9 +32,10 @@ class InstallmentsTable
 
                 TextColumn::make('credit.items.articleUnit.display_name')
                     ->label(__('resources.credits.installment.vehicle'))
-                        ->state(fn ($record) => $record->credit->items
-                                ->map(fn ($item) => $item->articleUnit->display_name)
-                                ->join(', ')),
+                    ->state(fn ($record) => $record->credit->items
+                            ->filter(fn ($item) => $item->item instanceof ArticleUnit)
+                            ->map(fn ($item) => $item->display_name)
+                            ->join(', ')),
 
                 TextColumn::make('number')
                     ->label(__('resources.credits.installment.number')),

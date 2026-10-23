@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 
 class Installment extends Model
 {
     /** @use HasFactory<\Database\Factories\InstallmentFactory> */
     use HasFactory;
+
+    public const UNPAID_STATUSES = ['pending', 'late'];
 
     /**
      * The attributes that are mass assignable.
@@ -41,6 +44,14 @@ class Installment extends Model
             'due_date' => 'date',
             'paid_at'  => 'date',
         ];
+    }
+
+
+    public function scopeOverdue(Builder $query): Builder
+    {
+        return $query
+            ->whereIn('status', self::UNPAID_STATUSES)
+            ->whereDate('due_date', '<', today());
     }
 
     public function credit()

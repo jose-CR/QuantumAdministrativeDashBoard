@@ -54,7 +54,7 @@ class ApplyPaymentService
 
     /**
      * Pago automático:
-     * distribuye el dinero entre las cuotas pendientes
+     * distribuye el dinero entre las cuotas sin pagar (pendientes o atrasadas)
      * comenzando por la más antigua.
      */
     private function applyAutomatically(
@@ -67,7 +67,7 @@ class ApplyPaymentService
 
         $installments = $credit
             ->installments()
-            ->where('status', 'pending')
+            ->whereIn('status', Installment::UNPAID_STATUSES)
             ->orderBy('number')
             ->lockForUpdate()
             ->get();
@@ -94,7 +94,7 @@ class ApplyPaymentService
                 continue;
             }
 
-            // Pago parcial (la cuota sigue pendiente)
+            // Pago parcial (la cuota conserva su estado)
             $installment->update([
                 'remaining_balance' => $balance - $remainingPayment,
             ]);
@@ -119,7 +119,7 @@ class ApplyPaymentService
 
         $installments = $installment->credit
             ->installments()
-            ->where('status', 'pending')
+            ->whereIn('status', Installment::UNPAID_STATUSES)
             ->where('number', '>=', $installment->number)
             ->orderBy('number')
             ->lockForUpdate()
@@ -146,7 +146,7 @@ class ApplyPaymentService
                 continue;
             }
 
-            // Pago parcial (la cuota sigue pendiente)
+            // Pago parcial (la cuota conserva su estado)
             $installment->update([
                 'remaining_balance' => $balance - $remainingPayment,
             ]);

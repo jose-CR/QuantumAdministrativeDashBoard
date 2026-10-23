@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Tables;
 
+use App\Models\ArticleUnit;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -14,6 +15,7 @@ class LoansTable
     public static function configure(Table $table): Table
     {
         return $table
+        ->modifyQueryUsing(fn ($query) => $query->with(['client', 'items.item']))
         ->columns([
             TextColumn::make('id')
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -32,8 +34,12 @@ class LoansTable
                 ->searchable()
                 ->sortable(),
 
-            TextColumn::make('articleUnit.display_name')
-                ->label(__('resources.credits.clients.vehicle')),
+            TextColumn::make('vehicle')
+                ->label(__('resources.credits.clients.vehicle'))
+                ->state(fn ($record) => $record->items
+                    ->filter(fn ($item) => $item->item instanceof ArticleUnit)
+                    ->map(fn ($item) => $item->display_name)
+                    ->join(', ')),
 
             TextColumn::make('down_payment')
                 ->label(__('resources.credits.credits.down_payment'))

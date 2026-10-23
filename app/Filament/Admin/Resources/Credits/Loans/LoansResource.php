@@ -30,7 +30,7 @@ class LoansResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $recordTitleAttribute = 'client_id';
+    protected static ?string $recordTitleAttribute = 'customer_id';
 
     protected static ?string $slug = 'creditos/loans';
 

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Models\User;
 use App\Services\InstallmentGeneratorService;
@@ -29,6 +30,10 @@ class CreateLoans extends CreateRecord
         app(InstallmentGeneratorService::class)->generate(
             credit: $this->record,
         );
+
+        $this->record->update([
+        'pending_balance' => round((float) $this->record->installments()->sum('remaining_balance'), 2),
+        ]);
     }
 
     public function mount(): void
@@ -38,6 +43,13 @@ class CreateLoans extends CreateRecord
         $this->form->fill([
             'customer_id' => request('customer'),
             'status' => 'active',
+        ]);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return CustomerResource::getUrl('view', [
+            'record' => $this->record->customer_id,
         ]);
     }
 }

@@ -2,13 +2,17 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
-use App\Models\User;
-use App\Services\InstallmentGeneratorService;
+use App\Services\Credits\InstallmentSyncService;
 use App\Services\LoanCalculatorService;
 use Filament\Actions\DeleteAction;
-use Filament\Facades\Filament;
+use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
+use Filament\Support\Exceptions\Halt;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
+use InvalidArgumentException;
 
 class EditLoans extends EditRecord
 {
@@ -16,35 +20,29 @@ class EditLoans extends EditRecord
 
     protected function mutateFormDataBeforeSave(array $data): array
     {
-
-        $calculator = app(LoanCalculatorService::class);
-
-        return array_merge(
-            $data,
-            $calculator->calculate($data)
-        );
+        return $data;
     }
 
-    protected function afterSave(): void
+    protected function handleRecordUpdate(Model $record, array $data): Model
     {
+        try {
+            return DB::transaction(function () use ($record, $data): Model {
+                $data = array_merge($data, app(LoanCalculatorService::class)->calculate($data));
 
-        $creator = Filament::auth()->user();
+                // El saldo se calcula después de sincronizar las cuotas.
+                unset($data['pending_balance']);
 
-        $assignedUser = null;
+                $record = parent::handleRecordUpdate($record, $data);
 
-        if (! empty($data['assigned_user_id'])) {
-            $assignedUser = User::findOrFail(
-                $data['assigned_user_id']
-            );
+                app(InstallmentSyncService::class)->sync($record);
+
+                return $record;
+            });
+        } catch (InvalidArgumentException $e) {
+            Notification::make()->danger()->title($e->getMessage())->send();
+
+            throw new Halt();
         }
-
-        app(
-            InstallmentGeneratorService::class
-        )->generate(
-                credit: $this->record,
-                creator: $creator,
-                assignedUser: $assignedUser,
-        );
     }
 
     protected function getHeaderActions(): array
@@ -52,5 +50,12 @@ class EditLoans extends EditRecord
         return [
             DeleteAction::make(),
         ];
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return CustomerResource::getUrl('view', [
+            'record' => $this->record->customer_id,
+        ]);
     }
 }
