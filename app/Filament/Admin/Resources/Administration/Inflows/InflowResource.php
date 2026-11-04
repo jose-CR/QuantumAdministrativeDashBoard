@@ -49,6 +49,11 @@ class InflowResource extends Resource
         ];
     }
 
+    public static function getNavigationGroup(): string
+    {
+        return __('models.others.cash');
+    }
+
     public static function getPages(): array
     {
         return [

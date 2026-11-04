@@ -62,6 +62,11 @@ class CustomerResource extends Resource
         ];
     }
 
+    public static function getNavigationGroup(): string
+    {
+        return __('models.others.clients');
+    }
+
     public static function getPages(): array
     {
         return [

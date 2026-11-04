@@ -65,6 +65,11 @@ class TagResource extends Resource
             ]);
     }
 
+    public static function getNavigationGroup(): string
+    {
+        return __('models.others.settings');
+    }
+
     public static function getPages(): array
     {
         return [

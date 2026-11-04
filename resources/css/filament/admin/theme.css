@@ -4,3 +4,165 @@
 @source '../../../../resources/views/filament/admin/**/*';
 
 @source '../../../../vendor/kenepa/translation-manager/resources/**/*.blade.php';
+
+/* ==========================================================================
+   Lanzador de aplicaciones (estilo Odoo)
+   ========================================================================== */
+
+.q-apps-grid {
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    align-items: start;
+    gap: 1.25rem;
+}
+
+@media (min-width: 640px) {
+    .q-apps-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1280px) {
+    .q-apps-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+.q-app-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 1rem;
+    border: 1px solid rgb(229 231 235);
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.q-app-card:hover {
+    transform: translateY(-2px);
+    border-color: rgb(209 213 219);
+    box-shadow: 0 16px 32px -18px rgba(15, 23, 42, 0.35);
+}
+
+.dark .q-app-card {
+    border-color: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow: none;
+}
+
+.dark .q-app-card:hover {
+    border-color: rgba(255, 255, 255, 0.16);
+    box-shadow: 0 16px 32px -18px rgba(0, 0, 0, 0.8);
+}
+
+.q-app-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+    padding: 1.25rem 1.25rem 1rem;
+    text-decoration: none;
+}
+
+.q-app-card__icon {
+    display: flex;
+    height: 3rem;
+    width: 3rem;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    border-radius: 0.875rem;
+    color: var(--q-app-color, #475569);
+    background: color-mix(in srgb, var(--q-app-color, #475569) 14%, transparent);
+}
+
+.q-app-card__titles {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.q-app-card__name {
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.25rem;
+    color: rgb(2 6 23);
+}
+
+.dark .q-app-card__name {
+    color: #ffffff;
+}
+
+.q-app-card__description {
+    font-size: 0.75rem;
+    line-height: 1.05rem;
+    color: rgb(107 114 128);
+}
+
+.dark .q-app-card__description {
+    color: rgb(156 163 175);
+}
+
+.q-app-card__items {
+    margin-top: auto;
+    border-top: 1px solid rgb(243 244 246);
+}
+
+.dark .q-app-card__items {
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.q-app-card__items > li + li {
+    border-top: 1px solid rgb(243 244 246);
+}
+
+.dark .q-app-card__items > li + li {
+    border-color: rgba(255, 255, 255, 0.06);
+}
+
+.q-app-card__item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.875rem;
+    color: rgb(75 85 99);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.q-app-card__item:hover {
+    background: rgb(249 250 251);
+    color: rgb(2 6 23);
+}
+
+.dark .q-app-card__item {
+    color: rgb(209 213 219);
+}
+
+.dark .q-app-card__item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #ffffff;
+}
+
+.q-app-card__chevron {
+    flex: none;
+    color: rgb(209 213 219);
+    transition: transform 0.15s ease, color 0.15s ease;
+}
+
+.q-app-card__item:hover .q-app-card__chevron {
+    transform: translateX(2px);
+    color: rgb(107 114 128);
+}
+
+/* Botón del selector de apps en la barra superior */
+.q-app-switcher {
+    transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.q-app-switcher:hover {
+    transform: scale(1.05);
+}
