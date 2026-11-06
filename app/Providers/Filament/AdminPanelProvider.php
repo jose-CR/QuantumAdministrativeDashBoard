@@ -2,22 +2,23 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Admin\pages\Apps;
 use App\Filament\Admin\pages\Dashboard;
-use Filament\Http\Middleware\Authenticate;
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
 use App\Http\Middleware\EnsureModuleEnabled;
 use Filament\Navigation\NavigationGroup;
-use Filament\App\Filament\Admin\pages;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
-use Filament\Widgets\AccountWidget;
-use Filament\Widgets\FilamentInfoWidget;
+use Filament\Support\Icons\Heroicon;
+use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
@@ -32,13 +33,16 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            // El inicio del panel es el lanzador de apps (estilo Odoo), no el dashboard.
+            ->homeUrl(fn (): string => Apps::getUrl())
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->login()
             ->colors([
                 'primary' => Color::Violet,
             ])
             ->discoverResources(in: app_path('Filament/Admin/Resources'), for: 'App\Filament\Admin\Resources')
-            ->discoverPages(in: app_path('Filament/Admin/Pages'), for: 'App\Filament\Admin\Pages')
+            // El directorio real es "pages" en minúscula; en Linux el path tiene que coincidir.
+            ->discoverPages(in: app_path('Filament/Admin/pages'), for: 'App\Filament\Admin\pages')
             ->pages([
                 Dashboard::class
             ])
@@ -62,15 +66,38 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
                 EnsureModuleEnabled::class,
             ])
+            // Cada grupo es una "app" del lanzador (ver App\Support\Apps\AppCatalog).
             ->navigationGroups([
                 NavigationGroup::make()
-                    ->label('Administración'),
+                    ->label(__('models.others.clients'))
+                    ->collapsible(false),
+                NavigationGroup::make()
+                    ->label(__('models.others.cash'))
+                    ->collapsible(false),
+                NavigationGroup::make()
+                    ->label(__('models.others.inventary'))
+                    ->collapsible(false),
+                NavigationGroup::make()
+                    ->label(__('models.others.credits'))
+                    ->collapsible(false),
+                NavigationGroup::make()
+                    ->label(__('models.others.administration'))
+                    ->collapsible(false),
+                NavigationGroup::make()
+                    ->label(__('models.others.settings'))
+                    ->collapsible(false),
             ])
+            // Botón de aplicaciones en la barra superior.
+            ->renderHook(
+                PanelsRenderHook::TOPBAR_START,
+                fn (): View => view('filament.admin.topbar.app-switcher'),
+            )
             ->databaseNotifications()
             ->plugins([
-                FilamentShieldPlugin::make(),
+                FilamentShieldPlugin::make()
+                    ->navigationGroup(__('models.others.settings')),
                 TranslationManagerPlugin::make()
-                ->navigationGroup(__('models.admin_panels.translate'))
+                    ->navigationGroup(__('models.others.settings')),
             ])
         ;
     }

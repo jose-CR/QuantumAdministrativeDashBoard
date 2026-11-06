@@ -81,6 +81,21 @@ return [
         'administration' => 'administration',
         'inventary' => 'Inventary',
         'credits' => 'Credits',
+        'clients' => 'Clients',
+        'cash' => 'Cash',
+        'settings' => 'Settings',
+        'general' => 'General',
+        'apps' => 'Apps',
+        'apps_subheading' => 'Pick a module to start working.',
+        'descriptions' => [
+            'clients' => 'Client records, references and attachments',
+            'cash' => 'Inflows, outflows and cash flow',
+            'inventory' => 'Articles, units, categories and transport',
+            'credits' => 'Credits, installments and payment history',
+            'administration' => 'Banks, users and roles',
+            'settings' => 'Tags, roles and translations',
+            'general' => 'General panel shortcuts',
+        ],
     ],
 
 ];
