@@ -44,6 +44,13 @@ return [
                 'title' => 'Categoría eliminada permanentemente',
                 'body' => 'La categoría fue eliminada permanentemente.',
             ],
+
+            // Bloqueo por integridad: la categoría tiene artículos (FK restrict).
+            'blocked' => [
+                'title' => 'No se puede eliminar la categoría',
+                'body' => '«:name» tiene artículos asociados. Muévelos a otra categoría o bórralos primero.',
+                'bulk' => 'Estas categorías tienen artículos: :names. No se eliminó ninguna.',
+            ],
         ],
 
         'articleUnits' => [
@@ -97,6 +104,13 @@ return [
             'force_delete' => [
                 'title' => 'Artículo eliminado permanentemente',
                 'body' => 'El artículo fue eliminado permanentemente.',
+            ],
+
+            // Bloqueo por integridad: el artículo tiene unidades registradas.
+            'blocked' => [
+                'title' => 'No se puede eliminar el artículo',
+                'body' => '«:name» tiene unidades registradas. Bórralas primero si de verdad ya no existe.',
+                'bulk' => 'Estos artículos tienen unidades registradas: :names. No se eliminó ninguno.',
             ],
         ],
     ],

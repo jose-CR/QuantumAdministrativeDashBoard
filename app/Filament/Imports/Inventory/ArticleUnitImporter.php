@@ -18,9 +18,10 @@ class ArticleUnitImporter extends Importer
         $rules = ArticleUnitRules::import();
 
         return [
+            // El id dejó de ser obligatorio: pedirlo en el Excel obligaba a
+            // inventar ids y desfasaba la secuencia de Postgres.
             ImportColumn::make('id')
-                ->requiredMapping()
-                ->rules($rules['id'] ?? ['integer']),
+                ->rules($rules['id']),
 
             ImportColumn::make('article_id')
                 ->requiredMapping()
@@ -34,6 +35,7 @@ class ArticleUnitImporter extends Importer
                 ->rules($rules['cash_price']),
 
             ImportColumn::make('vin')
+                ->requiredMapping()
                 ->rules($rules['vin']),
 
             ImportColumn::make('engine_number')
@@ -43,19 +45,26 @@ class ArticleUnitImporter extends Importer
                 ->rules($rules['plate']),
 
             ImportColumn::make('status')
-                ->requiredMapping()
                 ->rules($rules['status']),
         ];
     }
 
+    /**
+     * Se actualiza por id si viene, si no por VIN/serie (que es único), y si no
+     * existe se crea una unidad nueva.
+     */
     public function resolveRecord(): ArticleUnit
     {
-        if (! empty($this->data['id'])) {
+        if (filled($this->data['id'] ?? null)) {
             $record = ArticleUnit::find($this->data['id']);
 
             if ($record) {
                 return $record;
             }
+        }
+
+        if (filled($this->data['vin'] ?? null)) {
+            return ArticleUnit::firstOrNew(['vin' => $this->data['vin']]);
         }
 
         return new ArticleUnit();

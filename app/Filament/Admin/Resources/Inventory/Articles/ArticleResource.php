@@ -28,7 +28,7 @@ class ArticleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedSquares2x2;
 
-    protected static ?string $recordTitleAttribute = 'brand';
+    protected static ?string $recordTitleAttribute = 'name';
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 

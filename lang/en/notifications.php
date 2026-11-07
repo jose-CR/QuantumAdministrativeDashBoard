@@ -44,6 +44,12 @@ return [
                 'title' => 'Category permanently deleted',
                 'body' => 'The category was permanently deleted successfully.',
             ],
+
+            'blocked' => [
+                'title' => 'The category cannot be deleted',
+                'body' => '":name" has articles linked to it. Move them to another category or delete them first.',
+                'bulk' => 'These categories have articles: :names. None was deleted.',
+            ],
         ],
 
         'articleUnits' => [
@@ -97,6 +103,12 @@ return [
             'force_delete' => [
                 'title' => 'Article permanently deleted',
                 'body' => 'The article was permanently deleted successfully.',
+            ],
+
+            'blocked' => [
+                'title' => 'The article cannot be deleted',
+                'body' => '":name" has registered units. Delete them first if it really no longer exists.',
+                'bulk' => 'These articles have registered units: :names. None was deleted.',
             ],
         ],
     ],

@@ -2,12 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Inventory\ArticleUnits\Schemas;
 
-use App\Models\ArticleUnit;
+use App\Models\Article;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Database\Eloquent\Builder;
 
 class ArticleUnitForm
 {
@@ -15,74 +15,72 @@ class ArticleUnitForm
     {
         return $schema
             ->components([
+                /*
+                 * Solo se listan artículos serializados: los que se manejan por
+                 * cantidad (casco, repuesto) no tienen unidades, tienen stock.
+                 */
                 Select::make('article_id')
                     ->label(__('resources.inventary.article.article'))
-                    ->relationship('article', 'id')
-                    ->getOptionLabelFromRecordUsing(
-                        fn ($record) => $record->full_name
+                    ->relationship(
+                        'article',
+                        'name',
+                        modifyQueryUsing: fn (Builder $query) => $query->serialTracked(),
                     )
-                    ->searchable(['brand', 'model'])
+                    ->getOptionLabelFromRecordUsing(
+                        fn (Article $record): string => $record->full_name
+                    )
+                    ->searchable(['name', 'brand', 'model'])
                     ->optionsLimit(50)
-                    ->live(),
-                
-                Select::make('selected_price')
-                        ->label(__('resources.inventary.article_units.cash_price'))
-                        ->options(function (Get $get){
-                            $articleId = $get('article_id');
+                    ->required()
+                    ->live()
+                    ->helperText(__('resources.inventary.article_units.article_help'))
+                    // Al elegir el artículo se precarga su precio de lista; se puede
+                    // cambiar por unidad.
+                    ->afterStateUpdated(function (?string $state, Set $set) {
+                        if (blank($state)) {
+                            return;
+                        }
 
-                            if (!$articleId){
-                                return [];
-                            }
-
-                            $prices = ArticleUnit::query()
-                                ->where('article_id', $articleId)
-                                ->distinct()
-                                ->pluck('cash_price', 'cash_price')
-                                ->toArray();
-
-                            $prices['new'] = '➕ Nuevo precio';
-
-                            return $prices;
-                        })
-                        ->live()
-                        ->afterStateUpdated(function ($state, Set $set){
-                            if (!$state){
-                                $set('cash_price', null);
-                                return;
-                            } elseif ($state === 'new'){
-                                $set('cash_price', null);
-                            }else{
-                                $set('cash_price', $state);
-                            }
-                        }),
+                        $set('cash_price', Article::find($state)?->cash_price);
+                    }),
 
                 TextInput::make('cash_price')
                     ->label(__('resources.inventary.article_units.cash_price'))
                     ->numeric()
-                    ->visible(
-                        fn (Get $get) => $get('selected_price') === 'new'
-                    ),
+                    ->minValue(0.01)
+                    ->prefix('$')
+                    // La columna es NOT NULL: sin esta regla, guardar sin precio
+                    // terminaba en error de base de datos (500) y no en el campo.
+                    ->required(),
 
                 TextInput::make('vin')
-                    ->label(__('resources.inventary.article_units.vin')),
+                    ->label(__('resources.inventary.article_units.vin'))
+                    ->required()
+                    ->maxLength(20)
+                    ->unique(ignoreRecord: true)
+                    ->helperText(__('resources.inventary.article_units.vin_help')),
 
                 TextInput::make('engine_number')
-                    ->label(__('resources.inventary.article_units.engine_number')),
+                    ->label(__('resources.inventary.article_units.engine_number'))
+                    ->maxLength(255),
 
                 TextInput::make('plate')
-                    ->label(__('resources.inventary.article_units.plate')),
+                    ->label(__('resources.inventary.article_units.plate'))
+                    ->maxLength(255)
+                    ->unique(ignoreRecord: true),
 
                 TextInput::make('color')
-                    ->label(__('resources.inventary.article_units.color')),
-            
+                    ->label(__('resources.inventary.article_units.color'))
+                    ->maxLength(255),
+
                 Select::make('status')
                     ->label(__('resources.inventary.article_units.status'))
                     ->options([
                         'available' => 'Disponible',
-                        'reserved'  => 'Reservado',
-                        'sold'      => 'Vendido',
-                        'rented'    => 'Alquilado',
-                        'returned'  => 'Devuelto',
+                        'reserved' => 'Reservado',
+                        'sold' => 'Vendido',
+                        'rented' => 'Alquilado',
+                        'returned' => 'Devuelto',
                     ])
                     ->default('available')
                     ->hiddenOn('create'),

@@ -2,13 +2,13 @@
 
 namespace App\Rules\Inventory;
 
-use Illuminate\Validation\Rule;
-
 class ArticleUnitRules
 {
     public static function import(): array
     {
         return [
+            // Ya no es obligatorio: exigirlo forzaba a inventar ids en el Excel y
+            // desfasaba la secuencia de Postgres (el error de "id duplicado").
             'id' => [
                 'integer',
                 'nullable',
@@ -32,11 +32,11 @@ class ArticleUnitRules
                 'min:0.01',
             ],
 
+            // El VIN/serie identifica la pieza; el modelo lo revalida al guardar.
             'vin' => [
-                'nullable',
+                'required',
                 'string',
                 'max:20',
-                'unique:article_units,vin',
             ],
 
             'engine_number' => [
@@ -49,18 +49,11 @@ class ArticleUnitRules
                 'nullable',
                 'string',
                 'max:255',
-                'unique:article_units,plate',
             ],
 
             'status' => [
-                'required',
-                Rule::in([
-                    'available',
-                    'reserved',
-                    'rented',
-                    'returned',
-                    'sold',
-                ]),
+                'nullable',
+                'in:available,reserved,rented,returned,sold',
             ],
         ];
     }

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\Article;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -14,6 +15,9 @@ class ArticleFactory extends Factory
     {
         return [
             'category_id' => Category::factory(),
+
+            // Los artículos de prueba son vehículos: serializados, una unidad por VIN.
+            'tracking' => Article::TRACKING_SERIAL,
 
             'brand' => fake()->company(),
 

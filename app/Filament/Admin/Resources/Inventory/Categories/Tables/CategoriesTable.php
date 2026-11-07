@@ -27,11 +27,10 @@ class CategoriesTable
 
                 TextColumn::make('description')
                     ->label(__('resources.inventary.category.description'))
-                    ->formatStateUsing(fn (?string $state) => str_replace(
-                        ['<p>', '</p>'],
-                        '',
-                        $state
-                    ))
+                    // str_replace(null) revienta en PHP 8.4: la columna es nulable.
+                    ->formatStateUsing(fn (?string $state): ?string => $state === null
+                        ? null
+                        : trim(str_replace(['<p>', '</p>'], '', $state)))
                 //
             ])
             ->filters([
@@ -39,11 +38,42 @@ class CategoriesTable
             ])
             ->recordActions([
                 EditAction::make(),
-                DeleteAction::make(),
+                DeleteAction::make()
+                    // Borrar una categoría con artículos viola la FK y salía como
+                    // error 500. Aquí se avisa y se cancela la acción.
+                    ->before(function (DeleteAction $action, $record) {
+                        if ($record->articles()->exists()) {
+                            Notification::make()
+                                ->danger()
+                                ->title(__('notifications.inventary.category.blocked.title'))
+                                ->body(__('notifications.inventary.category.blocked.body', [
+                                    'name' => $record->name,
+                                ]))
+                                ->send();
+
+                            $action->cancel();
+                        }
+                    }),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make()
+                        ->before(function (DeleteBulkAction $action) {
+                            $bloqueadas = $action->getSelectedRecords()
+                                ->filter(fn ($category) => $category->articles()->exists());
+
+                            if ($bloqueadas->isNotEmpty()) {
+                                Notification::make()
+                                    ->danger()
+                                    ->title(__('notifications.inventary.category.blocked.title'))
+                                    ->body(__('notifications.inventary.category.blocked.bulk', [
+                                        'names' => $bloqueadas->pluck('name')->implode(', '),
+                                    ]))
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        })
                         ->successNotification(
                             Notification::make()
                                 ->success()

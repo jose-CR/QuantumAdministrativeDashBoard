@@ -14,11 +14,17 @@ class CategoriesForm
 
                 TextInput::make('name')
                     ->label(__('resources.inventary.category.name'))
-                    ->required(),
+                    ->required()
+                    ->maxLength(255)
+                    // Sin esta regla, un nombre repetido llegaba a la base y
+                    // reventaba con un error 500 en vez de avisar en el campo.
+                    ->unique(ignoreRecord: true),
 
-                TextInput::make('descripcion')
-                    ->label(__('resources.inventary.category.description')),
-                //
+                // Era 'descripcion': la columna real es `description`, así que lo
+                // que se escribía aquí no se guardaba nunca.
+                TextInput::make('description')
+                    ->label(__('resources.inventary.category.description'))
+                    ->maxLength(255),
             ]);
     }
 }

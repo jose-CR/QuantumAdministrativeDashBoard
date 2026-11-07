@@ -13,27 +13,18 @@ class Category extends Model
     /**
      * The attributes that are mass assignable.
      *
+     * `id` no va aquí: permitirlo dejaba crear registros con un id elegido a
+     * mano y desfasaba la secuencia de Postgres (el error de "id duplicado").
+     *
      * @var list<string>
      */
     protected $fillable = [
-        'id',
         'name',
         'description',
     ];
-
-    /**
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'content' => 'array',
-        ];
-    }
 
     public function articles()
     {
         return $this->hasMany(Article::class);
     }
-
 }

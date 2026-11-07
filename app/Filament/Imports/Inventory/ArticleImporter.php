@@ -15,34 +15,67 @@ class ArticleImporter extends Importer
 
     public static function getColumns(): array
     {
+        $rules = ArticleRules::import();
+
         return [
             ImportColumn::make('category_id')
                 ->requiredMapping()
-                ->rules(ArticleRules::import()['category_id']),
+                ->rules($rules['category_id']),
+
+            ImportColumn::make('name')
+                ->rules($rules['name']),
+
+            ImportColumn::make('sku')
+                ->rules($rules['sku']),
+
+            // sin / none: la columna del Excel que define cómo se almacena.
+            ImportColumn::make('tracking')
+                ->rules($rules['tracking']),
 
             ImportColumn::make('brand')
-                ->requiredMapping()
-                ->rules(ArticleRules::import()['brand']),
+                ->rules($rules['brand']),
 
             ImportColumn::make('model')
-                ->requiredMapping()
-                ->rules(ArticleRules::import()['model']),
+                ->rules($rules['model']),
 
             ImportColumn::make('year')
-                ->requiredMapping()
-                ->rules(ArticleRules::import()['year']),
+                ->rules($rules['year']),
+
+            ImportColumn::make('cash_price')
+                ->rules($rules['cash_price']),
+
+            ImportColumn::make('stock')
+                ->rules($rules['stock']),
 
             ImportColumn::make('description')
-                ->rules(ArticleRules::import()['description']),
+                ->rules($rules['description']),
         ];
     }
 
+    /**
+     * El artículo se identifica por SKU; si el Excel no lo trae, por su nombre
+     * dentro de la categoría, y como último recurso por marca + modelo + año.
+     *
+     * Antes el match era solo marca + modelo + año: dos artículos iguales en
+     * categorías distintas se pisaban entre sí.
+     */
     public function resolveRecord(): Article
     {
-        return Article::firstOrNew([
-            'brand' => $this->data['brand'],
-            'model' => $this->data['model'],
-            'year' => $this->data['year'],
+        $query = Article::query()
+            ->where('category_id', $this->data['category_id'] ?? null);
+
+        if (filled($this->data['sku'] ?? null)) {
+            return $query->firstOrNew(['sku' => $this->data['sku']]);
+        }
+
+        if (filled($this->data['name'] ?? null)) {
+            return $query->firstOrNew(['name' => $this->data['name']]);
+        }
+
+        return $query->firstOrNew([
+            'brand' => $this->data['brand'] ?? null,
+            'model' => $this->data['model'] ?? null,
+            'year' => $this->data['year'] ?? null,
         ]);
     }
 

@@ -23,15 +23,14 @@ class ArticleUnitsTable
                     ->label(__('resources.inventary.article_units.article'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
-                TextColumn::make('article.brand')
-                    ->label(__('resources.inventary.article_units.brand'))
+                // El nombre del artículo ya incluye marca y modelo (o el nombre
+                // propio de un artículo genérico). Antes se mostraban dos columnas
+                // que quedaban vacías para todo lo que no fuera vehículo.
+                TextColumn::make('article.name')
+                    ->label(__('resources.inventary.article_units.article'))
                     ->searchable()
-                    ->sortable(),
-
-                TextColumn::make('article.model')
-                    ->label(__('resources.inventary.article_units.model'))
-                    ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->weight('medium'),
 
                 TextColumn::make('cash_price')
                     ->label(__('resources.inventary.article_units.cash_price'))
@@ -58,7 +57,9 @@ class ArticleUnitsTable
                     ->searchable()
                     ->sortable()
                     ->badge()
-                    ->color(fn (string $state) => match ($state) {
+                    // El color es nulable: con el tipo `string` a secas, una unidad
+                    // sin color tumbaba el listado entero (TypeError).
+                    ->color(fn (?string $state): string => match ($state) {
                         'azul' => 'info',
                         'rojo', 'roja' => 'danger',
                         'verde' => 'success',
