@@ -13,6 +13,20 @@ class Credit extends Model
     use HasFactory;
 
     /**
+     * Al borrar el crédito, sus ítems se borran con la FK en cascada, y la cascada
+     * de la base **no** dispara los eventos del modelo: sin esto el stock de un
+     * artículo por cantidad nunca vuelve al inventario.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Credit $credit): void {
+            $credit->items()->get()->each(
+                fn (CreditItem $item) => $item->delete()
+            );
+        });
+    }
+
+    /**
      * The attributes that are mass assignable.
      *
      * @var list<string>

@@ -136,4 +136,28 @@ class CreditItemStockTest extends CreditTestCase
         $this->assertSame('3 × Casco abatible', $item->fresh()->display_name);
         $this->assertSame(75.0, $item->fresh()->total);
     }
+
+    public function test_borrar_el_credito_devuelve_el_stock(): void
+    {
+        // Los ítems se van por FK en cascada y esa cascada no dispara eventos:
+        // el crédito tiene que borrarlos él para que el stock vuelva.
+        $articulo = $this->makeArticle(stock: 10);
+
+        $credito = $this->makeCredit([['amount' => 50]]);
+        $credito->items()->create([
+            'item_type' => Article::class,
+            'item_id' => $articulo->id,
+            'price' => 25,
+            'quantity' => 2,
+        ]);
+
+        $this->assertSame(8, $articulo->fresh()->stock);
+
+        $credito->delete();
+
+        $this->assertSame(10, $articulo->fresh()->stock);
+        $this->assertFalse(
+            CreditItem::query()->where('credit_id', $credito->id)->exists()
+        );
+    }
 }

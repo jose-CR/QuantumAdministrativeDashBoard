@@ -87,7 +87,10 @@ class CreditItem extends Model
             return;
         }
 
-        $articulo->update(['stock' => (int) $articulo->stock + $delta]);
+        // Incremento atómico: dos créditos creados a la vez no pueden pisarse el stock.
+        Article::query()
+            ->whereKey($id)
+            ->increment('stock', $delta);
     }
 
     /**
