@@ -19,6 +19,10 @@ return [
     ],
 
     'inventary' => [
+
+        // Sufijo de la lista de créditos que impiden borrar: "#12 (Ana), #34 (Luis) y 3 más".
+        'more_credits' => 'y :count más',
+
         'category' => [
             'create' => [
                 'title' => 'Categoría creada',
@@ -33,6 +37,8 @@ return [
             'delete' => [
                 'title' => 'Categorías eliminadas',
                 'body' => 'Las categorías seleccionadas fueron eliminadas correctamente.',
+                // Se muestra en la confirmación antes de borrar.
+                'cascade' => 'También se eliminarán :articles artículos con sus :units unidades. Esta acción no se puede deshacer.',
             ],
 
             'restore' => [
@@ -45,11 +51,11 @@ return [
                 'body' => 'La categoría fue eliminada permanentemente.',
             ],
 
-            // Bloqueo por integridad: la categoría tiene artículos (FK restrict).
+            // Bloqueo por integridad: hay unidades usadas en créditos.
             'blocked' => [
                 'title' => 'No se puede eliminar la categoría',
-                'body' => '«:name» tiene artículos asociados. Muévelos a otra categoría o bórralos primero.',
-                'bulk' => 'Estas categorías tienen artículos: :names. No se eliminó ninguna.',
+                'body' => '«:name» tiene :units unidades usadas en créditos: :credits. Sácalas de esos créditos antes de borrar la categoría.',
+                'bulk' => 'Estas categorías tienen unidades usadas en créditos: :names. No se eliminó ninguna.',
             ],
         ],
 
@@ -94,6 +100,8 @@ return [
             'delete' => [
                 'title' => 'Artículos eliminados',
                 'body' => 'Los artículos seleccionados fueron eliminados correctamente.',
+                // Se muestra en la confirmación antes de borrar.
+                'cascade' => 'También se eliminarán sus :units unidades. Esta acción no se puede deshacer.',
             ],
 
             'restore' => [
@@ -106,11 +114,11 @@ return [
                 'body' => 'El artículo fue eliminado permanentemente.',
             ],
 
-            // Bloqueo por integridad: el artículo tiene unidades registradas.
+            // Bloqueo por integridad: hay unidades usadas en créditos.
             'blocked' => [
                 'title' => 'No se puede eliminar el artículo',
-                'body' => '«:name» tiene unidades registradas. Bórralas primero si de verdad ya no existe.',
-                'bulk' => 'Estos artículos tienen unidades registradas: :names. No se eliminó ninguno.',
+                'body' => '«:name» tiene :units unidades usadas en créditos: :credits. Sácalas de esos créditos antes de borrar el artículo.',
+                'bulk' => 'Estos artículos tienen unidades usadas en créditos: :names. No se eliminó ninguno.',
             ],
         ],
     ],

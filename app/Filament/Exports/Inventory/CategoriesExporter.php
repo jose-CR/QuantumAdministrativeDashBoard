@@ -3,6 +3,7 @@
 namespace App\Filament\Exports\Inventory;
 
 use App\Models\Category;
+use App\Support\Html;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -17,7 +18,10 @@ class CategoriesExporter extends Exporter
         return [
             ExportColumn::make('id'),
             ExportColumn::make('name'),
-            ExportColumn::make('description'),
+            ExportColumn::make('description')
+                // Texto plano: el editor guarda HTML y en el Excel viajaba como
+                // <p>…</p>, que al reimportar se duplicaba.
+                ->formatStateUsing(fn (?string $state): ?string => Html::plain($state)),
         ];
     }
 

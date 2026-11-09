@@ -19,6 +19,9 @@ return [
     ],
 
     'inventary' => [
+
+        'more_credits' => 'and :count more',
+
         'category' => [
             'create' => [
                 'title' => 'Category created',
@@ -33,6 +36,7 @@ return [
             'delete' => [
                 'title' => 'Categories deleted',
                 'body' => 'The selected categories were deleted successfully.',
+                'cascade' => 'This will also delete :articles articles and their :units units. This action cannot be undone.',
             ],
 
             'restore' => [
@@ -47,8 +51,8 @@ return [
 
             'blocked' => [
                 'title' => 'The category cannot be deleted',
-                'body' => '":name" has articles linked to it. Move them to another category or delete them first.',
-                'bulk' => 'These categories have articles: :names. None was deleted.',
+                'body' => '":name" has :units units used in credits: :credits. Remove them from those credits before deleting the category.',
+                'bulk' => 'These categories have units used in credits: :names. None was deleted.',
             ],
         ],
 
@@ -93,6 +97,7 @@ return [
             'delete' => [
                 'title' => 'Articles deleted',
                 'body' => 'The selected articles were deleted successfully.',
+                'cascade' => 'This will also delete its :units units. This action cannot be undone.',
             ],
 
             'restore' => [
@@ -107,8 +112,8 @@ return [
 
             'blocked' => [
                 'title' => 'The article cannot be deleted',
-                'body' => '":name" has registered units. Delete them first if it really no longer exists.',
-                'bulk' => 'These articles have registered units: :names. None was deleted.',
+                'body' => '":name" has :units units used in credits: :credits. Remove them from those credits before deleting the article.',
+                'bulk' => 'These articles have units used in credits: :names. None was deleted.',
             ],
         ],
     ],

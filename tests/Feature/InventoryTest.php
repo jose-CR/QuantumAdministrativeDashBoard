@@ -14,7 +14,11 @@ use App\Filament\Admin\Resources\Inventory\Categories\Pages\ListCategories;
 use App\Models\Article;
 use App\Models\ArticleUnit;
 use App\Models\Category;
+use App\Models\Credit;
+use App\Models\CreditItem;
+use App\Models\Customer;
 use App\Models\User;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Validation\ValidationException;
 use Livewire\Livewire;
@@ -156,5 +160,109 @@ class InventoryTest extends TestCase
         ]);
 
         $this->assertSame('Motomel Blitz 2024', $articulo->name);
+    }
+
+    /**
+     * Borrar el padre arrastra los hijos: la FK es RESTRICT y sin la cascada
+     * habría que borrar miles de artículos a mano antes de la categoría.
+     */
+    public function test_borrar_una_categoria_arrastra_sus_articulos_y_unidades(): void
+    {
+        [$categoria, $articulo, $unidad] = $this->arbolDeInventario('CASCADA-CAT');
+
+        $this->assertTrue($categoria->delete());
+
+        $this->assertDatabaseMissing('categories', ['id' => $categoria->id]);
+        $this->assertDatabaseMissing('articles', ['id' => $articulo->id]);
+        $this->assertDatabaseMissing('article_units', ['id' => $unidad->id]);
+    }
+
+    public function test_borrar_un_articulo_arrastra_sus_unidades(): void
+    {
+        [, $articulo, $unidad] = $this->arbolDeInventario('CASCADA-ART');
+
+        $this->assertTrue($articulo->delete());
+
+        $this->assertDatabaseMissing('articles', ['id' => $articulo->id]);
+        $this->assertDatabaseMissing('article_units', ['id' => $unidad->id]);
+    }
+
+    /**
+     * Si la unidad está en un crédito no se borra nada: `credit_items` apunta por
+     * relación polimórfica, sin FK, y quedaría huérfano.
+     */
+    public function test_no_borra_la_categoria_si_una_unidad_esta_en_un_credito(): void
+    {
+        [$categoria, , $unidad] = $this->arbolDeInventario('CASCADA-CRED');
+
+        $credito = Credit::query()->create([
+            'customer_id' => Customer::query()->firstOrFail()->id,
+            'initial_amount' => 100,
+            'financed_amount' => 100,
+            'installments' => 1,
+            'installment_amount' => 100,
+            'total_amount' => 100,
+            'start_date' => today(),
+            'payment_day' => 1,
+            'status' => 'active',
+        ]);
+
+        CreditItem::query()->create([
+            'credit_id' => $credito->id,
+            'item_type' => ArticleUnit::class,
+            'item_id' => $unidad->id,
+            'price' => 100,
+        ]);
+
+        $this->assertFalse($categoria->delete());
+        $this->assertFalse($categoria->canBeDeletedWithChildren());
+
+        // El aviso tiene que decir qué crédito es, no solo que hay uno.
+        $etiqueta = $categoria->creditsBlockingDeletionLabel();
+        $this->assertStringContainsString('#' . $credito->id, $etiqueta);
+        $this->assertStringContainsString($credito->client->full_name, $etiqueta);
+
+        $this->assertDatabaseHas('categories', ['id' => $categoria->id]);
+        $this->assertDatabaseHas('article_units', ['id' => $unidad->id]);
+    }
+
+    /**
+     * El resumen alimenta la confirmación del panel y la decisión de bloquear.
+     * Montar el modal comprueba además que el closure no revienta.
+     */
+    public function test_la_confirmacion_de_borrado_avisa_la_cascada(): void
+    {
+        [$categoria] = $this->arbolDeInventario('MODAL-CAT');
+
+        $this->assertSame(
+            ['articles' => 1, 'units' => 1, 'units_in_credits' => 0],
+            $categoria->deletionSummary(),
+        );
+
+        Livewire::test(ListCategories::class)
+            ->mountAction(TestAction::make('delete')->table($categoria->getKey()))
+            ->assertOk();
+    }
+
+    /**
+     * @return array{0: Category, 1: Article, 2: ArticleUnit}
+     */
+    private function arbolDeInventario(string $vin): array
+    {
+        $categoria = Category::query()->create(['name' => 'Categoría cascada ' . $vin]);
+
+        $articulo = Article::query()->create([
+            'category_id' => $categoria->id,
+            'name' => 'Artículo cascada ' . $vin,
+            'tracking' => Article::TRACKING_SERIAL,
+        ]);
+
+        $unidad = ArticleUnit::query()->create([
+            'article_id' => $articulo->id,
+            'cash_price' => 100,
+            'vin' => $vin,
+        ]);
+
+        return [$categoria, $articulo, $unidad];
     }
 }

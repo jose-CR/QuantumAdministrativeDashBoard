@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Inventory\Categories\Tables;
 
+use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -39,15 +40,32 @@ class CategoriesTable
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
-                    // Borrar una categoría con artículos viola la FK y salía como
-                    // error 500. Aquí se avisa y se cancela la acción.
-                    ->before(function (DeleteAction $action, $record) {
-                        if ($record->articles()->exists()) {
+                    // La cascada se lleva los artículos y sus unidades; se avisa
+                    // en la confirmación y solo se frena si alguna unidad está en
+                    // un crédito (esos ítems no tienen FK y quedarían huérfanos).
+                    ->modalDescription(function (Category $record): ?string {
+                        $summary = $record->deletionSummary();
+
+                        if ($summary['articles'] === 0) {
+                            return null;
+                        }
+
+                        return __('notifications.inventary.category.delete.cascade', [
+                            'articles' => $summary['articles'],
+                            'units' => $summary['units'],
+                        ]);
+                    })
+                    ->before(function (DeleteAction $action, Category $record) {
+                        $summary = $record->deletionSummary();
+
+                        if ($summary['units_in_credits'] > 0) {
                             Notification::make()
                                 ->danger()
                                 ->title(__('notifications.inventary.category.blocked.title'))
                                 ->body(__('notifications.inventary.category.blocked.body', [
                                     'name' => $record->name,
+                                    'units' => $summary['units_in_credits'],
+                                    'credits' => $record->creditsBlockingDeletionLabel(),
                                 ]))
                                 ->send();
 
@@ -60,7 +78,7 @@ class CategoriesTable
                     DeleteBulkAction::make()
                         ->before(function (DeleteBulkAction $action) {
                             $bloqueadas = $action->getSelectedRecords()
-                                ->filter(fn ($category) => $category->articles()->exists());
+                                ->filter(fn (Category $category) => ! $category->canBeDeletedWithChildren());
 
                             if ($bloqueadas->isNotEmpty()) {
                                 Notification::make()

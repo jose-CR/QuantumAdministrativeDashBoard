@@ -4,6 +4,7 @@ namespace App\Filament\Imports\Inventory;
 
 use App\Models\Category;
 use App\Rules\Inventory\CategoryRules;
+use App\Support\Html;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -21,7 +22,10 @@ class CategoryImporter extends Importer
                 ->rules(CategoryRules::import()['name']),
 
             ImportColumn::make('description')
-                ->rules(CategoryRules::import()['description']),
+                ->rules(CategoryRules::import()['description'])
+                // Un Excel viejo trae <p>…</p>: se guarda como texto plano y un
+                // <p></p> queda en null, no como etiqueta vacía.
+                ->castStateUsing(fn (?string $state): ?string => Html::plain($state)),
         ];
     }
 

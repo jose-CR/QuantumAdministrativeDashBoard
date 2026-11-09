@@ -4,6 +4,7 @@ namespace App\Filament\Imports\Inventory;
 
 use App\Models\Article;
 use App\Rules\Inventory\ArticleRules;
+use App\Support\Html;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -48,7 +49,10 @@ class ArticleImporter extends Importer
                 ->rules($rules['stock']),
 
             ImportColumn::make('description')
-                ->rules($rules['description']),
+                ->rules($rules['description'])
+                // Un Excel viejo trae <p>…</p>: se guarda como texto plano y un
+                // <p></p> queda en null, no como etiqueta vacía.
+                ->castStateUsing(fn (?string $state): ?string => Html::plain($state)),
         ];
     }
 

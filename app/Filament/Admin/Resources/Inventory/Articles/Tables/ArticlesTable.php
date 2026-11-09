@@ -103,15 +103,30 @@ class ArticlesTable
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make()
-                    // Con unidades registradas, borrar el artículo deja huérfanas
-                    // las referencias de créditos. Se avisa y se cancela.
+                    // La cascada se lleva sus unidades; se avisa en la confirmación
+                    // y solo se frena si alguna está usada en un crédito.
+                    ->modalDescription(function (Article $record): ?string {
+                        $summary = $record->deletionSummary();
+
+                        if ($summary['units'] === 0) {
+                            return null;
+                        }
+
+                        return __('notifications.inventary.article.delete.cascade', [
+                            'units' => $summary['units'],
+                        ]);
+                    })
                     ->before(function (DeleteAction $action, Article $record) {
-                        if ($record->units()->exists()) {
+                        $summary = $record->deletionSummary();
+
+                        if ($summary['units_in_credits'] > 0) {
                             Notification::make()
                                 ->danger()
                                 ->title(__('notifications.inventary.article.blocked.title'))
                                 ->body(__('notifications.inventary.article.blocked.body', [
                                     'name' => $record->full_name,
+                                    'units' => $summary['units_in_credits'],
+                                    'credits' => $record->creditsBlockingDeletionLabel(),
                                 ]))
                                 ->send();
 
@@ -124,7 +139,7 @@ class ArticlesTable
                     DeleteBulkAction::make()
                         ->before(function (DeleteBulkAction $action) {
                             $bloqueados = $action->getSelectedRecords()
-                                ->filter(fn (Article $article) => $article->units()->exists());
+                                ->filter(fn (Article $article) => ! $article->canBeDeletedWithChildren());
 
                             if ($bloqueados->isNotEmpty()) {
                                 Notification::make()

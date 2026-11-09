@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasCreditBlockedDeletion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 class Article extends Model
 {
     /** @use HasFactory<\Database\Factories\ArticleFactory> */
-    use HasFactory;
+    use HasCreditBlockedDeletion, HasFactory;
 
     /** Se controla por cantidad: no hay unidades, hay stock. */
     public const TRACKING_NONE = 'none';
@@ -63,6 +64,69 @@ class Article extends Model
                 $article->name = $article->composeName();
             }
         });
+
+        /*
+         * Borrar un artículo se lleva sus unidades. La FK es RESTRICT, así que
+         * sin esto habría que borrarlas a mano.
+         *
+         * Se cancela si alguna unidad está en un crédito: `credit_items` apunta
+         * por relación polimórfica, sin FK, y quedaría apuntando a la nada.
+         */
+        static::deleting(function (Article $article): bool {
+            if (! $article->canBeDeletedWithChildren()) {
+                return false;
+            }
+
+            ArticleUnit::query()->where('article_id', $article->id)->delete();
+
+            return true;
+        });
+    }
+
+    /**
+     * Qué se lleva por delante borrar este artículo.
+     *
+     * @return array{units: int, units_in_credits: int}
+     */
+    public function deletionSummary(): array
+    {
+        $units = $this->units();
+
+        return [
+            'units' => $units->count(),
+            'units_in_credits' => ArticleUnit::query()
+                ->where('article_id', $this->id)
+                ->whereIn('id', CreditItem::query()
+                    ->select('item_id')
+                    ->where('item_type', ArticleUnit::class))
+                ->count(),
+        ];
+    }
+
+    public function canBeDeletedWithChildren(): bool
+    {
+        return $this->deletionSummary()['units_in_credits'] === 0;
+    }
+
+    /**
+     * Créditos que impiden el borrado, para poder buscarlos: id y cliente.
+     *
+     * @return \Illuminate\Support\Collection<int, array{id: int, customer: string}>
+     */
+    public function creditsBlockingDeletion(): \Illuminate\Support\Collection
+    {
+        return Credit::query()
+            ->whereIn('id', CreditItem::query()
+                ->select('credit_id')
+                ->where('item_type', ArticleUnit::class)
+                ->whereIn('item_id', $this->units()->select('id')))
+            ->with('client:id,full_name')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (Credit $credit): array => [
+                'id' => $credit->id,
+                'customer' => (string) ($credit->client?->full_name ?? ''),
+            ]);
     }
 
     public function composeName(): string
