@@ -105,4 +105,27 @@ class PaymentTest extends CreditTestCase
         $this->assertSame('60.00', $cuota->remaining_balance);
         $this->assertSame('60.00', $credito->fresh()->pending_balance);
     }
+
+    public function test_una_cuota_con_saldo_cero_queda_pagada_y_cierra_el_credito(): void
+    {
+        // Caso real de la base: la última cuota quedó 'pending' con saldo 0, así
+        // que el crédito sumaba saldo 0 pero nunca se cerraba.
+        $credito = $this->makeCredit([
+            ['amount' => 100],
+            ['amount' => 0],
+        ]);
+
+        $cuotaCero = $credito->installments()->where('number', 2)->firstOrFail();
+        $cuotaCero->update(['remaining_balance' => 0, 'status' => 'pending']);
+
+        app(RegisterPaymentService::class)->execute(
+            credit: $credito,
+            amount: 100,
+            paymentMethod: 'cash',
+            receiptNumber: 'REC-006',
+        );
+
+        $this->assertSame('paid', $cuotaCero->fresh()->status);
+        $this->assertSame('completed', $credito->fresh()->status);
+    }
 }

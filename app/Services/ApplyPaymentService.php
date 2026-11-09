@@ -162,6 +162,18 @@ class ApplyPaymentService
         Credit $credit
     ): void {
 
+        // Una cuota sin saldo ya está pagada, aunque el estado haya quedado
+        // pendiente (pagos que la cierran por redondeo). Sin esto el crédito no
+        // se cierra nunca: el saldo suma 0 pero queda una cuota impaga.
+        $credit
+            ->installments()
+            ->whereIn('status', Installment::UNPAID_STATUSES)
+            ->where('remaining_balance', '<=', 0)
+            ->update([
+                'status' => 'paid',
+                'paid_at' => DB::raw('coalesce(paid_at, now())'),
+            ]);
+
         $total = $credit
             ->installments()
             ->sum('remaining_balance');
