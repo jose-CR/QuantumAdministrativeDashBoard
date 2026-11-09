@@ -3,30 +3,22 @@
 namespace App\Services\Alerts;
 
 use App\Models\Alert;
-use Filament\Notifications\Notification;
 
+/**
+ * Se conserva por compatibilidad: el envío vive en AlertService::notify(), que
+ * resuelve los destinatarios (asignado, creador o quienes ven créditos).
+ *
+ * La versión anterior llamaba `$user()->auth()->user()`, que no es PHP válido y
+ * reventaba en cuanto se usaba.
+ */
 class AlertNotificationService
 {
-    /**
-     * Create a new class instance.
-     */
+    public function __construct(
+        private readonly AlertService $alerts,
+    ) {}
+
     public function send(Alert $alert): void
     {
-        $users = collect([
-            $alert->creator,
-            $alert->assignedUser,
-        ])
-        ->filter()
-        ->unique('id');
-
-        foreach($users as $user){
-            $recipient = $user()->auth()->user();
-
-            Notification::make()
-                ->title($alert->title)
-                ->body($alert->message)
-                ->broadcast($recipient)
-                ->sendToDatabase($user);
-        }
+        $this->alerts->notify($alert);
     }
 }

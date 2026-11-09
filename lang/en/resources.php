@@ -335,6 +335,8 @@ return [
         'message' => 'Message',
         'upcoming_message' => '%s must pay installment #%d on %s.',
         'upcoming_payment' => 'Upcoming Payment',
+        'overdue_message' => '%s has installment #%d overdue since %s for $%s.',
+        'overdue_payment' => 'Overdue installment',
         'title_placeholder' => 'E.g. Remember to call the client',
         'message_placeholder' => 'Write the alert message...',
         'installment_format' => 'Installment #%d • Due: %s • Balance: $%s',

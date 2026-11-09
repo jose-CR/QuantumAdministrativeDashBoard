@@ -3,37 +3,30 @@
 namespace App\Services\Alerts;
 
 use App\Models\Alert;
-use App\Models\Client;
 use App\Models\Credit;
+use App\Models\Customer;
 use App\Models\Installment;
 use App\Models\User;
-use Illuminate\Database\Eloquent\Collection;
 use App\Notifications\AlertDatabaseNotification;
+use Illuminate\Database\Eloquent\Collection;
 
 class AlertService
 {
     /**
-    * Crea una alerta.
-    *
-    * @param array{
-    *     title: string,
-    *     message: string,
-    *     type: string,
-    *     alert_at: \Carbon\Carbon,
-    *     metadata?: array|null
-    * } $data
-    */
+     * Crea una alerta.
+     *
+     * @param  array{title: string, message: string, type: string, alert_at: \Carbon\Carbon, metadata?: array|null}  $data
+     */
     public function create(
-        Client $client,
+        Customer $customer,
         Credit $credit,
-        User $creator,
+        ?User $creator,
         ?User $assignedUser,
         ?Installment $installment,
         array $data,
     ): Alert {
-
-        $alert = Alert::create([
-            'client_id' => $client->id,
+        return Alert::create([
+            'customer_id' => $customer->id,
             'credit_id' => $credit->id,
             'installment_id' => $installment?->id,
 
@@ -42,53 +35,92 @@ class AlertService
             'type' => $data['type'],
             'alert_at' => $data['alert_at'],
 
-            'user_id' => $creator->id,
+            'user_id' => $creator?->id,
             'assigned_user_id' => $assignedUser?->id,
 
             'status' => Alert::STATUS_PENDING,
 
             'metadata' => $data['metadata'] ?? null,
         ]);
-
-        return $alert;
     }
 
     /**
-     * Alerta automática antes del vencimiento.
+     * Alerta automática antes del vencimiento de una cuota.
      */
-     public function createUpcoming(
+    public function createUpcoming(
         Installment $installment,
-        User $creator,
-        ?User $assignedUser,
+        ?User $creator = null,
+        ?User $assignedUser = null,
         int $daysBefore = 5,
     ): Alert {
+        $credit = $installment->credit;
 
-        $alert = Alert::create([
-            'installment_id' => $installment->id,
-            'type'           => Alert::TYPE_UPCOMING_PAYMENT,
-            'client_id'      => $installment->credit->client_id,
-            'credit_id'      => $installment->credit_id,
-            'user_id' => $creator->id,
-            'assigned_user_id' => $assignedUser?->id,
-            'title'          => __('resources.alert.upcoming_payment'),
-            'message'        => sprintf(
-                __('resources.alert.upcoming_message'),
-                $installment->credit->client->full_name,
-                $installment->number,
-                $installment->due_date->format('d/m/Y'),
-            ),
-            'status'         => Alert::STATUS_PENDING,
-            'alert_at'       => $installment->due_date->copy()->subDays($daysBefore),
-            'metadata'       => [
-                'days_before' => $daysBefore,
+        return $this->create(
+            customer: $credit->client,
+            credit: $credit,
+            creator: $creator,
+            assignedUser: $assignedUser,
+            installment: $installment,
+            data: [
+                'type' => Alert::TYPE_UPCOMING_PAYMENT,
+                'title' => __('resources.alert.upcoming_payment'),
+                'message' => sprintf(
+                    __('resources.alert.upcoming_message'),
+                    $credit->client->full_name,
+                    $installment->number,
+                    $installment->due_date->format('d/m/Y'),
+                ),
+                'alert_at' => $installment->due_date->copy()->subDays($daysBefore),
+                'metadata' => ['days_before' => $daysBefore],
             ],
-        ]);
-
-        return $alert;
+        );
     }
 
     /**
-     * Alertas que deben mostrarse hoy.
+     * Alerta de cuota vencida: se muestra de inmediato.
+     */
+    public function createOverdue(
+        Installment $installment,
+        ?User $creator = null,
+        ?User $assignedUser = null,
+    ): Alert {
+        $credit = $installment->credit;
+
+        return $this->create(
+            customer: $credit->client,
+            credit: $credit,
+            creator: $creator,
+            assignedUser: $assignedUser,
+            installment: $installment,
+            data: [
+                'type' => Alert::TYPE_OVERDUE,
+                'title' => __('resources.alert.overdue_payment'),
+                'message' => sprintf(
+                    __('resources.alert.overdue_message'),
+                    $credit->client->full_name,
+                    $installment->number,
+                    $installment->due_date->format('d/m/Y'),
+                    number_format((float) $installment->remaining_balance, 2),
+                ),
+                'alert_at' => now(),
+            ],
+        );
+    }
+
+    /**
+     * ¿Ya existe una alerta de este tipo para la cuota? Evita duplicados en cada
+     * corrida del generador (aunque la anterior ya se haya enviado).
+     */
+    public function existsFor(Installment $installment, string $type): bool
+    {
+        return Alert::query()
+            ->where('installment_id', $installment->id)
+            ->where('type', $type)
+            ->exists();
+    }
+
+    /**
+     * Alertas que deben mostrarse ya (vencidas o en su fecha).
      */
     public function dueToday(): Collection
     {
@@ -98,9 +130,6 @@ class AlertService
             ->get();
     }
 
-    /**
-     * Marca la alerta como enviada.
-     */
     public function markAsSent(Alert $alert): void
     {
         $alert->update([
@@ -110,108 +139,74 @@ class AlertService
     }
 
     /**
-     * Marca la alerta como completada.
+     * La cuota se pagó: sus alertas pendientes ya no aplican.
      */
-    public function complete(
-        Installment $installment
-    ): void {
-
+    public function complete(Installment $installment): void
+    {
         Alert::query()
             ->where('installment_id', $installment->id)
             ->where('status', Alert::STATUS_PENDING)
-            ->update([
-                'status' => Alert::STATUS_COMPLETED,
-            ]);
+            ->update(['status' => Alert::STATUS_COMPLETED]);
+    }
 
-        $nextInstallment = $installment->credit
-            ->installments()
-            ->where('status', 'pending')
-            ->orderBy('number')
-            ->first();
+    public function cancel(Installment $installment): void
+    {
+        Alert::query()
+            ->where('installment_id', $installment->id)
+            ->where('status', Alert::STATUS_PENDING)
+            ->update(['status' => Alert::STATUS_CANCELLED]);
+    }
 
-        if (! $nextInstallment) {
-            return;
-        }
-
-        $exists = Alert::query()
-            ->where('installment_id', $nextInstallment->id)
+    public function updateUpcomingDate(Installment $installment, int $daysBefore = 5): void
+    {
+        Alert::query()
+            ->where('installment_id', $installment->id)
             ->where('type', Alert::TYPE_UPCOMING_PAYMENT)
-            ->exists();
-
-        if ($exists) {
-            return;
-        }
-
-        $this->createUpcoming(
-            installment: $nextInstallment,
-            creator: $installment->credit->client,
-            assignedUser: null,
-        );
+            ->update([
+                'alert_at' => $installment->due_date->copy()->subDays($daysBefore),
+                'message' => sprintf(
+                    __('resources.alert.upcoming_message'),
+                    $installment->credit->client->full_name,
+                    $installment->number,
+                    $installment->due_date->format('d/m/Y'),
+                ),
+                'metadata' => ['days_before' => $daysBefore],
+            ]);
     }
 
     /**
-     * Cancela la alerta.
+     * A quién le llega la alerta: el asignado y quien la creó; si no hay
+     * ninguno (alertas automáticas), a quienes trabajan con créditos.
      */
-    public function cancel(
-        Installment $installment
-    ): void {
+    public function recipientsFor(Alert $alert): Collection
+    {
+        $explicit = collect([$alert->creator, $alert->assignedUser])
+            ->filter()
+            ->unique('id')
+            ->values();
 
-        Alert::query()
+        if ($explicit->isNotEmpty()) {
+            return new Collection($explicit->all());
+        }
 
-            ->where('installment_id', $installment->id)
+        $recipients = User::query()
+            ->permission(['ViewAny:Credit', 'ViewAny:Installment'])
+            ->get();
 
-            ->where('status', Alert::STATUS_PENDING)
+        if ($recipients->isEmpty()) {
+            $recipients = User::query()->role('super_admin')->get();
+        }
 
-            ->update([
-
-                'status' => Alert::STATUS_CANCELLED,
-            ]);
+        return $recipients;
     }
 
-    public function updateUpcomingDate(
-    Installment $installment,
-    int $daysBefore = 5,
-): void {
-
-    Alert::query()
-
-        ->where('installment_id', $installment->id)
-
-        ->where('type', Alert::TYPE_UPCOMING_PAYMENT)
-
-        ->update([
-
-            'alert_at' => $installment
-                ->due_date
-                ->copy()
-                ->subDays($daysBefore),
-
-            'message' => sprintf(
-                '%s debe pagar la cuota #%d el %s.',
-                $installment->credit->client->full_name,
-                $installment->number,
-                $installment->due_date->format('d/m/Y'),
-            ),
-
-            'metadata' => [
-                'days_before' => $daysBefore,
-            ],
-        ]);
-}
-
+    /**
+     * Manda la alerta al panel (campana de notificaciones).
+     */
     public function notify(Alert $alert): void
     {
-        $users = collect([
-            $alert->creator,
-            $alert->assignedUser,
-        ])
-        ->filter()
-        ->unique('id');
-
-        foreach($users as $user){
-            $user->notify(
-                new AlertDatabaseNotification($alert)
-            );
+        foreach ($this->recipientsFor($alert) as $user) {
+            $user->notify(new AlertDatabaseNotification($alert));
         }
     }
 }

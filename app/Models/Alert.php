@@ -19,7 +19,7 @@ class Alert extends Model
     public const TYPE_OVERDUE = 'overdue';
 
     protected $fillable = [
-        'client_id',
+        'customer_id',
         'credit_id',
         'installment_id',
         'user_id',
@@ -85,9 +85,18 @@ class Alert extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id');
+    }
+
+    /**
+     * Alias del nombre viejo: la columna es `customer_id` desde la migración
+     * de la tabla; `client_id` nunca existió.
+     */
     public function client()
     {
-        return $this->belongsTo(Client::class);
+        return $this->customer();
     }
 
     public function credit()

@@ -333,6 +333,8 @@ return [
         'message' => 'Mensaje',
         'upcoming_message' => '%s debe pagar la cuota #%d el %s.',
         'upcoming_payment' => 'Próximo pago',
+        'overdue_message' => '%s tiene la cuota #%d vencida desde el %s por $%s.',
+        'overdue_payment' => 'Cuota vencida',
         'title_placeholder' => 'Ej.: Recordar llamar al cliente',
         'message_placeholder' => 'Escriba el mensaje de la alerta...',
         'installment_format' => 'Cuota #%d • Vence: %s • Saldo: $%s',
