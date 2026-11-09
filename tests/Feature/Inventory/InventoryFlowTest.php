@@ -34,7 +34,7 @@ class InventoryFlowTest extends TestCase
     {
         parent::setUp();
 
-        $this->actingAs(User::query()->firstOrFail());
+        $this->actingAs($this->admin());
 
         filament()->setCurrentPanel(filament()->getPanel('admin'));
     }

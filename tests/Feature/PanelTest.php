@@ -19,7 +19,7 @@ class PanelTest extends TestCase
     {
         parent::setUp();
 
-        $this->actingAs(User::query()->firstOrFail());
+        $this->actingAs($this->admin());
     }
 
     public function test_el_lanzador_carga_sin_sidebar_y_con_todas_las_apps(): void

@@ -13,7 +13,7 @@ class PaymentTest extends CreditTestCase
 {
     public function test_un_pago_guarda_quien_lo_cobro(): void
     {
-        $usuario = User::query()->firstOrFail();
+        $usuario = $this->admin();
         $this->actingAs($usuario);
 
         $credito = $this->makeCredit([['amount' => 100]]);
