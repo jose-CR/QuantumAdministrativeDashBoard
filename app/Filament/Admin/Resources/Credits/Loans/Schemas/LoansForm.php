@@ -102,7 +102,11 @@ class LoansForm
                                                                 ->orWhere('color', 'ilike', "%{$search}%")
                                                                 ->orWhere('plate', 'ilike', "%{$search}%")
                                                                 ->orWhereHas('article', function ($query) use ($search) {
-                                                                    $query->where('brand', 'ilike', "%{$search}%")
+                                                                    // `name` cubre los artículos serializados que no
+                                                                    // son vehículos (batería con serie, por ejemplo).
+                                                                    $query->where('name', 'ilike', "%{$search}%")
+                                                                        ->orWhere('sku', 'ilike', "%{$search}%")
+                                                                        ->orWhere('brand', 'ilike', "%{$search}%")
                                                                         ->orWhere('model', 'ilike', "%{$search}%");
                                                                 });
                                                         })
