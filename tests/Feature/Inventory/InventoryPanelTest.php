@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Inventory;
 
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\CreateArticleUnit;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\EditArticleUnit;
@@ -29,7 +29,7 @@ use Tests\TestCase;
  * por cantidad (casco, repuesto). Las pruebas corren dentro de una transacción
  * y se revierten: no dejan filas en la base.
  */
-class InventoryTest extends TestCase
+class InventoryPanelTest extends TestCase
 {
     use DatabaseTransactions;
 
