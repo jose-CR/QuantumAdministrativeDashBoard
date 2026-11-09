@@ -211,14 +211,14 @@ return [
                 'installment' => 'Installment',
                 'installment_to_pay' => 'Installment to Pay',
                 'amount' => 'Amount to Pay',
-                'payment_method' => 'Payment Method',
 
-                'payment_methods' => [
-
+                'payment_method' => [
+                    'payment_method' => 'Payment Method',
                     'cash' => 'Cash',
                     'card' => 'Card',
-                    'bank_transfer' => 'Bank Transfer',
-                    'transfer' => 'Transfer'
+                    'cheque' => 'Bank Check',
+                    'transfer' => 'Transfer',
+                    'quedan' => '"Quedan" formal receipt for invoices received for future payment'
                 ],
 
                 'bank' => 'Bank',

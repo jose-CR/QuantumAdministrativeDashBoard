@@ -9,6 +9,8 @@ use App\Models\Outflow;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\ExportAction;
+use Filament\Actions\Exports\Enums\ExportFormat;
+use Filament\Actions\Exports\Models\Export;
 use Filament\Actions\ImportAction;
 use Filament\Schemas\Concerns\InteractsWithSchemas;
 use Filament\Schemas\Contracts\HasSchemas;
@@ -31,6 +33,13 @@ class OutflowsTableWidget extends Component implements HasActions, HasSchemas, H
     protected function getTableHeaderActions(): array
     {
         return [
+            ExportAction::make('exportReport')
+                ->label('Reporte de salidas')
+                ->icon('heroicon-o-chart-bar')
+                ->exporter(OutflowExporter::class)
+                ->formats([ExportFormat::Xlsx])
+                ->columnMapping(false)
+                ->fileName(fn (Export $export): string => "reporte-de-salidas-{$export->getKey()}"),
             ExportAction::make()
                 ->exporter(OutflowExporter::class)
                 ->columnMapping(false),

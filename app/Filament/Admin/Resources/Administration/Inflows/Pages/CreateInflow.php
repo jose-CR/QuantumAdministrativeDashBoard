@@ -16,4 +16,9 @@ class CreateInflow extends CreateRecord
     {
         $this->syncAttachments();
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
 }

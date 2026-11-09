@@ -43,7 +43,7 @@ class OverdueCreditsWidget extends TableWidget
                 Action::make('view')
                     ->label('Ver cliente')
                     ->icon('heroicon-o-eye')
-                    ->url(fn (Credit $record): string => CustomerResource::getUrl('edit', [
+                    ->url(fn (Credit $record): string => CustomerResource::getUrl('view', [
                         'record' => $record->customer_id,
                     ])),
             ])

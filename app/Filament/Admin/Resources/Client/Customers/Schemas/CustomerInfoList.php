@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Client\Customers\Schemas;
 
 use App\Models\Customer;
+use App\Support\ActividadesEconomicas;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Section;
@@ -74,6 +75,11 @@ class CustomerInfoList
                         TextEntry::make('economic_activity')
                             ->label(__('resources.clients.fields.enterprise.economic_activity'))
                             ->icon(Heroicon::Briefcase)
+                            ->formatStateUsing(function ($state, $record) {
+                                $economicActity = ActividadesEconomicas::activityName($record->economic_activity);
+
+                                return $economicActity;
+                            })
                             ->visible(fn (Customer $record) => $record->document_type === 'NIT'),
 
                         TextEntry::make('address')

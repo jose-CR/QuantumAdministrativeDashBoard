@@ -219,8 +219,9 @@ return [
 
                     'cash' => 'Efectivo',
                     'card' => 'Tarjeta',
-                    'bank_transfer' => 'Transferencia bancaria',
+                    'cheque' => 'Cheque',
                     'transfer' => 'Transferencia',
+                    'quedan' => 'Quedan'
                 ],
 
                 'bank' => 'Banco',
