@@ -16,4 +16,19 @@ return [
 
     'currency' => 'USD',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Python
+    |--------------------------------------------------------------------------
+    |
+    | Los exports arman el ZIP (Excel + adjuntos) con python/scripts/cash_report.py.
+    | `bin` es la ruta al intérprete; vacío = se resuelve solo (venv del proyecto,
+    | luego /usr/bin/python3). Ver App\Support\PythonBinary.
+    |
+    */
+    'python' => [
+        'bin' => env('PYTHON_BIN'),
+        'script' => 'python/scripts/cash_report.py',
+    ],
+
 ];

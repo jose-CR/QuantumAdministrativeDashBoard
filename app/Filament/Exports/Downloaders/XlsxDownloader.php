@@ -76,7 +76,7 @@ class XlsxDownloader implements Downloader
             $result = Process::timeout(60)
                 ->input(json_encode($reportPayload, JSON_UNESCAPED_UNICODE))
                 ->run([
-                    base_path('python/.venv/bin/python'),
+                    \App\Support\PythonBinary::path(),
                     base_path('python/scripts/cash_report.py'),
                 ]);
 

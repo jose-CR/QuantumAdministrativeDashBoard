@@ -1,6 +1,7 @@
 services:
   web:
     build: .
+    image: quantum-app:dev
     container_name: quantum-web
     ports:
       - "8082:80"          # 8080 lo usa app-php-pg
@@ -10,6 +11,37 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  # Procesa la cola (exports, imports, notificaciones). Sin este servicio los
+  # exports se quedan en `jobs` y el panel nunca genera el archivo.
+  # Corre como www-data (33) igual que Apache: si escribe como root, los
+  # archivos del export quedan sin permiso de lectura para la descarga.
+  worker:
+    image: quantum-app:dev
+    container_name: quantum-worker
+    user: "33:33"
+    volumes:
+      - ./:/var/www/html
+      - vendor:/var/www/html/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    command: php artisan queue:work --tries=3 --timeout=120 --sleep=1 --max-time=3600
+    restart: unless-stopped
+
+  # Corre el planificador: alerts:generate (una vez al día) y alerts:check.
+  scheduler:
+    image: quantum-app:dev
+    container_name: quantum-scheduler
+    user: "33:33"
+    volumes:
+      - ./:/var/www/html
+      - vendor:/var/www/html/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    command: php artisan schedule:work
     restart: unless-stopped
 
   db:

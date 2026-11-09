@@ -36,14 +36,21 @@ return [
             'serve' => true,
             'throw' => false,
             'report' => false,
+            /*
+             * Los archivos "privados" se sirven por rutas firmadas, no por estar
+             * en public/. Se dejan legibles para el grupo/otros (0644/0755)
+             * porque quien los escribe es el worker de la cola (root) y quien
+             * los descarga es Apache (www-data): con 0640/0750 la descarga del
+             * export moría en un 404 al no poder leer el directorio.
+             */
             'permissions' => [
                 'file' => [
-                    'public' => 0640,
-                    'private' => 0640,
+                    'public' => 0644,
+                    'private' => 0644,
                 ],
                 'dir' => [
-                    'public' => 0750,
-                    'private' => 0750,
+                    'public' => 0755,
+                    'private' => 0755,
                 ],
             ],
         ],
