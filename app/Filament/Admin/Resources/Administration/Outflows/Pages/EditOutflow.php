@@ -24,4 +24,9 @@ class EditOutflow extends EditRecord
     {
         $this->syncAttachments();
     }
+
+    protected function getRedirectUrl(): string
+    {
+        return static::getResource()::getUrl('index');
+    }
 }

@@ -27,7 +27,7 @@ class CustomersStatsWidget extends StatsOverviewWidget
     {
         return [
             $this->totalCustomers(),
-            $this->newCustomersThisMonth(),
+            //$this->newCustomersThisMonth(),
             $this->overdueCustomers(),
         ];
     }

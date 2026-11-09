@@ -16,6 +16,8 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Livewire\Component;
+use Filament\Actions\Exports\Enums\ExportFormat;
+use Filament\Actions\Exports\Models\Export;
 
 class InflowsTableWidget extends Component implements HasActions, HasTable, HasSchemas
 {
@@ -32,6 +34,13 @@ class InflowsTableWidget extends Component implements HasActions, HasTable, HasS
     protected function getTableHeaderActions(): array
     {
         return[
+            ExportAction::make('exportReport')
+                ->label('Reporte de entradas')
+                ->icon('heroicon-o-chart-bar')
+                ->exporter(InflowExporter::class)
+                ->formats([ExportFormat::Xlsx])
+                ->columnMapping(false)
+                ->fileName(fn (Export $export): string => "reporte-entradas-{$export->getKey()}"),
             ExportAction::make()
                 ->exporter(InflowExporter::class),
             ImportAction::make()

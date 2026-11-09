@@ -33,9 +33,9 @@ class CreditsStatsWidget extends StatsOverviewWidget
             Stat::make('Saldo por cobrar', $this->money($this->activeCredits()->sum('pending_balance')))
                 ->description('Pendiente de créditos activos')
                 ->color('warning'),
-            Stat::make('Financiado', $this->money($this->financedInRange()))
+/*             Stat::make('Financiado', $this->money($this->financedInRange()))
                 ->description('Créditos iniciados en el período')
-                ->color('success'),
+                ->color('success'), */
         ];
     }
 
