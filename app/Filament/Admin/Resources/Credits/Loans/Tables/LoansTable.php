@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Credits\Loans\Tables;
 
 use App\Models\ArticleUnit;
+use App\Models\Transportation;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -30,8 +31,10 @@ class LoansTable
 
             TextColumn::make('vehicle')
                 ->label(__('resources.credits.clients.vehicle'))
+                // Los bienes del crédito: unidades con serie y artículos por cantidad.
+                // El transporte va en su propia columna.
                 ->state(fn ($record) => $record->items
-                    ->filter(fn ($item) => $item->item instanceof ArticleUnit)
+                    ->filter(fn ($item) => ! $item->item instanceof Transportation)
                     ->map(fn ($item) => $item->display_name)
                     ->join(', ')),
 
