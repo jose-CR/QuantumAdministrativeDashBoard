@@ -33,6 +33,13 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            /*
+             * Sin sidebar: la navegación vive en el lanzador de apps. Apagar el
+             * "navigation builder" no borra la navegación (getNavigation() sigue
+             * armando los grupos), solo deja de dibujar el menú lateral, así que
+             * las tarjetas de /admin/apps se siguen alimentando de los recursos.
+             */
+            ->navigation(false)
             // El inicio del panel es el lanzador de apps (estilo Odoo), no el dashboard.
             ->homeUrl(fn (): string => Apps::getUrl())
             ->viteTheme('resources/css/filament/admin/theme.css')
