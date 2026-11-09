@@ -20,12 +20,6 @@ class LoansTable
             TextColumn::make('id')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-            TextColumn::make('client_id')
-                    ->toggleable(isToggledHiddenByDefault: true),
-            
-            TextColumn::make('article_unit_id')
-                ->toggleable(isToggledHiddenByDefault: true),
-
             TextColumn::make('refinanced_from_id')
                 ->toggleable(isToggledHiddenByDefault: true),
 
@@ -68,18 +62,23 @@ class LoansTable
                 ->label(__('resources.credits.credits.status'))
                 ->badge()
                 ->formatStateUsing(fn (string $state) => match ($state) {
-                    'pending'   => 'Pendiente',
-                    'active'    => 'Activo',
-                    'paid'      => 'Pagado',
-                    'cancelled' => 'Cancelado',
-                    default     => $state,
+                    'active'     => 'Activo',
+                    'completed'  => 'Completado',
+                    'refinanced' => 'Refinanciado',
+                    'cancelled'  => 'Cancelado',
+                    // Estados viejos que pueden quedar en datos históricos.
+                    'pending'    => 'Pendiente',
+                    'paid'       => 'Pagado',
+                    default      => $state,
                 })
                 ->color(fn (string $state) => match ($state) {
-                    'pending'   => 'warning',
-                    'active'    => 'success',
-                    'paid'      => 'info',
-                    'cancelled' => 'danger',
-                    default     => 'gray',
+                    'active'     => 'success',
+                    'completed'  => 'info',
+                    'refinanced' => 'warning',
+                    'cancelled'  => 'danger',
+                    'pending'    => 'warning',
+                    'paid'       => 'info',
+                    default      => 'gray',
                 }),
 
             // Ocultas por defecto

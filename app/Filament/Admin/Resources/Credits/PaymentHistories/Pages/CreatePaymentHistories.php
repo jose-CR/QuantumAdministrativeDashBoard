@@ -14,14 +14,16 @@ class CreatePaymentHistories extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
+        // Se pasan todos los datos del formulario: antes se descartaban la fecha
+        // y el banco, así que el pago quedaba con la fecha de hoy y sin banco.
         return app(RegisterPaymentService::class)->execute(
-            Credit::findOrFail(
-                $data['credit_id']
-            ),
-            $data['amount'],
-            $data['payment_method'],
-            $data['receipt_number'] ?? null,
-            $data['notes'] ?? null,
+            credit: Credit::findOrFail($data['credit_id']),
+            amount: (float) $data['amount'],
+            paymentMethod: $data['payment_method'],
+            receiptNumber: $data['receipt_number'] ?? null,
+            notes: $data['notes'] ?? null,
+            bankId: $data['bank_id'] ?? null,
+            paymentDate: $data['payment_date'] ?? null,
         );
     }
 

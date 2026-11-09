@@ -21,6 +21,7 @@ class RegisterPaymentService
         ?int $installmentId = null,
         ?int $bankId = null,
         ?string $paymentDate = null,
+        ?int $userId = null,
     ): PaymentHistory {
 
         return DB::transaction(function () use (
@@ -33,6 +34,7 @@ class RegisterPaymentService
             $installmentId,
             $bankId,
             $paymentDate,
+            $userId,
         ) {
 
             $credit = Credit::whereKey($credit->id)->lockForUpdate()->firstOrFail();
@@ -70,6 +72,7 @@ class RegisterPaymentService
 
             $paymentHistory = PaymentHistory::create([
                 'credit_id'        => $credit->id,
+                'user_id'          => $userId ?? auth()->id(),
                 'amount'           => $amount,
                 'payment_method'   => $paymentMethod,
                 'payment_date'     => $paymentDate ?? now(),
