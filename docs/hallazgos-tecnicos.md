@@ -15,12 +15,16 @@ hallazgo. Todos los de la lista original quedaron cerrados y probados.
 | 8 | El estado `late` no lo escribía nadie: una cuota vencida seguía `pending` y el panel la mostraba al día | Cerrado | Comando `credits:mark-late` agendado a las 06:45. Sobre la base de desarrollo marcó 110 cuotas por $28.524,83; el total vencido no cambió porque se calculaba por fecha. |
 | 9 | El refinanciamiento no tenía pruebas y descontaba el stock dos veces al replicar los bienes | Cerrado | `RefinancingService` replica los ítems dentro de `CreditItem::withoutEvents`; cubierto con tres pruebas (cierre del viejo, bienes sin mover stock, crédito cerrado rechazado). |
 | 10 | Dos filas del mismo artículo en un crédito podían dejar el stock en negativo | Cerrado | El modelo valida al guardar contra el stock real (ya descontado por las otras filas) y devuelve el error a la fila. |
+| 11 | Refinanciar no pedía permiso y, sobre un cliente, adivinaba cuál crédito refinar (el último activo) | Cerrado | La acción exige `Create:Credit` y sobre un cliente solo aparece si tiene un único crédito activo con saldo; con varios se refina desde el crédito concreto. |
+| 12 | Refinanciar copiaba la prima del crédito viejo y dejaba vivas las alertas de las cuotas que quedaban | Cerrado | El crédito nuevo se abre por el saldo pendiente sin prima, y las alertas pendientes de las cuotas refinanciadas se cancelan. |
+| 13 | Borrar un crédito refinanciado devolvía al inventario bienes que ya estaban en el crédito nuevo | Cerrado | El `deleting` lee el estado guardado y, si está refinanciado, borra los ítems sin disparar los eventos de stock. |
+| 14 | El modal de refinanciar se confirmaba a ciegas | Cerrado | Vista previa de cuota, total e intereses con el mismo servicio que guarda, recalculada al cambiar cuotas o monto. |
 
 ## Pendientes que no vienen de esta revisión
 
 - Los pagos anteriores al arreglo siguen con `user_id` en NULL: no hay forma de saber quién los cobró.
 - La prueba de descarga de export se salta si la base no tiene exports completados (no crea uno propio).
-- El refinanciamiento no copia los pagos del crédito viejo al nuevo: se arrastra el saldo pendiente, que es lo correcto, pero queda sin trazabilidad de qué pagos lo formaron.
+- El refinanciamiento no copia los pagos del crédito viejo: se arrastra el saldo, que es lo correcto para un documento nuevo. La cadena queda por `refinanced_from_id`; si se quiere el detalle de pagos en el nuevo, es una decisión aparte.
 
 ## Base de pruebas
 
