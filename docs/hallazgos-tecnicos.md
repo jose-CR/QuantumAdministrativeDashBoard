@@ -42,6 +42,26 @@ docker exec quantum-web php artisan test
 y los seeders de datos de ejemplo. Los tests que necesitan un usuario con rol lo crean solos
 (`$this->admin()` en `tests/TestCase.php`), así que la base no depende de usuarios de desarrollo.
 
+## Clientes (auditoría 2026-11-09)
+
+Cerrado — escrituras:
+
+| # | Hallazgo | Cómo quedó |
+|---|----------|------------|
+| 1 | `full_name` era UNIQUE: dos personas con el mismo nombre no se podían registrar (500) | Fuera el índice; el formulario y el modelo aceptan nombres repetidos |
+| 2 | Borrar un cliente se llevaba créditos, cuotas, pagos y alertas por la cascada de la base | Un cliente con créditos o facturas no se borra; el resumen dice cuántos y cuáles |
+| 3 | Los adjuntos (polimórficos, sin FK) quedaban huérfanos al borrar | Se borran sus filas y sus archivos junto con el cliente |
+| 4 | `document_number` era único global: el NIT de una empresa no podía coincidir con un pasaporte | La identidad es `(document_type, document_number)` |
+| 5 | La importación exigía `id` y resolvía por id (desfasa la secuencia) | Resuelve por tipo + número de documento |
+| 6 | `document_type` no se validaba en la importación ni en la base | `Rule::in(Customer::DOCUMENT_TYPES)` + validación en el modelo |
+| 7 | Municipio y distrito no se validaban contra el catálogo | El modelo valida la geografía completa antes de guardar |
+
+Pendiente — pantallas (próximo turno): mensaje de importación en inglés; el badge de estado de la ficha
+nunca se colorea ni se traduce; la ficha muestra `latestCredit` aunque decide con el crédito activo; el
+relation manager de créditos muestra el estado crudo; el export saca códigos en vez de nombres; y las
+referencias del cliente no tienen pantalla (la pestaña está comentada) con un import muerto a una clase
+que no existe.
+
 ## Respaldos
 
 Todos en `storage/app/backups/`:
