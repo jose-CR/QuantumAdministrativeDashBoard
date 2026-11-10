@@ -3,10 +3,12 @@
 namespace Tests\Feature\Customers;
 
 use App\Filament\Admin\Resources\Client\Customers\Pages\CreateCustomer;
+use App\Filament\Admin\Resources\Client\Customers\RelationManagers\CreditsRelationManager;
 use App\Filament\Admin\Resources\Client\Customers\RelationManagers\ReferencesRelationManager;
 use App\Filament\Admin\Resources\Client\Customers\Pages\ListCustomers;
 use App\Filament\Admin\Resources\Client\Customers\Pages\ViewCustomer;
 use App\Models\Customer;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -35,6 +37,54 @@ class CustomerPanelTest extends TestCase
         $cliente = Customer::query()->firstOrFail();
 
         Livewire::test(ViewCustomer::class, ['record' => $cliente->getKey()])->assertOk();
+    }
+
+    public function test_el_relation_manager_lista_los_creditos_viejos_y_abre_el_detalle(): void
+    {
+        $cliente = Customer::factory()->create();
+
+        $viejo = $cliente->credits()->create([
+            'initial_amount' => 1000,
+            'financed_amount' => 1000,
+            'installments' => 2,
+            'installment_amount' => 500,
+            'total_amount' => 1000,
+            'pending_balance' => 0,
+            'start_date' => today()->subMonths(6)->toDateString(),
+            'payment_day' => 1,
+            'status' => 'completed',
+        ]);
+
+        $nuevo = $cliente->credits()->create([
+            'initial_amount' => 500,
+            'financed_amount' => 500,
+            'installments' => 1,
+            'installment_amount' => 500,
+            'total_amount' => 500,
+            'pending_balance' => 500,
+            'start_date' => today()->toDateString(),
+            'payment_day' => 1,
+            'status' => 'active',
+        ]);
+
+        Livewire::test(CreditsRelationManager::class, [
+            'ownerRecord' => $cliente,
+            'pageClass' => ViewCustomer::class,
+        ])
+            ->assertOk()
+            // El listado tiene que mostrar el viejo y el nuevo, no solo el último.
+            ->assertCanSeeTableRecords([$viejo, $nuevo])
+            ->mountAction(TestAction::make('view')->table($viejo->getKey()))
+            ->assertActionMounted(TestAction::make('view')->table($viejo->getKey()));
+
+        // El contenido del modal es una vista: se verifica sola, con los números
+        // del crédito viejo (ya cerrado, saldo 0).
+        $resumen = view('filament.modals.credit-summary', ['credit' => $viejo])->render();
+
+        $this->assertStringContainsString('Saldo pendiente', $resumen);
+        $this->assertStringContainsString('$1,000.00', $resumen);
+        $this->assertStringContainsString('2 cuotas', $resumen);
+        $this->assertStringContainsString('Completado', $resumen);
     }
 
     public function test_la_ficha_muestra_la_cuenta_por_cobrar(): void
