@@ -18,9 +18,8 @@ use Livewire\Component;
  *  - Cuotas: los comprobantes de cada cuota (voucher, recibo).
  *  - Sueltos: facturas e imágenes del cliente que no son de ningún crédito.
  *
- * Solo mira y borra: para subir se usa la acción «Adjuntar archivo», que monta el
- * FileUpload de Filament y guarda con AttachmentService. Acá no se sube porque el
- * input dentro de un componente anidado no terminaba de mandar el archivo.
+ * Lista y borra lo que cuelga de este cliente. La subida la hace la acción
+ * «Adjuntar archivo», que la sección monta al lado con el FileUpload de Filament.
  *
  * Se puede borrar lo que sea de este cliente, nunca de otro.
  */

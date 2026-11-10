@@ -91,10 +91,5 @@
         </div>
     @endforelse
 
-    {{-- La subida la hace la acción «Adjuntar archivo» con el FileUpload de
-         Filament: el input de archivo propio no terminaba de subir nada acá. --}}
-    <div style="border-top:1px solid rgba(128,128,128,.2);padding-top:1rem;font-size:.8rem;opacity:.7;display:flex;align-items:center;gap:.5rem">
-        <x-filament::icon icon="heroicon-m-paper-clip" style="width:1rem;height:1rem;flex:none" />
-        Para subir un archivo usá <strong>Adjuntar archivo</strong>, arriba a la derecha: elegís si va al cliente, a un crédito o a una cuota.
-    </div>
+
 </div>

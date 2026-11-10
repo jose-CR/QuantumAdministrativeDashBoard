@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Schemas;
 
+use App\Filament\Admin\Actions\AttachFileAction;
 use App\Livewire\CustomerAttachments;
 use App\Models\Customer;
 use App\Models\Installment;
@@ -304,8 +305,13 @@ class CustomerInfoList
                  * cada cuota y las facturas o fotos sueltas del cliente.
                  */
                 Section::make('Adjuntos')
+                    ->key('adjuntos')
                     ->icon(Heroicon::PaperClip)
                     ->description('Facturas y fotos: por crédito, por cuota o sueltas.')
+                    ->headerActions([
+                        // Subir va acá, con la sección, y no en el header de la ficha.
+                        AttachFileAction::make(),
+                    ])
                     ->schema([
                         Livewire::make(CustomerAttachments::class, fn (Customer $record): array => [
                             'record' => $record,

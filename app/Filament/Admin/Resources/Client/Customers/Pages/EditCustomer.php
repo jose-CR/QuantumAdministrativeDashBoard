@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
-use App\Filament\Admin\Actions\AttachFileAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -14,7 +13,6 @@ class EditCustomer extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            AttachFileAction::make(),
             DeleteAction::make(),
         ];
     }

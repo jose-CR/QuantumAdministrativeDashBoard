@@ -7,6 +7,7 @@ use App\Models\Attachment;
 use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\Installment;
+use Filament\Actions\Testing\TestAction;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
@@ -14,8 +15,8 @@ use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
- * Subir un archivo desde la ficha del cliente con el FileUpload de Filament:
- * al cliente, a un crédito (la prima) o a una cuota.
+ * Subir un archivo desde la sección «Adjuntos» de la ficha del cliente con el
+ * FileUpload de Filament: al cliente, a un crédito (la prima) o a una cuota.
  */
 class AttachFileTest extends TestCase
 {
@@ -30,16 +31,29 @@ class AttachFileTest extends TestCase
         filament()->setCurrentPanel(filament()->getPanel('admin'));
     }
 
+    /** La ficha del cliente, donde vive la sección de adjuntos. */
     private function ficha(Customer $cliente)
     {
         return Livewire::test(ViewCustomer::class, ['record' => $cliente->getRouteKey()]);
     }
 
-    public function test_la_ficha_tiene_la_accion_de_adjuntar(): void
+    /** La acción de subir, montada desde la sección. */
+    private function subir(Customer $cliente, array $datos)
+    {
+        return $this->ficha($cliente)
+            ->mountAction(TestAction::make('attachFile')->schemaComponent('adjuntos'))
+            ->setActionData($datos)
+            ->callMountedAction();
+    }
+
+    public function test_la_seccion_de_adjuntos_muestra_el_boton_de_subir(): void
     {
         $cliente = Customer::factory()->create();
 
-        $this->ficha($cliente)->assertActionExists('attachFile');
+        $this->ficha($cliente)
+            ->assertOk()
+            ->assertSee('Adjuntos')
+            ->assertSee('Adjuntar archivo');
     }
 
     public function test_la_prima_se_guarda_en_el_credito(): void
@@ -47,13 +61,11 @@ class AttachFileTest extends TestCase
         $cliente = Customer::factory()->create();
         $credito = Credit::factory()->create(['customer_id' => $cliente->id]);
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'credit',
-                'credit_id' => $credito->id,
-                'files' => [UploadedFile::fake()->image('prima.jpg')],
-            ])
-            ->assertHasNoActionErrors();
+        $this->subir($cliente, [
+            'target' => 'credit',
+            'credit_id' => $credito->id,
+            'files' => [UploadedFile::fake()->image('prima.jpg')],
+        ])->assertHasNoActionErrors();
 
         $adjunto = Attachment::query()
             ->where('attachable_type', Credit::class)
@@ -62,22 +74,18 @@ class AttachFileTest extends TestCase
 
         $this->assertSame('prima.jpg', $adjunto->original_name);
         $this->assertStringContainsString('credit/', $adjunto->path);
-        $this->assertTrue(Storage::disk('attachments')->exists($adjunto->path));
-
-        // El archivo no queda en la carpeta de temporales.
         $this->assertStringNotContainsString('temporary', $adjunto->path);
+        $this->assertTrue(Storage::disk('attachments')->exists($adjunto->path));
     }
 
     public function test_una_factura_suelta_se_guarda_en_el_cliente(): void
     {
         $cliente = Customer::factory()->create();
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'customer',
-                'files' => [UploadedFile::fake()->create('factura.pdf', 120, 'application/pdf')],
-            ])
-            ->assertHasNoActionErrors();
+        $this->subir($cliente, [
+            'target' => 'customer',
+            'files' => [UploadedFile::fake()->create('factura.pdf', 120, 'application/pdf')],
+        ])->assertHasNoActionErrors();
 
         $adjunto = $cliente->attachments()->firstOrFail();
 
@@ -94,14 +102,12 @@ class AttachFileTest extends TestCase
             'number' => 1,
         ]);
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'installment',
-                'credit_id' => $credito->id,
-                'installment_id' => $cuota->id,
-                'files' => [UploadedFile::fake()->image('voucher.png')],
-            ])
-            ->assertHasNoActionErrors();
+        $this->subir($cliente, [
+            'target' => 'installment',
+            'credit_id' => $credito->id,
+            'installment_id' => $cuota->id,
+            'files' => [UploadedFile::fake()->image('voucher.png')],
+        ])->assertHasNoActionErrors();
 
         $adjunto = Attachment::query()
             ->where('attachable_type', Installment::class)
@@ -116,13 +122,11 @@ class AttachFileTest extends TestCase
         $cliente = Customer::factory()->create();
         $credito = Credit::factory()->create(['customer_id' => $cliente->id]);
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'credit',
-                'credit_id' => $credito->id,
-                'files' => [UploadedFile::fake()->image('prima.jpg')],
-            ])
-            ->assertHasNoActionErrors();
+        $this->subir($cliente, [
+            'target' => 'credit',
+            'credit_id' => $credito->id,
+            'files' => [UploadedFile::fake()->image('prima.jpg')],
+        ])->assertHasNoActionErrors();
 
         Livewire::test(\App\Livewire\CustomerAttachments::class, ['record' => $cliente->fresh()])
             ->assertOk()
@@ -133,12 +137,10 @@ class AttachFileTest extends TestCase
     {
         $cliente = Customer::factory()->create();
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'credit',
-                'files' => [UploadedFile::fake()->image('prima.jpg')],
-            ])
-            ->assertHasActionErrors(['credit_id']);
+        $this->subir($cliente, [
+            'target' => 'credit',
+            'files' => [UploadedFile::fake()->image('prima.jpg')],
+        ])->assertHasActionErrors(['credit_id']);
 
         $this->assertSame(0, Attachment::query()->count());
     }
@@ -147,8 +149,7 @@ class AttachFileTest extends TestCase
     {
         $cliente = Customer::factory()->create();
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', ['target' => 'customer'])
+        $this->subir($cliente, ['target' => 'customer'])
             ->assertHasActionErrors(['files']);
 
         $this->assertSame(0, Attachment::query()->count());
@@ -158,15 +159,13 @@ class AttachFileTest extends TestCase
     {
         $cliente = Customer::factory()->create();
 
-        $this->ficha($cliente)
-            ->callAction('attachFile', [
-                'target' => 'customer',
-                'files' => [
-                    UploadedFile::fake()->image('frente.jpg'),
-                    UploadedFile::fake()->image('atras.jpg'),
-                ],
-            ])
-            ->assertHasNoActionErrors();
+        $this->subir($cliente, [
+            'target' => 'customer',
+            'files' => [
+                UploadedFile::fake()->image('frente.jpg'),
+                UploadedFile::fake()->image('atras.jpg'),
+            ],
+        ])->assertHasNoActionErrors();
 
         $this->assertSame(2, $cliente->attachments()->count());
     }
