@@ -5,6 +5,7 @@ namespace Tests\Unit\Credits;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\CreditItem;
+use Illuminate\Validation\ValidationException;
 
 /**
  * Un crédito puede llevarse artículos que no tienen serie (casco, batería suelta):
@@ -159,5 +160,63 @@ class CreditItemStockTest extends CreditTestCase
         $this->assertFalse(
             CreditItem::query()->where('credit_id', $credito->id)->exists()
         );
+    }
+
+    public function test_no_deja_vender_mas_de_lo_que_hay(): void
+    {
+        $articulo = $this->makeArticle(stock: 5);
+        $credito = $this->makeCredit([['amount' => 100]]);
+
+        $this->expectException(ValidationException::class);
+
+        $credito->items()->create([
+            'item_type' => Article::class,
+            'item_id' => $articulo->id,
+            'price' => 25,
+            'quantity' => 6,
+        ]);
+    }
+
+    public function test_no_deja_vender_mas_de_lo_que_hay_repartido_en_dos_filas(): void
+    {
+        // Cada fila valida contra el stock que queda, no contra el total: con 5
+        // en existencia, 3 + 3 tiene que fallar.
+        $articulo = $this->makeArticle(stock: 5);
+        $credito = $this->makeCredit([['amount' => 100]]);
+
+        $credito->items()->create([
+            'item_type' => Article::class,
+            'item_id' => $articulo->id,
+            'price' => 25,
+            'quantity' => 3,
+        ]);
+
+        $this->assertSame(2, $articulo->fresh()->stock);
+
+        $this->expectException(ValidationException::class);
+
+        $credito->items()->create([
+            'item_type' => Article::class,
+            'item_id' => $articulo->id,
+            'price' => 25,
+            'quantity' => 3,
+        ]);
+    }
+
+    public function test_editar_la_cantidad_no_puede_pasarse_del_stock(): void
+    {
+        $articulo = $this->makeArticle(stock: 5);
+
+        $item = $this->addItem([
+            'item_type' => Article::class,
+            'item_id' => $articulo->id,
+            'price' => 25,
+            'quantity' => 3,
+        ]);
+
+        $this->expectException(ValidationException::class);
+
+        // Quedan 2, más las 3 que este ítem ya tenía reservadas: 5 es el tope.
+        $item->update(['quantity' => 6]);
     }
 }

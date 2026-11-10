@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\ElSalvadorCatalogo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class CreditItem extends Model
 {
@@ -33,6 +34,12 @@ class CreditItem extends Model
      */
     protected static function booted(): void
     {
+        // No se puede vender lo que no hay, ni repartido en dos filas del mismo
+        // artículo: el stock ya viene descontado por las otras filas del crédito.
+        static::saving(function (CreditItem $item): void {
+            $item->ensureStockAvailable();
+        });
+
         static::created(function (CreditItem $item): void {
             $item->moveStock(-$item->quantityInStock());
         });
@@ -56,6 +63,39 @@ class CreditItem extends Model
 
             $item->moveStock(-$item->quantityInStock());
         });
+    }
+
+    /**
+     * Valida que la cantidad pedida quepa en la existencia.
+     *
+     * El stock del artículo ya viene descontado por las otras filas del mismo
+     * crédito, así que solo se le suma lo que este ítem tenía reservado antes de
+     * guardarse (cuando se edita la cantidad o se cambia de artículo).
+     */
+    protected function ensureStockAvailable(): void
+    {
+        if ($this->item_type !== Article::class) {
+            return;
+        }
+
+        $articulo = Article::find($this->item_id);
+
+        if (! $articulo || ! $articulo->usesStock()) {
+            return;
+        }
+
+        $mismoArticulo = $this->exists
+            && $this->getOriginal('item_type') === Article::class
+            && $this->getOriginal('item_id') == $this->item_id;
+
+        $reservado = $mismoArticulo ? (int) ($this->getOriginal('quantity') ?: 1) : 0;
+        $disponible = (int) $articulo->stock + $reservado;
+
+        if ($this->quantityInStock() > $disponible) {
+            throw ValidationException::withMessages([
+                'quantity' => "Solo quedan {$disponible} de {$articulo->full_name}.",
+            ]);
+        }
     }
 
     /**
