@@ -56,11 +56,17 @@ Cerrado — escrituras:
 | 6 | `document_type` no se validaba en la importación ni en la base | `Rule::in(Customer::DOCUMENT_TYPES)` + validación en el modelo |
 | 7 | Municipio y distrito no se validaban contra el catálogo | El modelo valida la geografía completa antes de guardar |
 
-Pendiente — pantallas (próximo turno): mensaje de importación en inglés; el badge de estado de la ficha
-nunca se colorea ni se traduce; la ficha muestra `latestCredit` aunque decide con el crédito activo; el
-relation manager de créditos muestra el estado crudo; el export saca códigos en vez de nombres; y las
-referencias del cliente no tienen pantalla (la pestaña está comentada) con un import muerto a una clase
-que no existe.
+Cerrado — pantallas (2026-11-09):
+
+| # | Hallazgo | Cómo quedó |
+|---|----------|------------|
+| 8 | El mensaje de fin de importación estaba en inglés fijo | Claves de idioma en es/en |
+| 9 | El badge de estado de la ficha no se traducía ni se coloreaba | `App\Support\CreditStatus`, compartido con el listado de créditos y el relation manager |
+| 10 | La ficha mostraba `latestCredit` aunque decidía con el crédito activo | Todo el bloque del crédito usa `activeCredit` |
+| 11 | El relation manager de créditos mostraba el estado crudo | Etiqueta y color con el helper |
+| 12 | El export sacaba códigos (`06 / 14 / 01`) | Nombres en el export; el import acepta nombre o código y lo normaliza |
+| 13 | Las referencias no tenían pantalla y el recurso importaba una clase inexistente | `ReferencesRelationManager` nuevo; bloque comentado del formulario eliminado |
+| — | Sin sección de cuentas por cobrar | CxC con total, vencido, próximo vencimiento, cuotas pagadas y créditos activos, calculada sobre los créditos activos |
 
 ## Respaldos
 
