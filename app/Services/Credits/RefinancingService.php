@@ -3,6 +3,7 @@
 namespace App\Services\Credits;
 
 use App\Models\Credit;
+use App\Models\CreditItem;
 use App\Models\Customer;
 use App\Services\InstallmentGeneratorService;
 use App\Services\LoanCalculatorService;
@@ -34,7 +35,14 @@ class RefinancingService
                 app(LoanCalculatorService::class)->calculate($data),
             ));
 
-            $oldCredit->items->each(fn ($item) => $newCredit->items()->save($item->replicate()));
+            // Los bienes pasan al crédito nuevo sin volver a mover stock: la
+            // mercancía ya salió con el crédito original y replicar el ítem
+            // dispararía el descuento por segunda vez.
+            CreditItem::withoutEvents(function () use ($oldCredit, $newCredit): void {
+                $oldCredit->items->each(
+                    fn (CreditItem $item) => $newCredit->items()->save($item->replicate())
+                );
+            });
 
             app(InstallmentGeneratorService::class)->generate($newCredit);
 
@@ -47,6 +55,7 @@ class RefinancingService
                 'pending_balance' => 0,
             ]);
 
+            // 'partial' no lo escribe el sistema, pero puede venir de datos viejos.
             $oldCredit->installments()
                 ->whereIn('status', ['pending', 'partial', 'late'])
                 ->update(['status' => 'refinanced']);
