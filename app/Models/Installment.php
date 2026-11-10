@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Installment extends Model
 {
@@ -81,6 +82,14 @@ class Installment extends Model
     public function credit()
     {
         return $this->belongsTo(Credit::class);
+    }
+
+    /**
+     * Comprobantes de la cuota (el voucher de la transferencia, la foto del recibo).
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     public function paymentHistories()

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Schemas;
 
+use App\Livewire\CustomerAttachments;
 use App\Models\Customer;
 use App\Models\Installment;
 use App\Support\ActividadesEconomicas;
@@ -9,6 +10,7 @@ use App\Support\CreditStatus;
 use App\Support\ElSalvadorCatalogo;
 use Filament\Infolists\Components\RepeatableEntry;
 use Filament\Infolists\Components\TextEntry;
+use Filament\Schemas\Components\Livewire;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\FontWeight;
@@ -295,6 +297,22 @@ class CustomerInfoList
                 /*
                  * DATOS DE EMPRESA (solo NIT)
                  */
+                /*
+                 * ADJUNTOS
+                 *
+                 * Tres tabs: lo que se subió a cada crédito, los comprobantes de
+                 * cada cuota y las facturas o fotos sueltas del cliente.
+                 */
+                Section::make('Adjuntos')
+                    ->icon(Heroicon::PaperClip)
+                    ->description('Facturas y fotos: por crédito, por cuota o sueltas.')
+                    ->schema([
+                        Livewire::make(CustomerAttachments::class, fn (Customer $record): array => [
+                            'record' => $record,
+                        ]),
+                    ])
+                    ->columnSpanFull(),
+
                 Section::make(__('resources.clients.sections.customer_data'))
                     ->icon(Heroicon::Briefcase)
                     ->visible(fn (Customer $record): bool => $record->document_type === 'NIT')

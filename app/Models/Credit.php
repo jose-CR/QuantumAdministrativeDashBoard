@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -146,6 +147,14 @@ class Credit extends Model
     public function refinancings()
     {
         return $this->hasMany(Credit::class, 'refinanced_from_id');
+    }
+
+    /**
+     * Facturas y fotos del crédito (la boleta firmada, la foto del bien, etc.).
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     public function items()
