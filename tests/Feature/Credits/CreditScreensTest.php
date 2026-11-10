@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Credits;
 
+use App\Filament\Admin\Resources\Client\Customers\Pages\ListCustomers;
 use App\Filament\Admin\Resources\Credits\Installments\Pages\ListInstallments;
 use App\Filament\Admin\Resources\Credits\Loans\Pages\ListLoans;
 use App\Filament\Admin\Resources\Credits\PaymentHistories\Pages\ListPaymentHistories;
@@ -36,5 +37,12 @@ class CreditScreensTest extends TestCase
         ] as $page) {
             Livewire::test($page)->assertOk();
         }
+    }
+
+    public function test_la_pantalla_de_clientes_monta_la_accion_de_refinanciar(): void
+    {
+        // La acción se arma al renderizar la tabla: acá se cae si le falta un
+        // import o si el esquema del modal quedó mal armado.
+        Livewire::test(ListCustomers::class)->assertOk();
     }
 }
