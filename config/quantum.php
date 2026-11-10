@@ -7,11 +7,27 @@ return [
         'max_total_ratio' => (float) env('CREDITS_MAX_TOTAL_RATIO', 3)
     ],
 
+    /* Tasa de interés por cuota cuando se pacta un interés fijo (%). */
+    'interest' => [
+        'max_rate' => (float) env('CREDITS_MAX_INTEREST_RATE', 20),
+    ],
+
     'periodicities' => ['weekly', 'monthly', 'yearly'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Estados
+    |--------------------------------------------------------------------------
+    |
+    | Esta lista documenta lo que acepta la base: los valores reales están en el
+    | CHECK de `credits.status` e `installments.status`. Si una migración cambia
+    | el CHECK, se actualiza acá. `partial` quedó fuera de cuotas: nunca se
+    | escribió y la base no lo acepta.
+    |
+    */
     'statuses' => [
-        'credit'      => ['active', 'completed', 'refinanced'],
-        'installment' => ['pending', 'partial', 'late', 'paid', 'cancelled'],
+        'credit'      => ['pending', 'active', 'paid', 'refinanced', 'cancelled', 'defaulted', 'completed'],
+        'installment' => ['pending', 'paid', 'late', 'cancelled', 'refinanced', 'completed'],
     ],
 
     'currency' => 'USD',

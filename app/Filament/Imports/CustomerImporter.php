@@ -4,6 +4,7 @@ namespace App\Filament\Imports;
 
 use App\Models\Customer;
 use App\Rules\CustomerRules;
+use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -16,10 +17,6 @@ class CustomerImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            ImportColumn::make('id')
-                ->requiredMapping()
-                ->rules(CustomerRules::import()['id']),
-
             ImportColumn::make('document_type')
                 ->requiredMapping()
                 ->rules(CustomerRules::import()['document_type']),
@@ -65,19 +62,63 @@ class CustomerImporter extends Importer
         ];
     }
 
+    /**
+     * El export escribe nombres ("San Salvador") y la base guarda códigos ("06"):
+     * se traducen antes de llenar el modelo. Si ya viene el código, no cambia nada.
+     */
+    public function fillRecord(): void
+    {
+        $departamento = ElSalvadorCatalogo::resolveDepartment($this->data['department'] ?? null);
+
+        $municipio = ElSalvadorCatalogo::resolveMunicipality(
+            $departamento,
+            $this->data['municipality'] ?? null,
+        );
+
+        $distrito = ElSalvadorCatalogo::resolveDistrict(
+            $municipio,
+            $this->data['district'] ?? null,
+        );
+
+        $this->data['department'] = $departamento ?? ($this->data['department'] ?? null);
+        $this->data['municipality'] = $municipio ?? ($this->data['municipality'] ?? null);
+        $this->data['district'] = $distrito ?? ($this->data['district'] ?? null);
+
+        parent::fillRecord();
+    }
+
     public function resolveRecord(): Customer
     {
-        return Customer::firstOrNew([
-            'id' => $this->data['id'],
+        // Se resuelve por documento, no por id: importar ids explícitos desfasa la
+        // secuencia de Postgres y después las altas manuales fallan por id duplicado
+        // (lo mismo que pasó con el inventario).
+        $documento = trim((string) ($this->data['document_number'] ?? ''));
+
+        if ($documento === '') {
+            return new Customer();
+        }
+
+        return Customer::query()->firstOrNew([
+            'document_type' => $this->data['document_type'] ?? null,
+            'document_number' => $documento,
         ]);
+    }
+
+    public static function getCompletedNotificationTitle(Import $import): string
+    {
+        return __('notifications.clients.import.title');
     }
 
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your customer import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = __('notifications.clients.import.body', [
+            'rows' => Number::format($import->successful_rows),
+        ]);
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' ' . __('notifications.clients.import.failed', [
+                'rows' => Number::format($failedRowsCount),
+            ]);
         }
 
         return $body;

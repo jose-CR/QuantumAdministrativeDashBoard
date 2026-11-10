@@ -30,7 +30,9 @@ class PaymentHistoriesResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $recordTitleAttribute = 'user_id';
+    // El título del registro no puede ser un id de usuario: se muestra en modales
+    // y en la búsqueda global.
+    protected static ?string $recordTitleAttribute = 'receipt_number';
 
     protected static ?string $slug = 'creditos/history';
 

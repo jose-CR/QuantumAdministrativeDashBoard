@@ -25,11 +25,16 @@ class PaymentHistoriesForm
                         )
                     )
                     ->searchable()
-                    ->required(),
+                    ->required()
+                    // Un pago ya registrado no cambia de crédito ni de monto: editarlo
+                    // no recalcula cuotas ni saldo, así que solo se corrigen los datos
+                    // de referencia (recibo, banco, notas).
+                    ->disabledOn('edit'),
 
                 TextInput::make('amount')
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    ->disabledOn('edit'),
 
                 Select::make('payment_method')
                     ->label(__('resources.credits.clients.pay_installment.payment_method'))
@@ -53,7 +58,10 @@ class PaymentHistoriesForm
 
                 DatePicker::make('payment_date')
                     ->default(now())
-                    ->required(),
+                    ->required()
+                    // Cambiar la fecha de un pago viejo descuadra el historial sin
+                    // recalcular nada.
+                    ->disabledOn('edit'),
 
                 TextInput::make('receipt_number')
                     ->maxLength(255),

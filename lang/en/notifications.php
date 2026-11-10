@@ -125,6 +125,9 @@ return [
         ],
 
         'delete' => [
+            'blocked_title' => 'The client cannot be deleted',
+            'blocked_modal' => 'This client has history and cannot be deleted.',
+            'blocked_body' => 'It has :credits credits (:list) and :invoices invoices. Deleting it would take its payment history.',
             'title' => 'Client deleted',
             'body' => 'The  clients were deleted successfully.',
         ],
@@ -132,6 +135,12 @@ return [
         'update' => [
             'title' => 'User updated',
             'body' => 'The user was updated successfully.',
+        ],
+
+        'import' => [
+            'title' => 'Customer import completed',
+            'body' => ':rows rows were imported.',
+            'failed' => ':rows failed.',
         ],
 
         'deletes' => [

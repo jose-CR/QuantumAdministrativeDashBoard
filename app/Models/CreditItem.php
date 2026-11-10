@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Support\ElSalvadorCatalogo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Validation\ValidationException;
 
 class CreditItem extends Model
 {
@@ -16,13 +17,128 @@ class CreditItem extends Model
         'item_type',
         'item_id',
         'price',
+        'quantity',
     ];
 
     protected function casts(): array
     {
         return [
             'price' => 'decimal:2',
+            'quantity' => 'integer',
         ];
+    }
+
+    /**
+     * El stock de un artículo por cantidad se mueve con el crédito: sale cuando
+     * el bien entra al crédito y vuelve si el ítem se borra o cambia.
+     */
+    protected static function booted(): void
+    {
+        // No se puede vender lo que no hay, ni repartido en dos filas del mismo
+        // artículo: el stock ya viene descontado por las otras filas del crédito.
+        static::saving(function (CreditItem $item): void {
+            $item->ensureStockAvailable();
+        });
+
+        static::created(function (CreditItem $item): void {
+            $item->moveStock(-$item->quantityInStock());
+        });
+
+        static::deleted(function (CreditItem $item): void {
+            $item->moveStock($item->quantityInStock());
+        });
+
+        static::updated(function (CreditItem $item): void {
+            if (! $item->wasChanged(['item_type', 'item_id', 'quantity'])) {
+                return;
+            }
+
+            // Devolver lo que se había descontado del ítem anterior y descontar
+            // lo del nuevo: el repeater puede cambiar de artículo, no solo la cantidad.
+            $item->moveStockFor(
+                $item->getOriginal('item_type'),
+                (int) $item->getOriginal('item_id'),
+                (int) ($item->getOriginal('quantity') ?: 1),
+            );
+
+            $item->moveStock(-$item->quantityInStock());
+        });
+    }
+
+    /**
+     * Valida que la cantidad pedida quepa en la existencia.
+     *
+     * El stock del artículo ya viene descontado por las otras filas del mismo
+     * crédito, así que solo se le suma lo que este ítem tenía reservado antes de
+     * guardarse (cuando se edita la cantidad o se cambia de artículo).
+     */
+    protected function ensureStockAvailable(): void
+    {
+        if ($this->item_type !== Article::class) {
+            return;
+        }
+
+        $articulo = Article::find($this->item_id);
+
+        if (! $articulo || ! $articulo->usesStock()) {
+            return;
+        }
+
+        $mismoArticulo = $this->exists
+            && $this->getOriginal('item_type') === Article::class
+            && $this->getOriginal('item_id') == $this->item_id;
+
+        $reservado = $mismoArticulo ? (int) ($this->getOriginal('quantity') ?: 1) : 0;
+        $disponible = (int) $articulo->stock + $reservado;
+
+        if ($this->quantityInStock() > $disponible) {
+            throw ValidationException::withMessages([
+                'quantity' => "Solo quedan {$disponible} de {$articulo->full_name}.",
+            ]);
+        }
+    }
+
+    /**
+     * Cuánto stock mueve este ítem: solo los artículos por cantidad mueven algo.
+     */
+    public function quantityInStock(): int
+    {
+        return $this->item_type === Article::class
+            ? max(1, (int) $this->quantity)
+            : 0;
+    }
+
+    protected function moveStock(int $delta): void
+    {
+        $this->moveStockFor($this->item_type, (int) $this->item_id, $delta);
+    }
+
+    protected function moveStockFor(?string $type, int $id, int $delta): void
+    {
+        if ($delta === 0 || $type !== Article::class) {
+            return;
+        }
+
+        $articulo = Article::find($id);
+
+        // Las unidades con serie ya salieron del inventario al asignarse a la unidad:
+        // descontar stock ahí contaría dos veces.
+        if (! $articulo || ! $articulo->usesStock()) {
+            return;
+        }
+
+        // Incremento atómico: dos créditos creados a la vez no pueden pisarse el stock.
+        Article::query()
+            ->whereKey($id)
+            ->increment('stock', $delta);
+    }
+
+    /**
+     * Lo que suma este ítem al monto del crédito.
+     */
+    public function getTotalAttribute(): float
+    {
+        return round((float) $this->price * max(1, (int) $this->quantity), 2);
     }
 
     public function getDisplayNameAttribute(): string
@@ -30,6 +146,11 @@ class CreditItem extends Model
         return match (true) {
             $this->item instanceof ArticleUnit =>
                 $this->item->display_name,
+
+            // Artículo por cantidad: el nombre solo no dice cuántos se llevaron.
+            $this->item instanceof Article =>
+                ((int) $this->quantity > 1 ? (int) $this->quantity . ' × ' : '')
+                    . $this->item->full_name,
 
             $this->item instanceof Transportation =>
                 collect([

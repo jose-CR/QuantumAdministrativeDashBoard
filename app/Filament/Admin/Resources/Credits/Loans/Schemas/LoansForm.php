@@ -2,8 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 
+use App\Models\Article;
 use App\Models\ArticleUnit;
 use App\Models\Transportation;
+use App\Services\LoanCalculatorService;
 use App\Support\ElSalvadorCatalogo;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -15,6 +17,68 @@ use Filament\Schemas\Schema;
 
 class LoansForm
 {
+    /**
+     * Suma del repetidor de bienes: precio unitario por cantidad.
+     *
+     * La fila que se está eligiendo puede venir en $type/$id porque el estado del
+     * formulario todavía no la tiene: si coincide, se usa el precio/cantidad nuevos.
+     *
+     * @param  iterable<int|string, array<string, mixed>>  $items
+     */
+    protected static function itemsTotal(
+        iterable $items,
+        ?string $type = null,
+        int|string|null $id = null,
+        ?float $price = null,
+        ?int $quantity = null,
+    ): float {
+        $total = 0.0;
+
+        foreach ($items as $item) {
+            $esLaFila = $type !== null
+                && ($item['item_type'] ?? null) === $type
+                && (string) ($item['item_id'] ?? '') === (string) $id;
+
+            $precio = $esLaFila && $price !== null ? $price : (float) ($item['price'] ?? 0);
+            $cantidad = $esLaFila && $quantity !== null ? $quantity : (int) ($item['quantity'] ?? 1);
+
+            $total += $precio * max(1, $cantidad);
+        }
+
+        return round($total, 2);
+    }
+
+    /**
+     * Con interés fijo la tasa manda: la cuota es el resultado del cálculo.
+     *
+     * Se escribe en el formulario mientras se carga, para que el usuario vea lo
+     * que va a pagar. Al guardar, el servicio vuelve a calcular: esto es solo la
+     * vista previa y no reemplaza el cálculo del servidor.
+     */
+    protected static function applyFixedRate(callable $set, Get $get): void
+    {
+        if ($get('interest_type') !== 'fixed') {
+            return;
+        }
+
+        try {
+            $cotizacion = app(LoanCalculatorService::class)->calculate([
+                'initial_amount' => (float) $get('initial_amount'),
+                'down_payment' => (float) ($get('down_payment') ?? 0),
+                'installments' => (int) ($get('installments') ?? 0),
+                // En modo fijo la cuota se calcula: este valor no se usa.
+                'installment_amount' => 1,
+                'interest_type' => 'fixed',
+                'interest_rate' => (float) ($get('interest_rate') ?? 0),
+            ]);
+        } catch (\Throwable) {
+            // Datos incompletos: se deja como está y el guardado vuelve a calcular.
+            return;
+        }
+
+        $set('installment_amount', $cotizacion['installment_amount']);
+    }
+
     public static function configure(Schema $schema): Schema
     {
         return $schema
@@ -39,6 +103,7 @@ class LoansForm
                                             ->label('Tipo')
                                             ->options([
                                                 ArticleUnit::class => 'Vehículo',
+                                                Article::class => 'Artículo (por cantidad)',
                                                 Transportation::class => 'Transporte',
                                             ])
                                             ->required()
@@ -46,27 +111,29 @@ class LoansForm
                                             ->columnSpan(1)
                                             ->afterStateUpdated(function (callable $set, Get $get) {
 
-                                                $oldPrice = (float) ($get('price') ?? 0);
+                                                $oldAmount = (float) ($get('price') ?? 0)
+                                                    * max(1, (int) ($get('quantity') ?? 1));
 
                                                 $items = $get('../../items') ?? [];
 
-                                                $total = collect($items)->sum(
-                                                    fn ($item) => (float) ($item['price'] ?? 0)
+                                                $set(
+                                                    '../../initial_amount',
+                                                    round(self::itemsTotal($items) - $oldAmount, 2)
                                                 );
-
-                                                $set('../../initial_amount', round($total - $oldPrice, 2));
 
                                                 $set('item_id', null);
                                                 $set('price', null);
+                                                $set('quantity', 1);
 
                                             }),
 
                                         Select::make('item_id')
                                             ->label(
-                                                fn (Get $get) =>
-                                                    $get('item_type') === Transportation::class
-                                                        ? 'Transporte'
-                                                        : 'Vehículo'
+                                                fn (Get $get) => match ($get('item_type')) {
+                                                    Transportation::class => 'Transporte',
+                                                    Article::class => 'Artículo',
+                                                    default => 'Vehículo',
+                                                }
                                             )
                                             ->required()
                                             ->searchable()
@@ -196,6 +263,29 @@ class LoansForm
                                                         ->toArray();
                                                 }
 
+                                                /*
+                                                 * ARTÍCULOS POR CANTIDAD
+                                                 * (cascos, baterías sueltas: no tienen serie)
+                                                 */
+                                                if ($get('item_type') === Article::class) {
+                                                    return Article::query()
+                                                        ->where('tracking', Article::TRACKING_NONE)
+                                                        ->where('stock', '>', 0)
+                                                        ->where(function ($query) use ($search) {
+                                                            $query->where('name', 'ilike', "%{$search}%")
+                                                                ->orWhere('sku', 'ilike', "%{$search}%")
+                                                                ->orWhere('brand', 'ilike', "%{$search}%")
+                                                                ->orWhere('model', 'ilike', "%{$search}%");
+                                                        })
+                                                        ->orderBy('name')
+                                                        ->take(50)
+                                                        ->get()
+                                                        ->mapWithKeys(fn (Article $article) => [
+                                                            $article->id => "{$article->full_name} (stock: {$article->stock})",
+                                                        ])
+                                                        ->toArray();
+                                                }
+
                                                 return [];
                                             })
 
@@ -221,6 +311,18 @@ class LoansForm
                                                         return ArticleUnit::query()
                                                             ->find($value)
                                                             ?->display_name;
+                                                    }
+
+                                                    /*
+                                                     * ARTÍCULO POR CANTIDAD
+                                                     */
+                                                    if (
+                                                        $get('item_type') ===
+                                                        Article::class
+                                                    ) {
+                                                        return Article::query()
+                                                            ->find($value)
+                                                            ?->full_name;
                                                     }
 
                                                     /*
@@ -288,6 +390,9 @@ class LoansForm
                                                     ArticleUnit::class =>
                                                         (float) (ArticleUnit::find($state)?->cash_price ?? 0),
 
+                                                    Article::class =>
+                                                        (float) (Article::find($state)?->cash_price ?? 0),
+
                                                     Transportation::class =>
                                                         (float) (Transportation::find($state)?->price ?? 0),
 
@@ -296,27 +401,51 @@ class LoansForm
 
                                                 $set('price', $price);
 
+                                                // El monto del crédito es precio unitario por cantidad.
                                                 $set(
                                                     '../../initial_amount',
-                                                    round(
-                                                        collect($get('../../items') ?? [])
-                                                            ->map(function ($item) use ($state, $price, $get) {
-
-                                                                $sameItem =
-                                                                    ($item['item_type'] ?? null) === $get('item_type')
-                                                                    &&
-                                                                    ($item['item_id'] ?? null) == $state;
-
-                                                                return $sameItem
-                                                                    ? $price
-                                                                    : (float) ($item['price'] ?? 0);
-                                                            })
-                                                            ->sum(),
-                                                        2
+                                                    self::itemsTotal(
+                                                        $get('../../items') ?? [],
+                                                        $get('item_type'),
+                                                        $state,
+                                                        $price,
                                                     )
                                                 );
 
                                             }),
+
+                                        /*
+                                         * CANTIDAD
+                                         *
+                                         * Solo para artículos que se llevan por cantidad. El máximo
+                                         * es lo que hay en existencia: no se puede vender lo que no está.
+                                         */
+                                        TextInput::make('quantity')
+                                            ->label('Cantidad')
+                                            ->numeric()
+                                            ->integer()
+                                            ->default(1)
+                                            ->minValue(1)
+                                            ->maxValue(fn (Get $get) => max(
+                                                1,
+                                                (int) (Article::query()->find($get('item_id'))?->stock ?? 1)
+                                            ))
+                                            ->visible(fn (Get $get) => $get('item_type') === Article::class)
+                                            ->required(fn (Get $get) => $get('item_type') === Article::class)
+                                            ->live()
+                                            ->afterStateUpdated(function ($state, callable $set, Get $get) {
+                                                $set(
+                                                    '../../initial_amount',
+                                                    self::itemsTotal(
+                                                        $get('../../items') ?? [],
+                                                        $get('item_type'),
+                                                        $get('item_id'),
+                                                        (float) ($get('price') ?? 0),
+                                                        (int) ($state ?? 1),
+                                                    )
+                                                );
+                                            })
+                                            ->columnSpanFull(),
 
                                         /*
                                          * PRECIO
@@ -350,19 +479,55 @@ class LoansForm
                                     ->numeric()
                                     ->prefix('$')
                                     ->default(0)
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installments')
                                     ->label('Número de cuotas')
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue((int) config('quantum.installments.max', 100))
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
+
+                                /*
+                                 * INTERÉS
+                                 *
+                                 * 'auto' = se cobra la cuota que se escribe y la tasa
+                                 * se calcula. 'fixed' = la tasa se pactó, y la cuota
+                                 * y el total salen de ella.
+                                 */
+                                Select::make('interest_type')
+                                    ->label('Interés')
+                                    ->options([
+                                        'auto' => 'Calculado (según la cuota)',
+                                        'fixed' => 'Fijo (tasa pactada)',
+                                    ])
+                                    ->default('auto')
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
+
+                                TextInput::make('interest_rate')
+                                    ->label('Tasa por cuota')
+                                    ->numeric()
+                                    ->suffix('%')
+                                    ->step('0.01')
+                                    ->minValue(0)
+                                    ->maxValue((float) config('quantum.interest.max_rate', 20))
+                                    ->visible(fn (Get $get) => $get('interest_type') === 'fixed')
+                                    ->required(fn (Get $get) => $get('interest_type') === 'fixed')
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installment_amount')
                                     ->label('Monto de cuota')
                                     ->numeric()
                                     ->prefix('$')
+                                    // Con interés fijo la cuota es el resultado, no la entrada.
+                                    ->readOnly(fn (Get $get) => $get('interest_type') === 'fixed')
                                     ->required(),
 
                                 Select::make('periodicity')

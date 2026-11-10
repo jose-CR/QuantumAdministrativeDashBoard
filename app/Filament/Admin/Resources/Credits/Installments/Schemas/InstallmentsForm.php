@@ -23,7 +23,10 @@ class InstallmentsForm
                 TextInput::make('remaining_balance')
                     ->label(__('resources.credits.installment.remaining_balance'))
                     ->numeric()
-                    ->required(),
+                    ->required()
+                    // El saldo lo mueve el pago, no la mano: editarlo a mano dejaba
+                    // la cuota y el crédito descuadrados.
+                    ->disabledOn('edit'),
 
                 Select::make('status')
                     ->label(__('resources.credits.installment.status'))
@@ -42,7 +45,7 @@ class InstallmentsForm
                     ->disabled(),
 
                 TextInput::make('due_date')
-                    ->label(__('resources.credits.installment.paid_at'))
+                    ->label(__('resources.credits.installment.due_date'))
                     ->disabled(),
 
                 // Datos del pago
@@ -57,6 +60,9 @@ class InstallmentsForm
                         'card' => 'Tarjeta',
                         'bank_transfer' => 'Transferencia bancaria',
                     ])
+                    // Si se carga un pago hay que saber cómo se cobró: el método es
+                    // NOT NULL en payment_histories y sin esto reventaba al guardar.
+                    ->required(fn (Get $get): bool => filled($get('paid_amount')))
                     ->live(),
 
                 Select::make('bank_id')

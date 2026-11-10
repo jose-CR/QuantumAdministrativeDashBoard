@@ -68,19 +68,22 @@ class InstallmentsTable
                     ->label(__('resources.credits.installment.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
-                        'pending'   => 'Pendiente',
-                        'active'    => 'Activo',
-                        'paid'      => 'Pagado',
-                        'cancelled' => 'Cancelado',
-                        'completed' => 'Completado',
-                        default     => $state,
+                        'pending'    => 'Pendiente',
+                        'paid'       => 'Pagado',
+                        'late'       => 'Atrasada',
+                        'cancelled'  => 'Cancelada',
+                        'refinanced' => 'Refinanciada',
+                        'completed'  => 'Completada',
+                        default      => $state,
                     })
                     ->color(fn (string $state) => match ($state) {
-                        'pending'   => 'warning',
-                        'active'    => 'success',
-                        'paid'      => 'info',
-                        'cancelled' => 'danger',
-                        default     => 'gray',
+                        'pending'    => 'warning',
+                        'paid'       => 'success',
+                        'late'       => 'danger',
+                        'cancelled'  => 'gray',
+                        'refinanced' => 'warning',
+                        'completed'  => 'info',
+                        default      => 'gray',
                     }),
             ])
             ->filters([

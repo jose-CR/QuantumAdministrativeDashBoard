@@ -46,6 +46,29 @@ class PaymentHistory extends Model
         return $this->belongsTo(Credit::class);
     }
 
+    /**
+     * Los pagos son la fuente de verdad: si uno desaparece o cambia de monto,
+     * las cuotas se rehacen. Antes borrar un pago dejaba el crédito pagado
+     * para siempre, sin forma de corregirlo desde el panel.
+     */
+    protected static function booted(): void
+    {
+        static::deleted(function (PaymentHistory $pago): void {
+            if ($credito = $pago->credit) {
+                app(\App\Services\Credits\RecalculateCreditService::class)->execute($credito);
+            }
+        });
+
+        static::updated(function (PaymentHistory $pago): void {
+            if (
+                $pago->wasChanged(['amount', 'payment_date'])
+                && ($credito = $pago->credit)
+            ) {
+                app(\App\Services\Credits\RecalculateCreditService::class)->execute($credito);
+            }
+        });
+    }
+
     public function bank()
     {
         return $this->belongsTo(Bank::class);

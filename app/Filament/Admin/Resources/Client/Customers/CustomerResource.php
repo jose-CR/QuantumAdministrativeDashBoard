@@ -11,7 +11,6 @@ use App\Filament\Admin\Resources\Client\Customers\RelationManagers\ReferencesRel
 use App\Filament\Admin\Resources\Client\Customers\Schemas\CustomerForm;
 use App\Filament\Admin\Resources\Client\Customers\Schemas\CustomerInfoList;
 use App\Filament\Admin\Resources\Client\Customers\Tables\CustomersTable;
-use App\Filament\RelationManagers\AttachmentsRelationManager;
 use App\Models\Customer;
 use App\Support\Filament\HasTranslatedLabels;
 use BackedEnum;
@@ -57,8 +56,8 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AttachmentsRelationManager::class,
             CreditsRelationManager::class,
+            ReferencesRelationManager::class,
         ];
     }
 

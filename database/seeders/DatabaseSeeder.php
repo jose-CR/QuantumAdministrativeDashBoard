@@ -15,6 +15,8 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         $this->call([
+            // Roles y permisos primero: sin ellos nadie entra al panel.
+            ShieldSeeder::class,
             CategorySeeder::class,
             ArticleSeeder::class,
             ArticleUnitSeeder::class,

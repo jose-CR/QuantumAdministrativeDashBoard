@@ -3,6 +3,7 @@
 namespace App\Filament\Exports;
 
 use App\Models\Customer;
+use App\Support\ElSalvadorCatalogo;
 use App\Utils\Filament\FileHelper;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
@@ -47,28 +48,30 @@ class CustomerExporter extends Exporter
                     fn ($state) => ActividadesEconomicas::activityName($state)
                 ), */
 
+            // Se exporta el nombre: la planilla se lee. El import acepta nombre o código.
             ExportColumn::make('department')
-                ->label('Departamento'),               /* ->formatStateUsing(
-                    fn ($state) => ElSalvadorCatalogo::departmentName($state)
-                ), */
+                ->label('Departamento')
+                ->formatStateUsing(
+                    fn ($state) => ElSalvadorCatalogo::departmentName((string) $state)
+                ),
 
             ExportColumn::make('municipality')
-                ->label('Municipio'),
-/*                 ->formatStateUsing(
+                ->label('Municipio')
+                ->formatStateUsing(
                     fn ($state, $record) => ElSalvadorCatalogo::municipalityName(
-                        $record->department,
-                        $state,
+                        (string) $record->department,
+                        (string) $state,
                     )
-                ), */
+                ),
 
             ExportColumn::make('district')
-                ->label('Distrito'),
-/*                 ->formatStateUsing(
+                ->label('Distrito')
+                ->formatStateUsing(
                     fn ($state, $record) => ElSalvadorCatalogo::districtName(
-                        $record->municipality,
-                        $state,
+                        (string) $record->municipality,
+                        (string) $state,
                     )
-                ), */
+                ),
 
             ExportColumn::make('address')
                 ->label('Dirección'),

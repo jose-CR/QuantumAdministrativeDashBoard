@@ -40,20 +40,9 @@ class LoanCalculatorService
 
         $installments = (int) ($data['installments'] ?? 0);
 
-        $installmentAmount = round(
-            (float) ($data['installment_amount'] ?? 0),
-            2
-        );
-
         if ($installments <= 0) {
             throw new InvalidArgumentException(
                 'El número de cuotas debe ser mayor que cero.'
-            );
-        }
-
-        if ($installmentAmount <= 0) {
-            throw new InvalidArgumentException(
-                'El monto de la cuota debe ser mayor que cero.'
             );
         }
 
@@ -64,14 +53,88 @@ class LoanCalculatorService
                 "El número de cuotas no puede ser mayor a {$maxInstallments}."
             );
         }
-        
-        /*
-        * Total cotizado por las cuotas.
-        */
-        $quotedTotal = round($installments * $installmentAmount, 2);
 
-        // Si las cuotas no cubren lo financiado, la última cuota absorbe la diferencia
-        $totalAmount = max($quotedTotal, $financedAmount);
+        $interestType = ($data['interest_type'] ?? 'auto') === 'fixed' ? 'fixed' : 'auto';
+
+        if ($interestType === 'fixed') {
+            // El interés es el que se pactó: la tasa manda y la cuota sale de ella.
+            if ($financedAmount <= 0) {
+                throw new InvalidArgumentException(
+                    'No hay saldo que financiar: el pago inicial cubre el monto total.'
+                );
+            }
+
+            $interestRate = round((float) ($data['interest_rate'] ?? 0), 2);
+
+            $maxRate = (float) config('quantum.interest.max_rate', 20);
+
+            if ($interestRate < 0) {
+                throw new InvalidArgumentException('La tasa de interés no puede ser negativa.');
+            }
+
+            if ($interestRate > $maxRate) {
+                throw new InvalidArgumentException(
+                    "La tasa de interés por cuota no puede superar {$maxRate}%."
+                );
+            }
+
+            $totalAmount = round(
+                $financedAmount * (1 + ($interestRate / 100) * $installments),
+                2
+            );
+
+            $totalInterest = round($totalAmount - $financedAmount, 2);
+
+            // Hacia abajo: la última cuota absorbe el redondeo y nunca queda menor
+            // que las demás.
+            $installmentAmount = floor(($totalAmount / $installments) * 100) / 100;
+        } else {
+            $installmentAmount = round(
+                (float) ($data['installment_amount'] ?? 0),
+                2
+            );
+
+            if ($installmentAmount <= 0) {
+                throw new InvalidArgumentException(
+                    'El monto de la cuota debe ser mayor que cero.'
+                );
+            }
+
+            /*
+             * Total cotizado por las cuotas.
+             */
+            $quotedTotal = round($installments * $installmentAmount, 2);
+
+            // Si las cuotas no cubren lo financiado, la última cuota absorbe la diferencia
+            $totalAmount = max($quotedTotal, $financedAmount);
+
+            /*
+             * Intereses totales.
+             *
+             * Si el total de cuotas no supera el monto financiado,
+             * el crédito se considera sin intereses.
+             */
+            $totalInterest = max(
+                0,
+                round($totalAmount - $financedAmount, 2)
+            );
+
+            /*
+             * Tasa por período, la que sale de la cuota que se cobra.
+             */
+            $interestRate = (
+                $financedAmount > 0 &&
+                $totalInterest > 0
+            )
+                ? round(
+                    (
+                        ($totalInterest / $installments)
+                        / $financedAmount
+                    ) * 100,
+                    2
+                )
+                : 0;
+        }
 
         // Tope de razón: evita errores de captura (cuota con un cero de más)
         $maxRatio = (float) config('quantum.installments.max_total_ratio', 3);
@@ -82,47 +145,17 @@ class LoanCalculatorService
             );
         }
 
-        /*
-        * Intereses totales.
-
-        /*
-         * Intereses totales.
-         *
-         * Si el total de cuotas no supera el monto financiado,
-         * el crédito se considera sin intereses.
-         */
-        $totalInterest = max(
-            0,
-            round(
-                $totalAmount - $financedAmount,
-                2
-            )
-        );
-
-        /*
-         * Tasa por período.
-         */
-        $interestRate = (
-            $financedAmount > 0 &&
-            $totalInterest > 0
-        )
-            ? round(
-                (
-                    ($totalInterest / $installments)
-                    / $financedAmount
-                ) * 100,
-                2
-            )
-            : 0;
-
         return [
-            'initial_amount'  => $initialAmount,
-            'down_payment'    => $downPayment,
-            'financed_amount' => $financedAmount,
-            'total_amount'    => $totalAmount,
-            'total_interest'  => $totalInterest,
-            'interest_rate'   => $interestRate,
-            'pending_balance' => $financedAmount,
+            'initial_amount'     => $initialAmount,
+            'down_payment'       => $downPayment,
+            'financed_amount'    => $financedAmount,
+            'installments'       => $installments,
+            'installment_amount' => $installmentAmount,
+            'total_amount'       => $totalAmount,
+            'total_interest'     => $totalInterest,
+            'interest_type'      => $interestType,
+            'interest_rate'      => $interestRate,
+            'pending_balance'    => $financedAmount,
         ];
     }
 
@@ -148,9 +181,8 @@ class LoanCalculatorService
         return round(
             collect($data['items'])
                 ->sum(
-                    fn ($item) => (float) (
-                        $item['price'] ?? 0
-                    )
+                    fn ($item) => (float) ($item['price'] ?? 0)
+                        * max(1, (int) ($item['quantity'] ?? 1))
                 ),
             2
         );

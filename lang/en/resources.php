@@ -12,6 +12,18 @@ return [
         'last_seen' => 'Last Connection',
     ],
 
+    'statuses' => [
+        'credit' => [
+            'active' => 'Active',
+            'completed' => 'Completed',
+            'refinanced' => 'Refinanced',
+            'cancelled' => 'Cancelled',
+            'pending' => 'Pending',
+            'paid' => 'Paid',
+            'defaulted' => 'Defaulted',
+        ],
+    ],
+
     'clients' => [
 
         'sections' => [
@@ -22,6 +34,10 @@ return [
             'credit_status' => 'Credit Status',
             'latest_payments' => 'Latest Payments',
             'latest_payments_description' => 'Recent payment history for the credit.',
+            'account_receivable' => 'Accounts Receivable',
+            'account_receivable_description' => 'What this client owes today.',
+            'active_credit' => 'Active Credit',
+            'customer_data' => 'Customer Data',
             'personal_information' => 'Personal Information',
             'contact' => 'Contact',
             'references' => 'References',
@@ -80,6 +96,13 @@ return [
             'occupation' => 'Occupation',
             'remaining_installments' => 'Remaining Installments',
             'credit_progress' => 'Progress',
+            'total_receivable' => 'Total Receivable',
+            'overdue_amount' => 'Overdue',
+            'next_due_date' => 'Next Due Date',
+            'installments_paid' => 'Paid Installments',
+            'active_credits' => 'Active Credits',
+            'nothing_pending' => 'Nothing pending',
+            'nothing_pending_description' => 'This client has no active credits.',
             'recent_payments' => 'Recent Payments',
             'payment_date' => 'Payment Date',
             'amount' => 'Amount',
@@ -301,6 +324,9 @@ return [
             'status' => 'Status',
             'initial_amount' => 'Initial Amount',
             'interest_rate' => 'Interest Rate',
+            'interest_type' => 'Interest',
+            'interest_type_auto' => 'Calculated',
+            'interest_type_fixed' => 'Fixed',
             'total_interest' => 'Total Interest',
             'total_amount' => 'Total Amount',
             'periodicity' => 'Payment Frequency',

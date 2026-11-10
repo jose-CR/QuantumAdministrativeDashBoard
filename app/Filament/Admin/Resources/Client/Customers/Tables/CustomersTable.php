@@ -17,6 +17,7 @@ use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\SpatieTagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Notifications\Notification;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use App\Models\Tag;
@@ -134,7 +135,34 @@ class CustomersTable
                 ActionGroup::make([
                     ViewAction::make(),
                     EditAction::make(),
-                    DeleteAction::make(),
+                    DeleteAction::make()
+                        // La cascada de la base se lleva créditos, cuotas, pagos y
+                        // alertas: borrar un cliente con historial es perder la plata.
+                        ->modalDescription(fn (Customer $record): ?string => $record->canBeDeleted()
+                            ? null
+                            : __('notifications.clients.delete.blocked_modal'))
+                        ->before(function (DeleteAction $action, Customer $record): void {
+                            if ($record->canBeDeleted()) {
+                                return;
+                            }
+
+                            $resumen = $record->deletionSummary();
+
+                            Notification::make()
+                                ->title(__('notifications.clients.delete.blocked_title'))
+                                ->body(__('notifications.clients.delete.blocked_body', [
+                                    'credits' => $resumen['credits'],
+                                    'invoices' => $resumen['invoices'],
+                                    'list' => $record->creditsBlockingDeletion()
+                                        ->map(fn (array $credito): string => '#' . $credito['id'])
+                                        ->take(5)
+                                        ->implode(', '),
+                                ]))
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+                        }),
                     PayInstallmentAction::make(),
                     RefinanceCreditAction::make(),
                     Action::make('createCredit')
@@ -148,7 +176,24 @@ class CustomersTable
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        // En lote se frena si CUALQUIERA tiene historial: borrar la
+                        // mitad en silencio es peor que no borrar nada.
+                        ->before(function (DeleteBulkAction $action, \Illuminate\Support\Collection $records): void {
+                            $bloqueados = $records->reject(fn ($record) => $record->canBeDeleted());
+
+                            if ($bloqueados->isEmpty()) {
+                                return;
+                            }
+
+                            Notification::make()
+                                ->title(__('notifications.clients.delete.blocked_title'))
+                                ->body($bloqueados->take(5)->pluck('full_name')->implode(', '))
+                                ->danger()
+                                ->send();
+
+                            $action->halt();
+                        }),
                 ]),
             ]);
     }

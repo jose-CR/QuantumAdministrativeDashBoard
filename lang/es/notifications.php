@@ -130,6 +130,9 @@ return [
         ],
 
         'delete' => [
+            'blocked_title' => 'No se puede eliminar el cliente',
+            'blocked_modal' => 'Este cliente tiene historial: no se puede eliminar.',
+            'blocked_body' => 'Tiene :credits créditos (:list) y :invoices facturas. Borrarlo se llevaría su historial de pagos.',
             'title' => 'Cliente eliminado',
             'body' => 'El cliente fue eliminado correctamente.',
         ],
@@ -137,6 +140,12 @@ return [
         'update' => [
             'title' => 'Cliente actualizado',
             'body' => 'El cliente fue actualizado correctamente.',
+        ],
+
+        'import' => [
+            'title' => 'Importación de clientes terminada',
+            'body' => 'Se importaron :rows filas.',
+            'failed' => 'Fallaron :rows.',
         ],
 
         'deletes' => [

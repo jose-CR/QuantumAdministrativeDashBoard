@@ -3,6 +3,8 @@
 namespace App\Filament\Admin\Resources\Credits\Loans\Tables;
 
 use App\Models\ArticleUnit;
+use App\Models\Transportation;
+use App\Support\CreditStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -20,12 +22,6 @@ class LoansTable
             TextColumn::make('id')
                     ->toggleable(isToggledHiddenByDefault: true),
 
-            TextColumn::make('client_id')
-                    ->toggleable(isToggledHiddenByDefault: true),
-            
-            TextColumn::make('article_unit_id')
-                ->toggleable(isToggledHiddenByDefault: true),
-
             TextColumn::make('refinanced_from_id')
                 ->toggleable(isToggledHiddenByDefault: true),
 
@@ -36,8 +32,10 @@ class LoansTable
 
             TextColumn::make('vehicle')
                 ->label(__('resources.credits.clients.vehicle'))
+                // Los bienes del crédito: unidades con serie y artículos por cantidad.
+                // El transporte va en su propia columna.
                 ->state(fn ($record) => $record->items
-                    ->filter(fn ($item) => $item->item instanceof ArticleUnit)
+                    ->filter(fn ($item) => ! $item->item instanceof Transportation)
                     ->map(fn ($item) => $item->display_name)
                     ->join(', ')),
 
@@ -67,26 +65,22 @@ class LoansTable
             TextColumn::make('status')
                 ->label(__('resources.credits.credits.status'))
                 ->badge()
-                ->formatStateUsing(fn (string $state) => match ($state) {
-                    'pending'   => 'Pendiente',
-                    'active'    => 'Activo',
-                    'paid'      => 'Pagado',
-                    'cancelled' => 'Cancelado',
-                    default     => $state,
-                })
-                ->color(fn (string $state) => match ($state) {
-                    'pending'   => 'warning',
-                    'active'    => 'success',
-                    'paid'      => 'info',
-                    'cancelled' => 'danger',
-                    default     => 'gray',
-                }),
+                ->formatStateUsing(fn (?string $state): string => CreditStatus::label($state))
+                ->color(fn (?string $state): string => CreditStatus::color($state)),
 
             // Ocultas por defecto
             TextColumn::make('initial_amount')
                 ->label(__('resources.credits.credits.initial_amount'))
                 ->money('USD')
                 ->toggleable(isToggledHiddenByDefault: true),
+
+            TextColumn::make('interest_type')
+                ->label(__('resources.credits.credits.interest_type'))
+                ->badge()
+                ->formatStateUsing(fn (?string $state) => $state === 'fixed'
+                    ? __('resources.credits.credits.interest_type_fixed')
+                    : __('resources.credits.credits.interest_type_auto'))
+                ->color(fn (?string $state) => $state === 'fixed' ? 'warning' : 'gray'),
 
             TextColumn::make('interest_rate')
                 ->label(__('resources.credits.credits.interest_rate'))

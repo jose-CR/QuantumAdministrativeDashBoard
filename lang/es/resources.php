@@ -11,6 +11,18 @@ return [
         'last_seen' => 'Última conexión',
     ],
 
+    'statuses' => [
+        'credit' => [
+            'active' => 'Activo',
+            'completed' => 'Completado',
+            'refinanced' => 'Refinanciado',
+            'cancelled' => 'Cancelado',
+            'pending' => 'Pendiente',
+            'paid' => 'Pagado',
+            'defaulted' => 'En mora',
+        ],
+    ],
+
     'clients' => [
 
         'sections' => [
@@ -21,6 +33,10 @@ return [
             'credit_status' => 'Estado del crédito',
             'latest_payments' => 'Últimos pagos',
             'latest_payments_description' => 'Historial reciente de pagos del crédito.',
+            'account_receivable' => 'Cuentas por cobrar',
+            'account_receivable_description' => 'Lo que este cliente debe hoy.',
+            'active_credit' => 'Crédito activo',
+            'customer_data' => 'Datos del cliente',
             'personal_information' => 'Información personal',
             'contact' => 'Contacto',
             'references' => 'Referencias',
@@ -79,6 +95,13 @@ return [
             'occupation' => 'Ocupación',
             'remaining_installments' => 'Cuotas restantes',
             'credit_progress' => 'Progreso',
+            'total_receivable' => 'Total por cobrar',
+            'overdue_amount' => 'Vencido',
+            'next_due_date' => 'Próximo vencimiento',
+            'installments_paid' => 'Cuotas pagadas',
+            'active_credits' => 'Créditos activos',
+            'nothing_pending' => 'Sin saldo pendiente',
+            'nothing_pending_description' => 'Este cliente no tiene créditos activos.',
             'recent_payments' => 'Pagos recientes',
             'payment_date' => 'Fecha de pago',
             'amount' => 'Monto',
@@ -300,6 +323,9 @@ return [
             'status' => 'Estado',
             'initial_amount' => 'Monto inicial',
             'interest_rate' => 'Tasa de interés',
+            'interest_type' => 'Interés',
+            'interest_type_auto' => 'Calculado',
+            'interest_type_fixed' => 'Fijo',
             'total_interest' => 'Interés total',
             'total_amount' => 'Monto total',
             'periodicity' => 'Frecuencia de pago',
