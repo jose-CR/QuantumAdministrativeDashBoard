@@ -54,6 +54,30 @@ class Installment extends Model
             ->whereDate('due_date', '<', today());
     }
 
+    /**
+     * Borrar una cuota cambia el saldo del crédito: hay que recalcularlo, porque
+     * antes quedaba un saldo que ya no correspondía a ninguna cuota.
+     */
+    protected static function booted(): void
+    {
+        static::deleted(function (Installment $installment): void {
+            $credito = $installment->credit;
+
+            if (! $credito) {
+                return;
+            }
+
+            $credito->update([
+                'pending_balance' => round(
+                    (float) $credito->installments()->sum('remaining_balance'),
+                    2
+                ),
+            ]);
+
+            app(\App\Services\Credits\CloseCreditService::class)->execute($credito);
+        });
+    }
+
     public function credit()
     {
         return $this->belongsTo(Credit::class);
