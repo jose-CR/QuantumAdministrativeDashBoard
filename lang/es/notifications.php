@@ -130,6 +130,9 @@ return [
         ],
 
         'delete' => [
+            'blocked_title' => 'No se puede eliminar el cliente',
+            'blocked_modal' => 'Este cliente tiene historial: no se puede eliminar.',
+            'blocked_body' => 'Tiene :credits créditos (:list) y :invoices facturas. Borrarlo se llevaría su historial de pagos.',
             'title' => 'Cliente eliminado',
             'body' => 'El cliente fue eliminado correctamente.',
         ],

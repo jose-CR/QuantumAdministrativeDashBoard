@@ -16,10 +16,6 @@ class CustomerImporter extends Importer
     public static function getColumns(): array
     {
         return [
-            ImportColumn::make('id')
-                ->requiredMapping()
-                ->rules(CustomerRules::import()['id']),
-
             ImportColumn::make('document_type')
                 ->requiredMapping()
                 ->rules(CustomerRules::import()['document_type']),
@@ -67,8 +63,18 @@ class CustomerImporter extends Importer
 
     public function resolveRecord(): Customer
     {
-        return Customer::firstOrNew([
-            'id' => $this->data['id'],
+        // Se resuelve por documento, no por id: importar ids explícitos desfasa la
+        // secuencia de Postgres y después las altas manuales fallan por id duplicado
+        // (lo mismo que pasó con el inventario).
+        $documento = trim((string) ($this->data['document_number'] ?? ''));
+
+        if ($documento === '') {
+            return new Customer();
+        }
+
+        return Customer::query()->firstOrNew([
+            'document_type' => $this->data['document_type'] ?? null,
+            'document_number' => $documento,
         ]);
     }
 

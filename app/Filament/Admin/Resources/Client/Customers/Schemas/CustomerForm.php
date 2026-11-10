@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Schemas;
 
+use App\Models\Customer;
 use App\Rules\DepartmentCodeRule;
 use App\Rules\DistrictCodeRule;
 use App\Rules\MunicipalityCodeRule;
@@ -15,6 +16,7 @@ use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Tabs;
 use Filament\Schemas\Components\Tabs\Tab;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class CustomerForm
@@ -33,26 +35,42 @@ class CustomerForm
                                         // Documento
                                         Select::make('document_type')
                                             ->label(__('resources.clients.fields.document_type.document_type'))
-                                            ->options([
-                                                'DUI' => __('resources.clients.fields.document_type.DUI'),
-                                                'NIT' => __('resources.clients.fields.document_type.NIT'),
-                                                'PASSPORT' => __('resources.clients.fields.document_type.PASSPORT'),
-                                                'RES CARNET' => __('resources.clients.fields.document_type.RES_CARNET'),
-                                                'OTRO' => __('resources.clients.fields.document_type.otro'),
-                                            ])
+                                            // La lista sale del modelo: el import y la
+                                            // validación usan la misma.
+                                            ->options(collect(Customer::DOCUMENT_TYPES)
+                                                ->mapWithKeys(fn (string $tipo): array => [
+                                                    $tipo => match ($tipo) {
+                                                        'RES CARNET' => __('resources.clients.fields.document_type.RES_CARNET'),
+                                                        'OTRO' => __('resources.clients.fields.document_type.otro'),
+                                                        default => __('resources.clients.fields.document_type.' . $tipo),
+                                                    },
+                                                ])
+                                                ->all())
                                             ->live()
+                                            // Cambiar el tipo cambia la máscara: el número
+                                            // cargado ya no sirve, se limpia.
+                                            ->afterStateUpdated(fn (Set $set) => $set('document_number', null))
                                             ->required(),
 
                                         TextInput::make('document_number')
                                             ->label(__('resources.clients.fields.document_number'))
-                                            ->key(fn (Get $get) =>
-                                                'document_number_' . $get('document_type')
-                                            )
                                             ->mask(fn (Get $get) =>
                                                 DocumentHelper::mask(
                                                     $get('document_type')
                                                 )
                                             )
+                                            // La identidad es tipo + número: el mismo número
+                                            // con otro tipo es otro cliente.
+                                            ->unique(
+                                                table: 'customers',
+                                                column: 'document_number',
+                                                ignoreRecord: true,
+                                                modifyRuleUsing: fn ($rule, Get $get) => $rule
+                                                    ->where('document_type', $get('document_type')),
+                                            )
+                                            ->validationMessages([
+                                                'unique' => 'Ya hay un cliente con ese documento.',
+                                            ])
                                             ->required(),
                                         
                                         SpatieTagsInput::make('tags')

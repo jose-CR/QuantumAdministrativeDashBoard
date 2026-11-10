@@ -2,6 +2,7 @@
 
 namespace App\Rules;
 
+use App\Models\Customer;
 use App\Support\ActividadesEconomicas;
 use App\Support\ElSalvadorCatalogo;
 use Illuminate\Validation\Rule;
@@ -11,14 +12,11 @@ class CustomerRules
     public static function import(): array
     {
         return [
-            'id' => [
-                'nullable',
-                'integer',
-            ],
-
+            // El id no se importa: se resuelve por tipo + número de documento.
             'document_type' => [
                 'required',
                 'string',
+                Rule::in(Customer::DOCUMENT_TYPES),
             ],
 
             'document_number' => [
