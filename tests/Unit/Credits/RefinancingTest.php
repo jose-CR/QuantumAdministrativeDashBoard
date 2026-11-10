@@ -88,6 +88,29 @@ class RefinancingTest extends CreditTestCase
         $this->assertSame(8, $articulo->fresh()->stock);
     }
 
+    public function test_refinanciar_conserva_la_tasa_pactada(): void
+    {
+        $cliente = Customer::factory()->create();
+
+        $credito = $this->makeCredit([['amount' => 100], ['amount' => 100]], $cliente);
+        $credito->update(['interest_type' => 'fixed', 'interest_rate' => 3]);
+
+        $nuevo = app(RefinancingService::class)->execute($cliente, $credito, [
+            'installments' => 4,
+            'installment_amount' => 50,
+            'periodicity' => 'monthly',
+            'start_date' => today()->addMonth()->toDateString(),
+            'payment_day' => 5,
+        ]);
+
+        $this->assertSame('fixed', $nuevo->interest_type);
+        $this->assertSame('3.00', $nuevo->interest_rate);
+
+        // 200 financiados al 3% por cuota en 4 cuotas = 224
+        $this->assertSame('224.00', $nuevo->total_amount);
+        $this->assertSame('56.00', $nuevo->installment_amount);
+    }
+
     public function test_no_se_puede_refinanciar_un_credito_cerrado(): void
     {
         $credito = $this->makeCredit([['amount' => 100]]);

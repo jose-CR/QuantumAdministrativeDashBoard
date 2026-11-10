@@ -24,6 +24,10 @@ class RefinancingService
             $data = array_merge($data, [
                 'down_payment'   => $oldCredit->down_payment,
                 'initial_amount' => round((float) $oldCredit->pending_balance + (float) $oldCredit->down_payment, 2),
+                // Si el interés se pactó, se mantiene: el acuerdo sigue vigente.
+                // Con 'auto' manda la cuota que se cargue en el refinanciamiento.
+                'interest_type' => $oldCredit->interest_type ?? 'auto',
+                'interest_rate' => $oldCredit->interest_rate,
             ]);
 
             $newCredit = $client->credits()->create(array_merge(

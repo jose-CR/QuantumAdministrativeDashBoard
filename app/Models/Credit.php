@@ -41,6 +41,7 @@ class Credit extends Model
 
         'installments',          // Cantidad total de cuotas
         'installment_amount',    // Monto fijo de cada cuota
+        'interest_type',         // 'auto' = sale del cálculo, 'fixed' = tasa pactada
 
         'periodicity',           // Frecuencia de pago (mensual, semanal, etc.)
         'interest_rate',         // Tasa de interés aplicada
@@ -54,6 +55,14 @@ class Credit extends Model
         'payment_month',         // Mes de pago (si aplica)
 
         'status',                // Estado del crédito (activo, cerrado, refinanciado, etc.)
+    ];
+
+    /**
+     * Valores por defecto: un crédito creado por código (import, seeder, prueba)
+     * sin interés explícito usa el calculado.
+     */
+    protected $attributes = [
+        'interest_type' => 'auto',
     ];
 
     /**
