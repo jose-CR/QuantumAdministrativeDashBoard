@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Client\Customers\RelationManagers;
 
 use App\Filament\Admin\Actions\RefinanceCreditAction;
+use App\Support\CreditStatus;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -21,7 +22,11 @@ class CreditsRelationManager extends RelationManager
                 TextColumn::make('financed_amount')->label('Financiado')->money('USD'),
                 TextColumn::make('pending_balance')->label('Saldo pendiente')->money('USD'),
                 TextColumn::make('installments')->label('Cuotas'),
-                TextColumn::make('status')->label('Estado')->badge(),
+                TextColumn::make('status')
+                    ->label('Estado')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => CreditStatus::label($state))
+                    ->color(fn (?string $state): string => CreditStatus::color($state)),
             ])
             ->defaultSort('start_date', 'desc')
             ->recordActions([

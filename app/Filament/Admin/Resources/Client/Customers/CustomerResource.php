@@ -57,8 +57,9 @@ class CustomerResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AttachmentsRelationManager::class,
             CreditsRelationManager::class,
+            ReferencesRelationManager::class,
+            AttachmentsRelationManager::class,
         ];
     }
 

@@ -195,54 +195,6 @@ class CustomerForm
                                     ]),
                             ]),
 
-/*                         Tab::make('references')
-                            ->visible(function (Get $get, string $operation): bool {
-                                return $operation === 'create'
-                                    && $get('document_type') === 'DUI';
-                            })
-                            ->schema([
-                                Repeater::make('references')
-                                    ->relationship()
-                                    ->label(__('resources.clients.sections.references'))
-                                    ->addActionLabel(__('resources.clients.actions.add_reference'))
-                                    ->cloneable()
-                                    ->itemLabel(
-                                        fn (array $state): ?string =>
-                                            $state['full_name']
-                                                ?? __('resources.clients.messages.new_reference')
-                                    )
-                                    ->schema([
-                                        Grid::make(2)
-                                            ->schema([
-                                                TextInput::make('full_name')
-                                                    ->label(__('resources.clients.fields.full_name'))
-                                                    ->required(),
-
-                                                Select::make('reference_type')
-                                                    ->label(__('resources.clients.fields.reference_type'))
-                                                    ->options([
-                                                        'family' => __('resources.clients.reference_types.family'),
-                                                        'friend' => __('resources.clients.reference_types.friend'),
-                                                    ])
-                                                    ->required(),
-
-                                                TextInput::make('relationship')
-                                                    ->label(__('resources.clients.fields.relationship')),
-
-                                                TextInput::make('phone')
-                                                    ->label(__('resources.clients.fields.phone'))
-                                                    ->tel()
-                                                    ->required(),
-
-                                                TextInput::make('occupation')
-                                                    ->label(__('resources.clients.fields.occupation')),
-
-                                                TextInput::make('address')
-                                                    ->label(__('resources.clients.fields.address'))
-                                                    ->columnSpanFull(),
-                                            ])
-                                    ])
-                            ]), */
                     ])
                     ->columnSpanFull(),
             ]);

@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Credits\Loans\Tables;
 
 use App\Models\ArticleUnit;
 use App\Models\Transportation;
+use App\Support\CreditStatus;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -64,25 +65,8 @@ class LoansTable
             TextColumn::make('status')
                 ->label(__('resources.credits.credits.status'))
                 ->badge()
-                ->formatStateUsing(fn (string $state) => match ($state) {
-                    'active'     => 'Activo',
-                    'completed'  => 'Completado',
-                    'refinanced' => 'Refinanciado',
-                    'cancelled'  => 'Cancelado',
-                    // Estados viejos que pueden quedar en datos históricos.
-                    'pending'    => 'Pendiente',
-                    'paid'       => 'Pagado',
-                    default      => $state,
-                })
-                ->color(fn (string $state) => match ($state) {
-                    'active'     => 'success',
-                    'completed'  => 'info',
-                    'refinanced' => 'warning',
-                    'cancelled'  => 'danger',
-                    'pending'    => 'warning',
-                    'paid'       => 'info',
-                    default      => 'gray',
-                }),
+                ->formatStateUsing(fn (?string $state): string => CreditStatus::label($state))
+                ->color(fn (?string $state): string => CreditStatus::color($state)),
 
             // Ocultas por defecto
             TextColumn::make('initial_amount')
