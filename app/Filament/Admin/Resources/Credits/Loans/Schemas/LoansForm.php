@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 use App\Models\Article;
 use App\Models\ArticleUnit;
 use App\Models\Transportation;
+use App\Services\LoanCalculatorService;
 use App\Support\ElSalvadorCatalogo;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
@@ -45,6 +46,37 @@ class LoansForm
         }
 
         return round($total, 2);
+    }
+
+    /**
+     * Con interés fijo la tasa manda: la cuota es el resultado del cálculo.
+     *
+     * Se escribe en el formulario mientras se carga, para que el usuario vea lo
+     * que va a pagar. Al guardar, el servicio vuelve a calcular: esto es solo la
+     * vista previa y no reemplaza el cálculo del servidor.
+     */
+    protected static function applyFixedRate(callable $set, Get $get): void
+    {
+        if ($get('interest_type') !== 'fixed') {
+            return;
+        }
+
+        try {
+            $cotizacion = app(LoanCalculatorService::class)->calculate([
+                'initial_amount' => (float) $get('initial_amount'),
+                'down_payment' => (float) ($get('down_payment') ?? 0),
+                'installments' => (int) ($get('installments') ?? 0),
+                // En modo fijo la cuota se calcula: este valor no se usa.
+                'installment_amount' => 1,
+                'interest_type' => 'fixed',
+                'interest_rate' => (float) ($get('interest_rate') ?? 0),
+            ]);
+        } catch (\Throwable) {
+            // Datos incompletos: se deja como está y el guardado vuelve a calcular.
+            return;
+        }
+
+        $set('installment_amount', $cotizacion['installment_amount']);
     }
 
     public static function configure(Schema $schema): Schema
@@ -447,19 +479,55 @@ class LoansForm
                                     ->numeric()
                                     ->prefix('$')
                                     ->default(0)
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installments')
                                     ->label('Número de cuotas')
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue((int) config('quantum.installments.max', 100))
-                                    ->required(),
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
+
+                                /*
+                                 * INTERÉS
+                                 *
+                                 * 'auto' = se cobra la cuota que se escribe y la tasa
+                                 * se calcula. 'fixed' = la tasa se pactó, y la cuota
+                                 * y el total salen de ella.
+                                 */
+                                Select::make('interest_type')
+                                    ->label('Interés')
+                                    ->options([
+                                        'auto' => 'Calculado (según la cuota)',
+                                        'fixed' => 'Fijo (tasa pactada)',
+                                    ])
+                                    ->default('auto')
+                                    ->required()
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
+
+                                TextInput::make('interest_rate')
+                                    ->label('Tasa por cuota')
+                                    ->numeric()
+                                    ->suffix('%')
+                                    ->step('0.01')
+                                    ->minValue(0)
+                                    ->maxValue((float) config('quantum.interest.max_rate', 20))
+                                    ->visible(fn (Get $get) => $get('interest_type') === 'fixed')
+                                    ->required(fn (Get $get) => $get('interest_type') === 'fixed')
+                                    ->live()
+                                    ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installment_amount')
                                     ->label('Monto de cuota')
                                     ->numeric()
                                     ->prefix('$')
+                                    // Con interés fijo la cuota es el resultado, no la entrada.
+                                    ->readOnly(fn (Get $get) => $get('interest_type') === 'fixed')
                                     ->required(),
 
                                 Select::make('periodicity')

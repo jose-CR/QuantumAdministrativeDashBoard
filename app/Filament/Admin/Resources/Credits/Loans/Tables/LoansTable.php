@@ -90,6 +90,14 @@ class LoansTable
                 ->money('USD')
                 ->toggleable(isToggledHiddenByDefault: true),
 
+            TextColumn::make('interest_type')
+                ->label(__('resources.credits.credits.interest_type'))
+                ->badge()
+                ->formatStateUsing(fn (?string $state) => $state === 'fixed'
+                    ? __('resources.credits.credits.interest_type_fixed')
+                    : __('resources.credits.credits.interest_type_auto'))
+                ->color(fn (?string $state) => $state === 'fixed' ? 'warning' : 'gray'),
+
             TextColumn::make('interest_rate')
                 ->label(__('resources.credits.credits.interest_rate'))
                 ->suffix('%')

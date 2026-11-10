@@ -7,6 +7,11 @@ return [
         'max_total_ratio' => (float) env('CREDITS_MAX_TOTAL_RATIO', 3)
     ],
 
+    /* Tasa de interés por cuota cuando se pacta un interés fijo (%). */
+    'interest' => [
+        'max_rate' => (float) env('CREDITS_MAX_INTEREST_RATE', 20),
+    ],
+
     'periodicities' => ['weekly', 'monthly', 'yearly'],
 
     'statuses' => [

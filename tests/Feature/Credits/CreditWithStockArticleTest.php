@@ -55,6 +55,7 @@ class CreditWithStockArticleTest extends TestCase
                 'initial_amount' => 50,
                 'down_payment' => 0,
                 'installments' => 1,
+                'interest_type' => 'auto',
                 'installment_amount' => 50,
                 'periodicity' => 'monthly',
                 'start_date' => today()->toDateString(),
