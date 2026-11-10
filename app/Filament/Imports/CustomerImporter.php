@@ -4,6 +4,7 @@ namespace App\Filament\Imports;
 
 use App\Models\Customer;
 use App\Rules\CustomerRules;
+use App\Support\ElSalvadorCatalogo;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -61,6 +62,31 @@ class CustomerImporter extends Importer
         ];
     }
 
+    /**
+     * El export escribe nombres ("San Salvador") y la base guarda códigos ("06"):
+     * se traducen antes de llenar el modelo. Si ya viene el código, no cambia nada.
+     */
+    public function fillRecord(): void
+    {
+        $departamento = ElSalvadorCatalogo::resolveDepartment($this->data['department'] ?? null);
+
+        $municipio = ElSalvadorCatalogo::resolveMunicipality(
+            $departamento,
+            $this->data['municipality'] ?? null,
+        );
+
+        $distrito = ElSalvadorCatalogo::resolveDistrict(
+            $municipio,
+            $this->data['district'] ?? null,
+        );
+
+        $this->data['department'] = $departamento ?? ($this->data['department'] ?? null);
+        $this->data['municipality'] = $municipio ?? ($this->data['municipality'] ?? null);
+        $this->data['district'] = $distrito ?? ($this->data['district'] ?? null);
+
+        parent::fillRecord();
+    }
+
     public function resolveRecord(): Customer
     {
         // Se resuelve por documento, no por id: importar ids explícitos desfasa la
@@ -78,12 +104,21 @@ class CustomerImporter extends Importer
         ]);
     }
 
+    public static function getCompletedNotificationTitle(Import $import): string
+    {
+        return __('notifications.clients.import.title');
+    }
+
     public static function getCompletedNotificationBody(Import $import): string
     {
-        $body = 'Your customer import has completed and ' . Number::format($import->successful_rows) . ' ' . str('row')->plural($import->successful_rows) . ' imported.';
+        $body = __('notifications.clients.import.body', [
+            'rows' => Number::format($import->successful_rows),
+        ]);
 
         if ($failedRowsCount = $import->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to import.';
+            $body .= ' ' . __('notifications.clients.import.failed', [
+                'rows' => Number::format($failedRowsCount),
+            ]);
         }
 
         return $body;

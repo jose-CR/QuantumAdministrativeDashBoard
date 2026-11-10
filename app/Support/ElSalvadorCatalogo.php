@@ -52,6 +52,47 @@ class ElSalvadorCatalogo
      *
      * @return array<string, string>
      */
+    /**
+     * Acepta el código o el nombre (lo que escribe el export) y devuelve el código.
+     */
+    protected static function resolveCode(array $options, ?string $value): ?string
+    {
+        $value = trim((string) $value);
+
+        if ($value === '') {
+            return null;
+        }
+
+        if (array_key_exists($value, $options)) {
+            return $value;
+        }
+
+        $buscado = mb_strtolower($value);
+
+        foreach ($options as $codigo => $nombre) {
+            if (mb_strtolower(trim((string) $nombre)) === $buscado) {
+                return (string) $codigo;
+            }
+        }
+
+        return null;
+    }
+
+    public static function resolveDepartment(?string $value): ?string
+    {
+        return static::resolveCode(static::departments(), $value);
+    }
+
+    public static function resolveMunicipality(?string $departmentCode, ?string $value): ?string
+    {
+        return static::resolveCode(static::municipalities($departmentCode), $value);
+    }
+
+    public static function resolveDistrict(?string $municipalityCode, ?string $value): ?string
+    {
+        return static::resolveCode(static::districts($municipalityCode), $value);
+    }
+
     public static function departments(): array
     {
         $options = [];

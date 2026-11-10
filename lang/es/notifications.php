@@ -142,6 +142,12 @@ return [
             'body' => 'El cliente fue actualizado correctamente.',
         ],
 
+        'import' => [
+            'title' => 'Importación de clientes terminada',
+            'body' => 'Se importaron :rows filas.',
+            'failed' => 'Fallaron :rows.',
+        ],
+
         'deletes' => [
             'title' => 'Clientes eliminados',
             'body' => 'Los clientes seleccionados fueron eliminados correctamente.',

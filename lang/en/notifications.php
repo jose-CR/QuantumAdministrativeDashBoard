@@ -137,6 +137,12 @@ return [
             'body' => 'The user was updated successfully.',
         ],
 
+        'import' => [
+            'title' => 'Customer import completed',
+            'body' => ':rows rows were imported.',
+            'failed' => ':rows failed.',
+        ],
+
         'deletes' => [
             'title' => 'Clients deleted',
             'body' => 'The selected clients were deleted successfully.',

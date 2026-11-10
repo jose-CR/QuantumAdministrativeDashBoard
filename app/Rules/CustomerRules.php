@@ -68,9 +68,12 @@ class CustomerRules
                 'required',
                 'string',
                 'max:255',
-                Rule::in(array_keys(
-                    ElSalvadorCatalogo::departments()
-                )),
+                // El export escribe el nombre; el import acepta nombre o código.
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if (ElSalvadorCatalogo::resolveDepartment((string) $value) === null) {
+                        $fail('El departamento no existe en el catálogo.');
+                    }
+                },
             ],
 
             'municipality' => [
