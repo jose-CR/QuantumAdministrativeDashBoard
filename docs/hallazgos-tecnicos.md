@@ -11,11 +11,16 @@ hallazgo. Todos los de la lista original quedaron cerrados y probados.
 | 4 | `partial`/`late` nunca se escriben, y `CloseCreditService` solo miraba `pending` | Cerrado | `CloseCreditService` usa `Installment::UNPAID_STATUSES`: una cuota atrasada ya no deja cerrar el crédito con deuda. Una cuota con saldo 0 se marca pagada al recalcular (`ApplyPaymentService`), que era el caso que dejaba créditos abiertos. |
 | 5 | Sin tests reales (`phpunit.xml` apuntaba a la base real) | Cerrado | Las pruebas corren contra `quantum_test` (ver *Base de pruebas*), con `DatabaseTransactions`. Una prueba falla si la base no termina en `_test`. 66 pruebas entre inventario, créditos, export y panel. |
 | 6 | 8 créditos `active` con la última cuota en `pending` y saldo 0: el total daba 0 pero no se cerraban nunca | Cerrado | Migración `2026_11_09_160000_close_paid_credits`: 8 cuotas a `paid` y 8 créditos a `completed` (36 activos → 28, 14 completados → 22). Respaldo previo en `storage/app/backups/creditos-antes-de-cerrar-2026-11-09.sql`. |
+| 7 | Borrar un pago o una cuota desde el panel dejaba el crédito descuadrado: las cuotas quedaban pagadas y el saldo no volvía | Cerrado | `RecalculateCreditService`: los pagos son la fuente de verdad y las cuotas se rehacen a partir de ellos. Se dispara al borrar o cambiar el monto de un pago, y al borrar una cuota. |
+| 8 | El estado `late` no lo escribía nadie: una cuota vencida seguía `pending` y el panel la mostraba al día | Cerrado | Comando `credits:mark-late` agendado a las 06:45. Sobre la base de desarrollo marcó 110 cuotas por $28.524,83; el total vencido no cambió porque se calculaba por fecha. |
+| 9 | El refinanciamiento no tenía pruebas y descontaba el stock dos veces al replicar los bienes | Cerrado | `RefinancingService` replica los ítems dentro de `CreditItem::withoutEvents`; cubierto con tres pruebas (cierre del viejo, bienes sin mover stock, crédito cerrado rechazado). |
+| 10 | Dos filas del mismo artículo en un crédito podían dejar el stock en negativo | Cerrado | El modelo valida al guardar contra el stock real (ya descontado por las otras filas) y devuelve el error a la fila. |
 
 ## Pendientes que no vienen de esta revisión
 
 - Los pagos anteriores al arreglo siguen con `user_id` en NULL: no hay forma de saber quién los cobró.
 - La prueba de descarga de export se salta si la base no tiene exports completados (no crea uno propio).
+- El refinanciamiento no copia los pagos del crédito viejo al nuevo: se arrastra el saldo pendiente, que es lo correcto, pero queda sin trazabilidad de qué pagos lo formaron.
 
 ## Base de pruebas
 
