@@ -39,21 +39,27 @@ class CashFlowStatsWidget extends StatsOverviewWidget
             Stat::make('Balance', $this->money($balance))
                 ->description('Entradas menos salidas')
                 ->color($balance >= 0 ? 'success' : 'danger'),
+            Stat::make('Cobrado', $this->money($this->totalInRange(Inflow::class, 'date', 'amount_paid')))
+                ->description('De lo facturado en el rango')
+                ->color('info'),
+            Stat::make('Por cobrar', $this->money($inflows - $this->totalInRange(Inflow::class, 'date', 'amount_paid')))
+                ->description('Facturado que todavía no entró')
+                ->color('warning'),
         ];
     }
 
-    private function totalInRange(string $model, string $dateColumn): float
+    private function totalInRange(string $model, string $dateColumn, string $sumColumn = 'amount'): float
     {
         return (float) $model::query()
             ->when(
-                $this->pageFilters['startDate'] ?? null,
+                ($this->pageFilters ?? [])['startDate'] ?? null,
                 fn (Builder $query, string $date) => $query->whereDate($dateColumn, '>=', $date),
             )
             ->when(
-                $this->pageFilters['endDate'] ?? null,
+                ($this->pageFilters ?? [])['endDate'] ?? null,
                 fn (Builder $query, string $date) => $query->whereDate($dateColumn, '<=', $date),
             )
-            ->sum('amount');
+            ->sum($sumColumn);
     }
 
     private function money(float $amount): string

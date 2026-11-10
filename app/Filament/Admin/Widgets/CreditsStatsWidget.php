@@ -48,11 +48,11 @@ class CreditsStatsWidget extends StatsOverviewWidget
     {
         return (float) Credit::query()
             ->when(
-                $this->pageFilters['startDate'] ?? null,
+                ($this->pageFilters ?? [])['startDate'] ?? null,
                 fn (Builder $query, string $date) => $query->whereDate('start_date', '>=', $date),
             )
             ->when(
-                $this->pageFilters['endDate'] ?? null,
+                ($this->pageFilters ?? [])['endDate'] ?? null,
                 fn (Builder $query, string $date) => $query->whereDate('start_date', '<=', $date),
             )
             ->sum('financed_amount');

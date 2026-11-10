@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Administration\Inflows\Pages;
 
+use App\Filament\Admin\Actions\CashReportAction;
 use App\Filament\Admin\Resources\Administration\Inflows\InflowResource;
 use App\Filament\Exports\Inflow\InflowExporter;
 use App\Filament\Imports\Inflow\InflowImporter;
@@ -20,6 +21,8 @@ class ListInflows extends ListRecords
     {
         return [
             CreateAction::make(),
+            // Caja + cartera + inventario en un solo Excel.
+            CashReportAction::make(),
             ExportAction::make('exportReport')
                 ->label('Reporte de entradas')
                 ->icon('heroicon-o-chart-bar')

@@ -24,8 +24,8 @@ class ArticlesStatsWidget extends StatsOverviewWidget
 
     protected function getStats(): array
     {
-        $startDate = $this->pageFilters['startDate'] ?? null;
-        $endDate = $this->pageFilters['endDate'] ?? null;
+        $startDate = ($this->pageFilters ?? [])['startDate'] ?? null;
+        $endDate = ($this->pageFilters ?? [])['endDate'] ?? null;
 
         return [
             Stat::make('Artículos', Article::query()

@@ -488,6 +488,25 @@ def single_flow_report(payload):
     }
 
 
+# ---------- hojas extra: cartera e inventario ----------
+def append_extra_sheets(wb, extras):
+    """Tablas simples que no son flujo de caja (cartera, inventario)."""
+    for hoja in extras or []:
+        ws = wb.create_sheet(title=str(hoja.get("title", "Hoja"))[:31])
+
+        headers = hoja.get("headers") or []
+
+        for c, header in enumerate(headers, start=1):
+            put(ws, 1, c, header, bold=True, fill=HEAD_FILL, color="FFFFFF")
+
+        for r, fila in enumerate(hoja.get("rows") or [], start=2):
+            for c, valor in enumerate(fila, start=1):
+                put(ws, r, c, clean(valor))
+
+        for c, header in enumerate(headers, start=1):
+            ws.column_dimensions[L(c)].width = min(42, max(14, len(str(header)) + 6))
+
+
 # ---------- mode: full report combining both flows into a new file ----------
 def combined_report(p):
     cfgs = [p["inflows"], p["outflows"]]
@@ -499,6 +518,7 @@ def combined_report(p):
     flows = build_report_sheet(wb, cfgs, dfs, flags, int(p.get("gap", 2)))
     periods = write_summary(wb, flows, dfs, cfgs)
     write_analysis(wb, cfgs, dfs, flags, flows, periods, int(p.get("projection_months", 3)))
+    append_extra_sheets(wb, p.get("extras"))
     wb.save(p["out"])
 
     return {

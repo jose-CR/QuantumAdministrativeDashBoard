@@ -34,8 +34,8 @@ class CustomersStatsWidget extends StatsOverviewWidget
 
     private function totalCustomers(): Stat
     {
-        $startDate = $this->pageFilters['startDate'] ?? null;
-        $endDate = $this->pageFilters['endDate'] ?? null;
+        $startDate = ($this->pageFilters ?? [])['startDate'] ?? null;
+        $endDate = ($this->pageFilters ?? [])['endDate'] ?? null;
 
         return Stat::make('Clientes', Customer::query()
                     ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
