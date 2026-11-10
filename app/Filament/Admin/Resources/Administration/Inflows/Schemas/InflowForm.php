@@ -53,15 +53,27 @@ class InflowForm
                         TextInput::make('amount')
                             ->label(__('resources.flow.inflow.amount'))
                             ->numeric()
-                            ->required(),
+                            ->prefix('$')
+                            ->required()
+                            ->live()
+                            // Por defecto se cobra entero: si todavía no se tocó lo
+                            // cobrado, se copia el monto.
+                            ->afterStateUpdated(function ($state, callable $set, Get $get): void {
+                                if ((float) ($get('amount_paid') ?? 0) <= 0) {
+                                    $set('amount_paid', $state);
+                                }
+                            }),
 
-                        Select::make('payment_status')
-                            ->label(__('resources.flow.inflow.payment_status'))
-                            ->options([
-                                'pending' => __('resources.clients.statuses.pending'),
-                                'partial' => __('resources.clients.statuses.partial'),
-                                'paid' => __('resources.clients.statuses.paid'),
-                            ])
+                        /*
+                         * Lo cobrado manda: el estado (pendiente, parcial o pagado)
+                         * se calcula solo al guardar.
+                         */
+                        TextInput::make('amount_paid')
+                            ->label(__('resources.flow.inflow.amount_paid'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->helperText('0 = pendiente · igual al monto = pagado · en medio = parcial')
                             ->required(),
 
                         Select::make('payment_method')

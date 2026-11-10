@@ -28,6 +28,12 @@ class InflowExporter extends Exporter
                 ->label('Cliente')
                 ->state(fn (Inflow $record) => $record->customer_id),
 
+            ExportColumn::make('amount_paid')
+                ->label('Cobrado'),
+
+            ExportColumn::make('receivable')
+                ->label('Por cobrar'),
+
             ExportColumn::make('amount')
                 ->label('Monto'),
 

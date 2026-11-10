@@ -398,6 +398,8 @@ return [
             'client' => 'Client',
             'cod_invoice' => 'Invoice Number',
             'amount' => 'Amount',
+            'amount_paid' => 'Collected',
+            'receivable' => 'Receivable',
             'description' => 'Description',
             'payment_method' => 'Payment Method',
             'transfer_number' => 'Transfer Number',

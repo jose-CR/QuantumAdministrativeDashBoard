@@ -399,6 +399,8 @@ return [
             'client' => 'Cliente',
             'cod_invoice' => 'Número de factura',
             'amount' => 'Monto',
+            'amount_paid' => 'Cobrado',
+            'receivable' => 'Por cobrar',
             'description' => 'Descripción',
             'payment_method' => 'Método de pago',
             'transfer_number' => 'Número de transferencia',

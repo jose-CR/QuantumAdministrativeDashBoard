@@ -32,6 +32,9 @@ class InflowImporter extends Importer
                 ->label('Cliente')
                 ->rules(InflowRules::import()['customer_id']),
 
+            ImportColumn::make('amount_paid')
+                ->rules(InflowRules::import()['amount_paid']),
+
             ImportColumn::make('amount')
                 ->label('Monto')
                 ->rules(InflowRules::import()['amount']),
