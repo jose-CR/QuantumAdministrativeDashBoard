@@ -55,7 +55,6 @@ class OutflowForm
                     ->openable()
                     ->previewable()
                     ->maxFiles(10)
-                    ->dehydrated(false)
                     ->afterStateHydrated(
                         function (
                             FileUpload $component,

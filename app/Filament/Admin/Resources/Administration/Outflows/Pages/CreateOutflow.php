@@ -12,6 +12,11 @@ class CreateOutflow extends CreateRecord
 
     protected static string $resource = OutflowResource::class;
 
+    protected function mutateFormDataBeforeCreate(array $data): array
+    {
+        return $this->captureAttachments($data);
+    }
+
     protected function afterCreate(): void
     {
         $this->syncAttachments();
