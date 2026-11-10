@@ -20,9 +20,27 @@ class Credit extends Model
     protected static function booted(): void
     {
         static::deleting(function (Credit $credit): void {
-            $credit->items()->get()->each(
-                fn (CreditItem $item) => $item->delete()
-            );
+            // El estado guardado, no el de la instancia: un objeto viejo en memoria
+            // puede seguir diciendo 'active' cuando en la base ya está refinanciado.
+            $estado = Credit::query()->whereKey($credit->getKey())->value('status')
+                ?? $credit->status;
+
+            /*
+             * Un crédito refinanciado ya no tiene los bienes: viven en el crédito
+             * nuevo. Si se borra, hay que sacar sus ítems SIN disparar los eventos,
+             * porque devolver el stock lo contaría dos veces.
+             */
+            if ($estado === 'refinanced') {
+                CreditItem::withoutEvents(
+                    fn () => $credit->items()->delete()
+                );
+
+                return;
+            }
+
+            $credit->items()
+                ->get()
+                ->each(fn (CreditItem $item) => $item->delete());
         });
     }
 

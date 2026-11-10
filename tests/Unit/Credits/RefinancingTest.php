@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Credits;
 
+use App\Models\Alert;
 use App\Models\Article;
 use App\Models\Category;
 use App\Models\Customer;
@@ -109,6 +110,73 @@ class RefinancingTest extends CreditTestCase
         // 200 financiados al 3% por cuota en 4 cuotas = 224
         $this->assertSame('224.00', $nuevo->total_amount);
         $this->assertSame('56.00', $nuevo->installment_amount);
+    }
+
+    public function test_el_credito_nuevo_es_por_el_saldo_pendiente_y_no_arrastra_la_prima(): void
+    {
+        $cliente = Customer::factory()->create();
+
+        $credito = $this->makeCredit([['amount' => 250], ['amount' => 250]], $cliente);
+        $credito->update([
+            'initial_amount' => 1000,
+            'down_payment' => 200,
+            'financed_amount' => 800,
+            'pending_balance' => 500,
+        ]);
+
+        $nuevo = app(RefinancingService::class)->execute($cliente, $credito, [
+            'installments' => 5,
+            'installment_amount' => 100,
+            'periodicity' => 'monthly',
+            'start_date' => today()->addMonth()->toDateString(),
+            'payment_day' => 5,
+        ]);
+
+        // Se refina lo que se debe, no el precio original con la prima otra vez.
+        $this->assertSame('500.00', $nuevo->initial_amount);
+        $this->assertSame('0.00', $nuevo->down_payment);
+        $this->assertSame('500.00', $nuevo->financed_amount);
+        $this->assertSame('500.00', $nuevo->total_amount);
+    }
+
+    public function test_refinanciar_cancela_las_alertas_de_las_cuotas_que_quedan(): void
+    {
+        $cliente = Customer::factory()->create();
+        $credito = $this->makeCredit([['amount' => 100]], $cliente);
+        $cuota = $credito->installments()->firstOrFail();
+
+        $alerta = Alert::query()->create([
+            'customer_id' => $cliente->id,
+            'credit_id' => $credito->id,
+            'installment_id' => $cuota->id,
+            'type' => Alert::TYPE_OVERDUE,
+            'title' => 'Cuota vencida',
+            'message' => 'Cuota vencida de prueba',
+            'alert_at' => now(),
+            'status' => Alert::STATUS_PENDING,
+        ]);
+
+        app(RefinancingService::class)->execute($cliente, $credito, [
+            'installments' => 2,
+            'installment_amount' => 50,
+            'periodicity' => 'monthly',
+            'start_date' => today()->addMonth()->toDateString(),
+            'payment_day' => 5,
+        ]);
+
+        $this->assertSame('cancelled', $alerta->fresh()->status);
+    }
+
+    public function test_borrar_el_credito_refinanciado_no_devuelve_el_stock(): void
+    {
+        [$viejo, , $articulo] = $this->refinance();
+
+        $this->assertSame(8, $articulo->fresh()->stock);
+
+        $viejo->delete();
+
+        // Los bienes viven en el crédito nuevo: borrar el viejo no devuelve nada.
+        $this->assertSame(8, $articulo->fresh()->stock);
     }
 
     public function test_no_se_puede_refinanciar_un_credito_cerrado(): void
