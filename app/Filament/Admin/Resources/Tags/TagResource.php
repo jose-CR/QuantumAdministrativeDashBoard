@@ -10,6 +10,7 @@ use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -31,7 +32,24 @@ class TagResource extends Resource
             TextInput::make('name')
                 ->label('Nombre')
                 ->required()
-                ->maxLength(255),
+                ->maxLength(255)
+                // El nombre es un JSON por idioma: se compara traducido para no
+                // terminar con "mayorista" y "Mayorista" como dos etiquetas.
+                ->rule(function (Get $get, ?Tag $record) {
+                    return function (string $attribute, mixed $value, \Closure $fail) use ($get, $record): void {
+                        $buscado = mb_strtolower(trim((string) $value));
+
+                        $existe = Tag::query()
+                            ->where('type', $get('type'))
+                            ->when($record, fn ($consulta) => $consulta->whereKeyNot($record->getKey()))
+                            ->get()
+                            ->contains(fn (Tag $tag): bool => mb_strtolower(trim((string) $tag->name)) === $buscado);
+
+                        if ($existe) {
+                            $fail('Ya hay una etiqueta con ese nombre.');
+                        }
+                    };
+                }),
 
             Select::make('type')
                 ->label('Tipo')
@@ -53,7 +71,20 @@ class TagResource extends Resource
 
                 TextColumn::make('type')
                     ->label('Tipo')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => match ($state) {
+                        'customer' => 'Clientes',
+                        default => (string) $state,
+                    }),
+
+                // Cuántos registros la usan: una etiqueta en cero solo ensucia el filtro.
+                TextColumn::make('usos')
+                    ->label('Usos')
+                    ->badge()
+                    ->state(fn (Tag $record): int => \Illuminate\Support\Facades\DB::table('taggables')
+                        ->where('tag_id', $record->id)
+                        ->count())
+                    ->color(fn (int $state): string => $state > 0 ? 'success' : 'gray'),
             ])
             ->recordActions([
                 EditAction::make()

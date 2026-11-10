@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             // Roles y permisos primero: sin ellos nadie entra al panel.
             ShieldSeeder::class,
+            TagSeeder::class,
             CategorySeeder::class,
             ArticleSeeder::class,
             ArticleUnitSeeder::class,
