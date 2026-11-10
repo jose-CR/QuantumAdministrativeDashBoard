@@ -29,8 +29,18 @@ class Outflow extends Model
     protected static function booted(): void
     {
         static::deleting(function (Outflow $outflow) {
+            // Las líneas mueven stock: se borran con eventos para devolverlo.
+            $outflow->items()->get()->each(fn (FlowItem $item) => $item->delete());
             $outflow->attachments->each->delete();
         });
+    }
+
+    /**
+     * Artículos de la compra: son los que suman inventario.
+     */
+    public function items()
+    {
+        return $this->morphMany(FlowItem::class, 'flow');
     }
 
     public function attachments()

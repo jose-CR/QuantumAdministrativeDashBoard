@@ -2,9 +2,11 @@
 
 namespace App\Filament\Admin\Resources\Administration\Inflows\Schemas;
 
+use App\Models\Article;
 use App\Models\Inflow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -104,6 +106,54 @@ class InflowForm
                             ->visible(fn (Get $get): bool => $get('payment_method') !== 'cash'),
                     ])
                     ->columns(2)
+                    ->columnSpanFull(),
+
+                Section::make('Artículos')
+                    ->description('Si la venta incluye artículos del inventario, se descuentan del stock al guardar.')
+                    ->schema([
+                        Repeater::make('items')
+                            ->relationship()
+                            ->hiddenLabel()
+                            ->schema([
+                                Select::make('article_id')
+                                    ->label('Artículo')
+                                    ->searchable()
+                                    ->required()
+                                    ->options(fn (): array => Article::query()
+                                        ->where('tracking', Article::TRACKING_NONE)
+                                        ->orderBy('name')
+                                        ->get()
+                                        ->mapWithKeys(fn (Article $articulo): array => [
+                                            $articulo->id => "{$articulo->full_name} (stock: {$articulo->stock})",
+                                        ])
+                                        ->all())
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                        if ($articulo = Article::find($state)) {
+                                            $set('price', (float) $articulo->cash_price);
+                                        }
+                                    }),
+
+                                TextInput::make('quantity')
+                                    ->label('Cantidad')
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+
+                                TextInput::make('price')
+                                    ->label('Precio unitario')
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->defaultItems(0)
+                            ->addActionLabel('Agregar artículo')
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
                     ->columnSpanFull(),
 
                 Section::make('Documentación')

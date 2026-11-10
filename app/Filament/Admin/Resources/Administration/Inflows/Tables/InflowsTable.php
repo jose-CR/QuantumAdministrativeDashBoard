@@ -76,6 +76,13 @@ class InflowsTable
                 TextColumn::make('salesperson')
                     ->label(__('resources.flow.inflow.salesperson')),
 
+                TextColumn::make('items_count')
+                    ->label('Artículos')
+                    ->counts('items')
+                    ->badge()
+                    ->color(fn (int $state): string => $state > 0 ? 'info' : 'gray')
+                    ->formatStateUsing(fn (int $state): string => $state > 0 ? "{$state} artículo(s)" : '—'),
+
                 TextColumn::make('attachments_count')
                     ->label(__('resources.flow.attachment'))
                     ->counts('attachments')

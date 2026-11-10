@@ -37,6 +37,13 @@ class Inflow extends Model
         static::saving(function (Inflow $inflow): void {
             $inflow->normalizePayment();
         });
+
+        // Las líneas se van por FK en cascada, y esa cascada no dispara eventos:
+        // sin esto el stock de una venta no vuelve al borrar la entrada.
+        static::deleting(function (Inflow $inflow): void {
+            $inflow->items()->get()->each(fn (FlowItem $item) => $item->delete());
+            $inflow->attachments()->get()->each(fn (Attachment $adjunto) => $adjunto->delete());
+        });
     }
 
     protected function normalizePayment(): void
@@ -92,6 +99,14 @@ class Inflow extends Model
     {
         return $this->belongsTo(Bank::class);
     }    
+
+    /**
+     * Artículos de la venta: son los que descuentan inventario.
+     */
+    public function items()
+    {
+        return $this->morphMany(FlowItem::class, 'flow');
+    }
 
     public function attachments()
     {
