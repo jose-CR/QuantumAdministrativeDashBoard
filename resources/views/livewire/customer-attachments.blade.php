@@ -91,53 +91,5 @@
         </div>
     @endforelse
 
-    {{-- Subir: el destino depende del tab --}}
-    <div style="border-top:1px solid rgba(128,128,128,.2);padding-top:1rem;display:flex;flex-wrap:wrap;gap:.75rem;align-items:flex-end">
-        @if ($tab !== 'loose')
-            <label style="display:block">
-                <span style="display:block;font-size:.75rem;opacity:.6;margin-bottom:.25rem">
-                    {{ $tab === 'credits' ? 'Crédito' : 'Cuota' }}
-                </span>
 
-                <x-filament::input.wrapper>
-                    <x-filament::input.select wire:model="targetId">
-                        <option value="">Elegir…</option>
-
-                        @foreach (($tab === 'credits' ? $this->creditos : $this->cuotas) as $id => $etiqueta)
-                            <option value="{{ $id }}">{{ $etiqueta }}</option>
-                        @endforeach
-                    </x-filament::input.select>
-                </x-filament::input.wrapper>
-            </label>
-        @endif
-
-        <label style="display:block;flex:1;min-width:220px">
-            <span style="display:block;font-size:.75rem;opacity:.6;margin-bottom:.25rem">
-                Archivo (PDF o imagen, hasta 10 MB)
-            </span>
-
-            <input
-                type="file"
-                wire:model="file"
-                accept=".pdf,.jpg,.jpeg,.png,.webp"
-                style="display:block;width:100%;font-size:.875rem;color:inherit"
-            />
-        </label>
-
-        <x-filament::button
-            wire:click="upload"
-            icon="heroicon-m-arrow-up-tray"
-            wire:loading.attr="disabled"
-        >
-            Subir
-        </x-filament::button>
-    </div>
-
-    @error('file')
-        <div style="font-size:.8rem;color:#dc2626">{{ $message }}</div>
-    @enderror
-
-    @error('targetId')
-        <div style="font-size:.8rem;color:#dc2626">{{ $message }}</div>
-    @enderror
 </div>

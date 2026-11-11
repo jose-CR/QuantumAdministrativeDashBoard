@@ -173,7 +173,6 @@ class InflowForm
                             ->openable()
                             ->previewable()
                             ->maxFiles(10)
-                            ->dehydrated(false)
                             ->columnSpanFull()
                             ->afterStateHydrated(
                                 function (

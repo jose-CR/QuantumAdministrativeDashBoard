@@ -20,6 +20,11 @@ class EditOutflow extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeSave(array $data): array
+    {
+        return $this->captureAttachments($data);
+    }
+
     protected function afterSave(): void
     {
         $this->syncAttachments();
