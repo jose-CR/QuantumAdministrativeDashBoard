@@ -2,12 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Inventory\Articles\Pages;
 
+use App\Filament\Admin\pages\DataTransfer;
 use App\Filament\Admin\Resources\Inventory\Articles\ArticleResource;
-use App\Filament\Exports\Inventory\ArticlesExporter;
-use App\Filament\Imports\Inventory\ArticleImporter;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListArticles extends ListRecords
@@ -18,10 +16,12 @@ class ListArticles extends ListRecords
     {
         return [
             CreateAction::make(),
-            ExportAction::make()
-            ->exporter(ArticlesExporter::class),
-            ImportAction::make()
-                ->importer(ArticleImporter::class),
+            // Los Excel de este módulo viven en Importar y exportar.
+            Action::make('datos')
+                ->label(__('models.others.data_transfer'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->url(DataTransfer::getUrl(['modelo' => 'articles'])),
         ];
     }
 }

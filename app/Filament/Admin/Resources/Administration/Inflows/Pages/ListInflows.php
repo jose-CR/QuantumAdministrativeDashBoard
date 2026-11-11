@@ -3,14 +3,10 @@
 namespace App\Filament\Admin\Resources\Administration\Inflows\Pages;
 
 use App\Filament\Admin\Actions\CashReportAction;
+use App\Filament\Admin\pages\DataTransfer;
 use App\Filament\Admin\Resources\Administration\Inflows\InflowResource;
-use App\Filament\Exports\Inflow\InflowExporter;
-use App\Filament\Imports\Inflow\InflowImporter;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\Exports\Enums\ExportFormat;
-use Filament\Actions\Exports\Models\Export;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListInflows extends ListRecords
@@ -23,17 +19,12 @@ class ListInflows extends ListRecords
             CreateAction::make(),
             // Caja + cartera + inventario en un solo Excel.
             CashReportAction::make(),
-            ExportAction::make('exportReport')
-                ->label('Reporte de entradas')
-                ->icon('heroicon-o-chart-bar')
-                ->exporter(InflowExporter::class)
-                ->formats([ExportFormat::Xlsx])
-                ->columnMapping(false)
-                ->fileName(fn (Export $export): string => "reporte-entradas-{$export->getKey()}"),
-            ExportAction::make()
-                ->exporter(InflowExporter::class),
-            ImportAction::make()
-                ->importer(InflowImporter::class),
+            // Los Excel de este módulo viven en Importar y exportar.
+            Action::make('datos')
+                ->label(__('models.others.data_transfer'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->url(DataTransfer::getUrl(['modelo' => 'inflows'])),
         ];
     }
 }

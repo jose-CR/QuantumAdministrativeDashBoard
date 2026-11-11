@@ -2,14 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Administration\Outflows\Pages;
 
+use App\Filament\Admin\pages\DataTransfer;
 use App\Filament\Admin\Resources\Administration\Outflows\OutflowResource;
-use App\Filament\Exports\Outflow\OutflowExporter;
-use App\Filament\Imports\Outflow\OutflowImporter;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\Exports\Enums\ExportFormat;
-use Filament\Actions\Exports\Models\Export;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListOutflows extends ListRecords
@@ -20,19 +16,12 @@ class ListOutflows extends ListRecords
     {
         return [
             CreateAction::make(),
-            ExportAction::make('exportReport')
-                ->label('Reporte de salidas')
-                ->icon('heroicon-o-chart-bar')
-                ->exporter(OutflowExporter::class)
-                ->formats([ExportFormat::Xlsx])
-                ->columnMapping(false)
-                ->fileName(fn (Export $export): string => "reporte-de-salidas-{$export->getKey()}"),
-            ExportAction::make()
-                ->exporter(OutflowExporter::class)
-                ->columnMapping(false),
-            ImportAction::make()
-                ->importer(OutflowImporter::class),
+            // Los Excel de este módulo viven en Importar y exportar.
+            Action::make('datos')
+                ->label(__('models.others.data_transfer'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->url(DataTransfer::getUrl(['modelo' => 'outflows'])),
         ];
     }
 }
-

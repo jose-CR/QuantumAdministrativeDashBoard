@@ -2,12 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Filament\Admin\pages\DataTransfer;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
-use App\Filament\Exports\Credits\LoansExporter;
-use App\Filament\Imports\Credits\LoanImporter;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListLoans extends ListRecords
@@ -18,10 +16,12 @@ class ListLoans extends ListRecords
     {
         return [
             CreateAction::make(),
-            ExportAction::make()
-            ->exporter(LoansExporter::class),
-            ImportAction::make()
-                ->importer(LoanImporter::class),
+            // Los Excel de este módulo viven en Importar y exportar.
+            Action::make('datos')
+                ->label(__('models.others.data_transfer'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->url(DataTransfer::getUrl(['modelo' => 'loans'])),
         ];
     }
 }
