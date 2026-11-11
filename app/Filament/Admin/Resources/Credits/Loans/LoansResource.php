@@ -32,7 +32,7 @@ class LoansResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'customer_id';
 
-    protected static ?string $slug = 'creditos/loans';
+    protected static ?string $slug = 'credits/loans';
 
     protected static ?string $modelLabel = null;
 

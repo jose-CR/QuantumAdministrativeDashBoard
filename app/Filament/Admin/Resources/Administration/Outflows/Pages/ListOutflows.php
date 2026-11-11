@@ -21,7 +21,7 @@ class ListOutflows extends ListRecords
                 ->label(__('models.others.data_transfer'))
                 ->icon('heroicon-o-arrows-right-left')
                 ->color('gray')
-                ->url(DataTransfer::getUrl(['modelo' => 'outflows'])),
+                ->url(DataTransfer::getUrl(['model' => 'outflows'])),
         ];
     }
 }

@@ -21,7 +21,7 @@ class ListLoans extends ListRecords
                 ->label(__('models.others.data_transfer'))
                 ->icon('heroicon-o-arrows-right-left')
                 ->color('gray')
-                ->url(DataTransfer::getUrl(['modelo' => 'loans'])),
+                ->url(DataTransfer::getUrl(['model' => 'loans'])),
         ];
     }
 }

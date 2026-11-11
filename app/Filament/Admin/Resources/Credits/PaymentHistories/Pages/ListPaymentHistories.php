@@ -21,7 +21,7 @@ class ListPaymentHistories extends ListRecords
                 ->label(__('models.others.data_transfer'))
                 ->icon('heroicon-o-arrows-right-left')
                 ->color('gray')
-                ->url(DataTransfer::getUrl(['modelo' => 'payments'])),
+                ->url(DataTransfer::getUrl(['model' => 'payments'])),
         ];
     }
 }

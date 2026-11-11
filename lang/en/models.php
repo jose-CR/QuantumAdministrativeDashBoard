@@ -102,5 +102,51 @@ return [
             'general' => 'General panel shortcuts',
         ],
     ],
-
+    /*
+    |--------------------------------------------------------------------------
+    | Import & export (single data screen)
+    |--------------------------------------------------------------------------
+    */
+    'data_transfer' => [
+        'customers' => [
+            'label' => 'Customers',
+            'description' => 'Full record: document, contact, address and references.',
+        ],
+        'articles' => [
+            'label' => 'Articles',
+            'description' => 'Catalog with category, prices and stock.',
+        ],
+        'article_units' => [
+            'label' => 'Serialized units',
+            'description' => 'VIN or serial number, status and price of each unit.',
+        ],
+        'categories' => [
+            'label' => 'Categories',
+            'description' => 'Inventory category tree.',
+        ],
+        'loans' => [
+            'label' => 'Credits',
+            'description' => 'Whole credit: customer, amounts, installments and interest.',
+        ],
+        'installments' => [
+            'label' => 'Installments',
+            'description' => 'Installments of every credit, with balance and status.',
+        ],
+        'payments' => [
+            'label' => 'Payments',
+            'description' => 'Receipts: credit, installment, amount, bank and date.',
+        ],
+        'inflows' => [
+            'label' => 'Inflows',
+            'description' => 'Sales: invoice, amount, collected, receivable and items.',
+        ],
+        'outflows' => [
+            'label' => 'Outflows',
+            'description' => 'Purchases and expenses: vendor, invoice, amount and area.',
+        ],
+        'banks' => [
+            'label' => 'Banks',
+            'description' => 'Bank catalog used by payments.',
+        ],
+    ],
 ];

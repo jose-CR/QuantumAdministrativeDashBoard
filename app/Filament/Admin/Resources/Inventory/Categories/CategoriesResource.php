@@ -32,7 +32,7 @@ class CategoriesResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $slug = 'inventary/categories';
+    protected static ?string $slug = 'inventory/categories';
 
     protected static ?string $modelLabel = null;
 

@@ -46,7 +46,7 @@ class ModuleDataButtonsTest extends TestCase
 
             $accion = $componente->instance()->getAction('datos');
             $this->assertStringContainsString(
-                DataTransfer::getUrl(['modelo' => $modelo]),
+                DataTransfer::getUrl(['model' => $modelo]),
                 (string) $accion->getUrl(),
                 "El botón de {$pagina} no apunta a {$modelo}",
             );
@@ -65,7 +65,7 @@ class ModuleDataButtonsTest extends TestCase
     {
         Customer::factory()->create();
 
-        Livewire::test(DataTransfer::class, ['modelo' => 'customers'])
+        Livewire::test(DataTransfer::class, ['model' => 'customers'])
             ->assertOk()
             ->assertSee('Clientes')
             ->assertSee('Exportar')

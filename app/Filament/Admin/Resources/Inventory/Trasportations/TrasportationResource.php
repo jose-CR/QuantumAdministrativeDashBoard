@@ -24,7 +24,7 @@ class TrasportationResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $slug = 'inventary/transportation';
+    protected static ?string $slug = 'inventory/transportation';
 
     public static function form(Schema $schema): Schema
     {

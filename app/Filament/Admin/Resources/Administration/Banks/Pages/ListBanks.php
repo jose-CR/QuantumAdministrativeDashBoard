@@ -21,7 +21,7 @@ class ListBanks extends ListRecords
                 ->label(__('models.others.data_transfer'))
                 ->icon('heroicon-o-arrows-right-left')
                 ->color('gray')
-                ->url(DataTransfer::getUrl(['modelo' => 'banks'])),
+                ->url(DataTransfer::getUrl(['model' => 'banks'])),
         ];
     }
 }

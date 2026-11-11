@@ -162,83 +162,83 @@ class CashReport
     private static function extras(): array
     {
         return [
-            static::cartera(),
-            static::inventario(),
+            static::portfolio(),
+            static::inventory(),
         ];
     }
 
-    private static function cartera(): array
+    private static function portfolio(): array
     {
-        $clientes = Customer::query()
+        $customers = Customer::query()
             ->whereHas('credits', fn ($query) => $query->where('status', 'active'))
             ->with(['credits' => fn ($query) => $query->where('status', 'active')])
             ->orderBy('full_name')
             ->get();
 
-        $hoy = today();
+        $today = today();
 
-        $filas = $clientes->map(function (Customer $cliente) use ($hoy): array {
-            $creditos = $cliente->credits;
+        $rows = $customers->map(function (Customer $customer) use ($today): array {
+            $credits = $customer->credits;
 
-            $saldo = round((float) $creditos->sum('pending_balance'), 2);
+            $balance = round((float) $credits->sum('pending_balance'), 2);
 
-            $cuotas = Installment::query()
-                ->whereIn('credit_id', $creditos->pluck('id'))
+            $installments = Installment::query()
+                ->whereIn('credit_id', $credits->pluck('id'))
                 ->get();
 
-            $vencido = round((float) $cuotas
+            $overdue = round((float) $installments
                 ->whereIn('status', Installment::UNPAID_STATUSES)
-                ->filter(fn (Installment $cuota): bool => $cuota->due_date?->lt($hoy))
+                ->filter(fn (Installment $installment): bool => $installment->due_date?->lt($today))
                 ->sum('remaining_balance'), 2);
 
-            $proxima = $cuotas
+            $next = $installments
                 ->whereIn('status', Installment::UNPAID_STATUSES)
-                ->min(fn (Installment $cuota) => $cuota->due_date);
+                ->min(fn (Installment $installment) => $installment->due_date);
 
             return [
-                $cliente->full_name,
-                $creditos->count(),
-                $saldo,
-                $vencido,
-                $proxima?->toDateString(),
+                $customer->full_name,
+                $credits->count(),
+                $balance,
+                $overdue,
+                $next?->toDateString(),
             ];
         })->all();
 
         return [
             'title' => 'Cartera',
             'headers' => ['Cliente', 'Créditos activos', 'Saldo por cobrar', 'Vencido', 'Próximo vencimiento'],
-            'rows' => $filas,
+            'rows' => $rows,
         ];
     }
 
-    private static function inventario(): array
+    private static function inventory(): array
     {
-        $articulos = Article::query()
+        $articles = Article::query()
             ->with('category')
             ->orderBy('name')
             ->get();
 
-        $filas = $articulos->map(function (Article $articulo): array {
-            $esSerial = $articulo->tracksSerials();
+        $rows = $articles->map(function (Article $article): array {
+            $isSerial = $article->tracksSerials();
 
-            $disponibles = $esSerial
-                ? $articulo->units()->where('status', 'available')->count()
-                : (int) $articulo->stock;
+            $available = $isSerial
+                ? $article->units()->where('status', 'available')->count()
+                : (int) $article->stock;
 
             return [
-                $articulo->category?->name,
-                $articulo->full_name,
-                $esSerial ? 'Con serie' : 'Por cantidad',
-                $disponibles,
-                (float) $articulo->cash_price,
-                round($disponibles * (float) $articulo->cash_price, 2),
+                $article->category?->name,
+                $article->full_name,
+                $isSerial ? 'Con serie' : 'Por cantidad',
+                $available,
+                (float) $article->cash_price,
+                round($available * (float) $article->cash_price, 2),
             ];
         })->all();
 
         return [
             'title' => 'Inventario',
             'headers' => ['Categoría', 'Artículo', 'Tipo', 'Disponibles', 'Precio', 'Valor'],
-            'rows' => $filas,
+            'rows' => $rows,
         ];
     }
 

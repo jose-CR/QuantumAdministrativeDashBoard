@@ -32,7 +32,7 @@ class ArticleResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $slug = 'inventary/article';
+    protected static ?string $slug = 'inventory/articles';
 
     protected static ?string $modelLabel = null;
 

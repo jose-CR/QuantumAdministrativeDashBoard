@@ -65,13 +65,13 @@ class FlowItem extends Model
 
     protected function ensureStockAvailable(): void
     {
-        $articulo = Article::find($this->article_id);
+        $article = Article::find($this->article_id);
 
-        if (! $articulo) {
+        if (! $article) {
             return;
         }
 
-        if ($articulo->tracksSerials()) {
+        if ($article->tracksSerials()) {
             throw ValidationException::withMessages([
                 'article_id' => 'Ese artículo se lleva por unidades con serie: no se puede usar en una entrada o salida.',
             ]);
@@ -82,51 +82,51 @@ class FlowItem extends Model
             return;
         }
 
-        $reservado = $this->exists
+        $reserved = $this->exists
             && $this->getOriginal('article_id') == $this->article_id
             ? (int) ($this->getOriginal('quantity') ?: 1)
             : 0;
 
-        $disponible = (int) $articulo->stock + $reservado;
+        $available = (int) $article->stock + $reserved;
 
-        if ((int) $this->quantity > $disponible) {
+        if ((int) $this->quantity > $available) {
             throw ValidationException::withMessages([
-                'quantity' => "Solo quedan {$disponible} de {$articulo->full_name}.",
+                'quantity' => "Solo quedan {$available} de {$article->full_name}.",
             ]);
         }
     }
 
     /**
-     * @param  int  $signo  1 aplica el movimiento, -1 lo revierte
+     * @param  int  $sign  1 applies the movement, -1 reverts it
      */
-    protected function moveStock(int $signo): void
+    protected function moveStock(int $sign): void
     {
         $this->moveStockFor(
             (string) $this->flow_type,
             (int) $this->article_id,
             (int) $this->quantity,
-            $signo,
+            $sign,
         );
     }
 
-    protected function moveStockFor(string $tipo, int $articuloId, int $cantidad, int $signo): void
+    protected function moveStockFor(string $flowType, int $articleId, int $quantity, int $sign): void
     {
-        if ($cantidad <= 0 || $articuloId <= 0) {
+        if ($quantity <= 0 || $articleId <= 0) {
             return;
         }
 
-        $articulo = Article::find($articuloId);
+        $article = Article::find($articleId);
 
-        if (! $articulo || ! $articulo->usesStock()) {
+        if (! $article || ! $article->usesStock()) {
             return;
         }
 
         // Entrada = venta (resta). Salida = compra (suma).
-        $delta = $tipo === Inflow::class ? -$cantidad : $cantidad;
+        $delta = $flowType === Inflow::class ? -$quantity : $quantity;
 
         Article::query()
-            ->whereKey($articuloId)
-            ->increment('stock', $signo * $delta);
+            ->whereKey($articleId)
+            ->increment('stock', $sign * $delta);
     }
 
     /**

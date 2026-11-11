@@ -37,23 +37,23 @@ use Illuminate\Database\Eloquent\Builder;
 use Livewire\Attributes\Url;
 
 /**
- * Todos los export e import del panel en una sola pantalla, agrupados por área y,
- * dentro de cada área, por modelo.
+ * Every export and import of the panel in one screen, grouped by area and, inside
+ * each area, by model.
  *
- * Los módulos ya no llevan sus botones: en cada listado queda uno que trae acá con
- * el modelo ya elegido (?modelo=inflows).
+ * Modules no longer carry their own buttons: each list has one that comes here with
+ * the model already selected (?model=inflows).
  */
 class DataTransfer extends Page
 {
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArrowsRightLeft;
 
-    protected static ?string $slug = 'datos';
+    protected static ?string $slug = 'data';
 
     protected static ?int $navigationSort = -9;
 
-    /** Modelo pedido por la ruta; vacío muestra todas las áreas. */
+    /** Model requested by the route; empty shows every area. */
     #[Url]
-    public ?string $modelo = null;
+    public ?string $model = null;
 
     public static function getNavigationLabel(): string
     {
@@ -76,86 +76,86 @@ class DataTransfer extends Page
     }
 
     /**
-     * El catálogo: qué área, qué modelo y con qué clases se exporta e importa.
+     * The catalog: which area, which model and which classes export and import it.
      *
-     * @return array<string, array{area: string, label: string, description: string, exporter: class-string, importer: class-string}>
+     * @return array<string, array{area: string, label: string, description: string, exporter: class-string, importer: class-string, filter?: string}>
      */
     public static function registry(): array
     {
         return [
             'customers' => [
                 'area' => __('models.others.clients'),
-                'label' => 'Clientes',
-                'description' => 'Ficha completa: documento, contacto, dirección y referencias.',
+                'label' => __('models.data_transfer.customers.label'),
+                'description' => __('models.data_transfer.customers.description'),
                 'exporter' => CustomerExporter::class,
                 'importer' => CustomerImporter::class,
-                // El export de clientes se puede filtrar por tipo de documento.
+                // The customer export can be filtered by document type.
                 'filter' => 'document_type',
             ],
 
             'articles' => [
                 'area' => __('models.others.inventary'),
-                'label' => 'Artículos',
-                'description' => 'Catálogo con categoría, precios y existencias.',
+                'label' => __('models.data_transfer.articles.label'),
+                'description' => __('models.data_transfer.articles.description'),
                 'exporter' => ArticlesExporter::class,
                 'importer' => ArticleImporter::class,
             ],
             'article-units' => [
                 'area' => __('models.others.inventary'),
-                'label' => 'Unidades con serie',
-                'description' => 'VIN o número de serie, estado y precio de cada unidad.',
+                'label' => __('models.data_transfer.article_units.label'),
+                'description' => __('models.data_transfer.article_units.description'),
                 'exporter' => UnitArticlesExporter::class,
                 'importer' => ArticleUnitImporter::class,
             ],
             'categories' => [
                 'area' => __('models.others.inventary'),
-                'label' => 'Categorías',
-                'description' => 'Árbol de categorías del inventario.',
+                'label' => __('models.data_transfer.categories.label'),
+                'description' => __('models.data_transfer.categories.description'),
                 'exporter' => CategoriesExporter::class,
                 'importer' => CategoryImporter::class,
             ],
 
             'loans' => [
                 'area' => __('models.others.credits'),
-                'label' => 'Créditos',
-                'description' => 'Crédito completo: cliente, montos, cuotas e interés.',
+                'label' => __('models.data_transfer.loans.label'),
+                'description' => __('models.data_transfer.loans.description'),
                 'exporter' => LoansExporter::class,
                 'importer' => LoanImporter::class,
             ],
             'installments' => [
                 'area' => __('models.others.credits'),
-                'label' => 'Cuotas',
-                'description' => 'Cuotas de todos los créditos, con saldo y estado.',
+                'label' => __('models.data_transfer.installments.label'),
+                'description' => __('models.data_transfer.installments.description'),
                 'exporter' => InstallmentsExporter::class,
                 'importer' => InstallmentImporter::class,
             ],
             'payments' => [
                 'area' => __('models.others.credits'),
-                'label' => 'Pagos',
-                'description' => 'Recibos: crédito, cuota, monto, banco y fecha.',
+                'label' => __('models.data_transfer.payments.label'),
+                'description' => __('models.data_transfer.payments.description'),
                 'exporter' => PaymentHistoriesExporter::class,
                 'importer' => PaymentHistoryImporter::class,
             ],
 
             'inflows' => [
                 'area' => __('models.others.cash'),
-                'label' => 'Entradas',
-                'description' => 'Ventas: factura, monto, cobrado, por cobrar y artículos.',
+                'label' => __('models.data_transfer.inflows.label'),
+                'description' => __('models.data_transfer.inflows.description'),
                 'exporter' => InflowExporter::class,
                 'importer' => InflowImporter::class,
             ],
             'outflows' => [
                 'area' => __('models.others.cash'),
-                'label' => 'Salidas',
-                'description' => 'Compras y gastos: proveedor, factura, monto y área.',
+                'label' => __('models.data_transfer.outflows.label'),
+                'description' => __('models.data_transfer.outflows.description'),
                 'exporter' => OutflowExporter::class,
                 'importer' => OutflowImporter::class,
             ],
 
             'banks' => [
                 'area' => __('models.others.administration'),
-                'label' => 'Bancos',
-                'description' => 'Catálogo de bancos para los pagos.',
+                'label' => __('models.data_transfer.banks.label'),
+                'description' => __('models.data_transfer.banks.description'),
                 'exporter' => BanksExporter::class,
                 'importer' => BankImporter::class,
             ],
@@ -172,14 +172,14 @@ class DataTransfer extends Page
      */
     protected function body(): array
     {
-        $catalogo = static::registry();
+        $registry = static::registry();
 
-        // Ruta específica: /admin/datos?modelo=inflows muestra solo ese modelo.
-        if (filled($this->modelo) && isset($catalogo[$this->modelo])) {
+        // Specific route: /admin/data?model=inflows shows only that card.
+        if (filled($this->model) && isset($registry[$this->model])) {
             return [
-                $this->card($this->modelo, $catalogo[$this->modelo]),
+                $this->card($this->model, $registry[$this->model]),
                 SchemaActions::make([
-                    Action::make('verTodo')
+                    Action::make('seeAll')
                         ->label(__('models.others.data_transfer_all'))
                         ->link()
                         ->url(static::getUrl()),
@@ -187,13 +187,13 @@ class DataTransfer extends Page
             ];
         }
 
-        return collect($catalogo)
+        return collect($registry)
             ->groupBy('area')
-            ->map(fn ($modelos, string $area): Section => Section::make($area)
+            ->map(fn ($models, string $area): Section => Section::make($area)
                 ->columns(2)
                 ->schema(
-                    $modelos
-                        ->map(fn (array $modelo, string $clave): Section => $this->card($clave, $modelo))
+                    $models
+                        ->map(fn (array $model, string $key): Section => $this->card($key, $model))
                         ->values()
                         ->all()
                 ))
@@ -202,59 +202,59 @@ class DataTransfer extends Page
     }
 
     /**
-     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string}  $modelo
+     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string, filter?: string}  $model
      */
-    protected function card(string $clave, array $modelo): Section
+    protected function card(string $key, array $model): Section
     {
-        return Section::make($modelo['label'])
-            ->key($clave)
-            ->description($modelo['description'])
+        return Section::make($model['label'])
+            ->key($key)
+            ->description($model['description'])
             ->schema([
                 SchemaActions::make([
-                    $this->exportAction($clave, $modelo),
-                    $this->importAction($clave, $modelo),
+                    $this->exportAction($key, $model),
+                    $this->importAction($key, $model),
                 ]),
             ]);
     }
 
     /**
-     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string}  $modelo
+     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string, filter?: string}  $model
      */
-    protected function exportAction(string $clave, array $modelo): ExportAction
+    protected function exportAction(string $key, array $model): ExportAction
     {
-        $accion = ExportAction::make("export-{$clave}")
+        $action = ExportAction::make("export-{$key}")
             ->label(__('models.others.data_transfer_export'))
             ->icon(Heroicon::OutlinedArrowDownTray)
             ->color('gray')
-            ->modalHeading(__('models.others.data_transfer_export') . ' · ' . $modelo['label'])
-            ->exporter($modelo['exporter'])
+            ->modalHeading(__('models.others.data_transfer_export') . ' · ' . $model['label'])
+            ->exporter($model['exporter'])
             ->formats([ExportFormat::Xlsx])
             ->columnMapping(false)
-            ->fileName(fn (Export $export): string => "{$clave}-{$export->getKey()}");
+            ->fileName(fn (Export $export): string => "{$key}-{$export->getKey()}");
 
-        // El filtro que tenía el botón del módulo sigue valiendo acá.
-        if (($modelo['filter'] ?? null) === 'document_type') {
-            $accion->modifyQueryUsing(function (Builder $query, array $options) {
-                $tipo = $options['document_type'] ?? null;
+        // The filter the module button had keeps working here.
+        if (($model['filter'] ?? null) === 'document_type') {
+            $action->modifyQueryUsing(function (Builder $query, array $options) {
+                $type = $options['document_type'] ?? null;
 
-                return blank($tipo) || $tipo === 'ALL'
+                return blank($type) || $type === 'ALL'
                     ? $query
-                    : $query->where('document_type', $tipo);
+                    : $query->where('document_type', $type);
             });
         }
 
-        return $accion;
+        return $action;
     }
 
     /**
-     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string}  $modelo
+     * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string, filter?: string}  $model
      */
-    protected function importAction(string $clave, array $modelo): ImportAction
+    protected function importAction(string $key, array $model): ImportAction
     {
-        return ImportAction::make("import-{$clave}")
+        return ImportAction::make("import-{$key}")
             ->label(__('models.others.data_transfer_import'))
             ->icon(Heroicon::OutlinedArrowUpTray)
-            ->modalHeading(__('models.others.data_transfer_import') . ' · ' . $modelo['label'])
-            ->importer($modelo['importer']);
+            ->modalHeading(__('models.others.data_transfer_import') . ' · ' . $model['label'])
+            ->importer($model['importer']);
     }
 }

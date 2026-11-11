@@ -52,7 +52,7 @@ class DataTransferTest extends TestCase
 
     public function test_la_ruta_de_un_modelo_muestra_solo_su_tarjeta(): void
     {
-        Livewire::test(DataTransfer::class, ['modelo' => 'inflows'])
+        Livewire::test(DataTransfer::class, ['model' => 'inflows'])
             ->assertOk()
             ->assertSee('Entradas')
             ->assertDontSee('Unidades con serie')
@@ -71,7 +71,7 @@ class DataTransferTest extends TestCase
 
     public function test_la_accion_de_importar_abre_su_formulario(): void
     {
-        $componente = Livewire::test(DataTransfer::class, ['modelo' => 'customers'])
+        $componente = Livewire::test(DataTransfer::class, ['model' => 'customers'])
             ->mountAction(TestAction::make('import-customers')->schemaComponent('customers'));
 
         $this->assertSame('import-customers', $componente->instance()->getMountedAction()?->getName());
@@ -83,7 +83,7 @@ class DataTransferTest extends TestCase
 
         Customer::factory()->create();
 
-        Livewire::test(DataTransfer::class, ['modelo' => 'customers'])
+        Livewire::test(DataTransfer::class, ['model' => 'customers'])
             ->mountAction(TestAction::make('export-customers')->schemaComponent('customers'))
             ->callMountedAction()
             ->assertHasNoActionErrors();

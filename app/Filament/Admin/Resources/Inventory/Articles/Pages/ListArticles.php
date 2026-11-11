@@ -21,7 +21,7 @@ class ListArticles extends ListRecords
                 ->label(__('models.others.data_transfer'))
                 ->icon('heroicon-o-arrows-right-left')
                 ->color('gray')
-                ->url(DataTransfer::getUrl(['modelo' => 'articles'])),
+                ->url(DataTransfer::getUrl(['model' => 'articles'])),
         ];
     }
 }

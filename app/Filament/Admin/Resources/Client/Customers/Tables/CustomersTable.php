@@ -167,7 +167,7 @@ class CustomersTable
                     RefinanceCreditAction::make(),
                     Action::make('createCredit')
                         ->url(fn (Customer $record): string => route(
-                            'filament.admin.resources.creditos.loans.create',
+                            'filament.admin.resources.credits.loans.create',
                             [
                                 'customer' => $record->id,
                             ],
