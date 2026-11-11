@@ -77,6 +77,36 @@ class DataTransferTest extends TestCase
         $this->assertSame('import-customers', $componente->instance()->getMountedAction()?->getName());
     }
 
+    public function test_cada_tarjeta_ofrece_excel_y_csv(): void
+    {
+        $componente = Livewire::test(DataTransfer::class, ['model' => 'inflows']);
+
+        $componente->assertOk()
+            ->assertSee('Excel')
+            ->assertSee('CSV')
+            ->assertSee('Importar');
+
+        // Los dos formatos son acciones distintas, además del import.
+        $componente->mountAction(TestAction::make('export-csv-inflows')->schemaComponent('inflows'));
+
+        $this->assertSame('export-csv-inflows', $componente->instance()->getMountedAction()?->getName());
+    }
+
+    public function test_el_csv_se_genera_con_su_exporter(): void
+    {
+        Queue::fake();
+
+        Livewire::test(DataTransfer::class, ['model' => 'inflows'])
+            ->mountAction(TestAction::make('export-csv-inflows')->schemaComponent('inflows'))
+            ->callMountedAction()
+            ->assertHasNoActionErrors();
+
+        $export = Export::query()->latest('id')->first();
+
+        $this->assertNotNull($export, 'No se creó la exportación CSV.');
+        $this->assertSame(\App\Filament\Exports\Inflow\InflowExporter::class, $export->exporter);
+    }
+
     public function test_exportar_desde_la_pantalla_encola_el_archivo(): void
     {
         Queue::fake();

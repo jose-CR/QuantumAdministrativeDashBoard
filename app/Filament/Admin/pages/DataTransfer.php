@@ -211,7 +211,9 @@ class DataTransfer extends Page
             ->description($model['description'])
             ->schema([
                 SchemaActions::make([
-                    $this->exportAction($key, $model),
+                    $this->exportAction($key, $model, ExportFormat::Xlsx, __('models.others.data_transfer_excel'), Heroicon::OutlinedTableCells),
+                    // El CSV es el respaldo que se puede volver a importar tal cual.
+                    $this->exportAction($key, $model, ExportFormat::Csv, __('models.others.data_transfer_csv'), Heroicon::OutlinedDocumentText, suffix: 'csv'),
                     $this->importAction($key, $model),
                 ]),
             ]);
@@ -220,15 +222,24 @@ class DataTransfer extends Page
     /**
      * @param  array{area: string, label: string, description: string, exporter: class-string, importer: class-string, filter?: string}  $model
      */
-    protected function exportAction(string $key, array $model): ExportAction
-    {
-        $action = ExportAction::make("export-{$key}")
-            ->label(__('models.others.data_transfer_export'))
-            ->icon(Heroicon::OutlinedArrowDownTray)
+    protected function exportAction(
+        string $key,
+        array $model,
+        ExportFormat $format = ExportFormat::Xlsx,
+        ?string $label = null,
+        mixed $icon = null,
+        ?string $suffix = null,
+    ): ExportAction {
+        $name = $suffix ? "export-{$suffix}-{$key}" : "export-{$key}";
+        $label ??= __('models.others.data_transfer_export');
+
+        $action = ExportAction::make($name)
+            ->label($label)
+            ->icon($icon ?? Heroicon::OutlinedArrowDownTray)
             ->color('gray')
-            ->modalHeading(__('models.others.data_transfer_export') . ' · ' . $model['label'])
+            ->modalHeading($label . ' · ' . $model['label'])
             ->exporter($model['exporter'])
-            ->formats([ExportFormat::Xlsx])
+            ->formats([$format])
             ->columnMapping(false)
             ->fileName(fn (Export $export): string => "{$key}-{$export->getKey()}");
 

@@ -89,6 +89,8 @@ return [
         'data_transfer' => 'Import & export',
         'data_transfer_hint' => 'Every module spreadsheet, in one place.',
         'data_transfer_export' => 'Export',
+        'data_transfer_excel' => 'Excel',
+        'data_transfer_csv' => 'CSV',
         'data_transfer_import' => 'Import',
         'data_transfer_all' => 'See every area',
         'apps_subheading' => 'Pick a module to start working.',

@@ -89,6 +89,8 @@ return [
         'data_transfer' => 'Importar y exportar',
         'data_transfer_hint' => 'Los Excel de todos los módulos, en un solo lugar.',
         'data_transfer_export' => 'Exportar',
+        'data_transfer_excel' => 'Excel',
+        'data_transfer_csv' => 'CSV',
         'data_transfer_import' => 'Importar',
         'data_transfer_all' => 'Ver todas las áreas',
         'apps_subheading' => 'Elige un módulo para empezar a trabajar.',
