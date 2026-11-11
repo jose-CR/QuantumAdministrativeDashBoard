@@ -249,8 +249,9 @@ def write_summary(wb, flows, dfs, cfgs):
     all_dates = pd.concat([d[c["date"]] for c, d in zip(cfgs, dfs)]).dropna()
     today = date.today()
     all_dates = all_dates[all_dates <= pd.Timestamp(today)]
-    periods = list(pd.period_range(all_dates.min().to_period("M"), all_dates.max().to_period("M"), freq="M")) \
-        if len(all_dates) else []
+    # Solo los meses con movimiento: una fecha mal cargada (un 2020 entre datos de
+    # 2026) estiraba el resumen a decenas de filas en cero.
+    periods = sorted(all_dates.dt.to_period("M").unique().tolist()) if len(all_dates) else []
 
     r = 3
     first = r
