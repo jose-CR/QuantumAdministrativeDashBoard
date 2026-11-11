@@ -68,6 +68,40 @@ Cerrado — pantallas (2026-11-09):
 | 13 | Las referencias no tenían pantalla y el recurso importaba una clase inexistente | `ReferencesRelationManager` nuevo; bloque comentado del formulario eliminado |
 | — | Sin sección de cuentas por cobrar | CxC con total, vencido, próximo vencimiento, cuotas pagadas y créditos activos, calculada sobre los créditos activos |
 
+
+## Caja (2026-11-10)
+
+| # | Hallazgo | Cómo quedó |
+|---|----------|------------|
+| 14 | El estado de pago de una entrada se elegía a mano: se podía marcar "parcial" sin decir cuánto entró | Se deriva de `amount_paid`: 0 → pendiente, igual al monto → pagado, en medio → parcial. Cobrar de más o negativo se rechaza. Los registros viejos que decían "pagado" sin monto se completan solos |
+| 15 | Una venta de contado no descontaba inventario: `inflows` solo guardaba el monto | Tabla `flow_items` (morph a entrada/salida). Una entrada descuenta stock y no deja vender más de lo que hay; una salida lo suma |
+| 16 | El stock no volvía al borrar el documento: la cascada de la FK no dispara eventos | `Inflow`/`Outflow` borran sus líneas una por una, con eventos |
+| 17 | Los artículos con serie se podían meter en caja como si tuvieran cantidad | Se rechazan: esos se asignan a un crédito con su unidad |
+| 18 | Los métodos de pago del import eran dos y la base acepta cinco | `cash, card, transfer, cheque, quedan` |
+
+## Configuración (2026-11-10)
+
+| # | Hallazgo | Cómo quedó |
+|---|----------|------------|
+| 19 | El nombre de la etiqueta es un JSON por idioma y no se validaba: se podían crear "mayorista" y "Mayorista" | Se valida traducido y sin distinguir mayúsculas, por tipo |
+| 20 | No había forma de saber qué etiquetas se usan | Columna Usos; `TagSeeder` con las ocho base, idempotente |
+
+## Reportes (2026-11-10)
+
+| # | Hallazgo | Cómo quedó |
+|---|----------|------------|
+| 21 | **El reporte de caja no se podía generar en Docker**: buscaba `python/.venv/bin/python`, que no existe en la imagen | Usa `PythonBinary` (venv, `PYTHON_BIN` o el `python3` del sistema) |
+| 22 | El tablero estaba vacío: cinco widgets escritos y ninguno registrado | `Dashboard::getWidgets()`; los widgets ya no se rompen si no hay filtros de fecha |
+| 23 | El reporte contaba plata pero no lo que falta cobrar, ni la cartera, ni el depósito | La hoja de entradas lleva Cobrado y Por cobrar; dos hojas nuevas: **Cartera** (saldo y vencido por cliente) e **Inventario** (disponibles y valor) |
+| 24 | El botón del reporte solo estaba en Clientes | También en Caja |
+
+## Pendientes
+
+- **Fuente de verdad del stock:** si la web externa que factura ya descuenta, hay que decidir si el panel manda o solo registra. Hasta que se decida, una venta cargada acá descuenta acá.
+- Los 41 pagos históricos sin `user_id` no se pueden atribuir (dato que no existe).
+- Refinanciar no copia los pagos del crédito viejo: el saldo arrastra pero no queda el rastro de cómo se formó.
+- El test de descarga de export se salta si la base de pruebas no tiene exports completados.
+
 ## Respaldos
 
 Todos en `storage/app/backups/`:

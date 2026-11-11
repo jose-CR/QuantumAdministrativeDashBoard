@@ -18,7 +18,7 @@ return [
         ],
     ],
 
-    'inventary' => [
+    'inventory' => [
 
         // Sufijo de la lista de créditos que impiden borrar: "#12 (Ana), #34 (Luis) y 3 más".
         'more_credits' => 'y :count más',
@@ -161,5 +161,10 @@ return [
         ],
 
         'message' => '%s debe pagar la cuota #%d el %s.'
+    ],
+
+    'create' => [
+        'title' => 'Registro creado',
+        'body' => 'El registro se creó correctamente.',
     ],
 ];

@@ -1,0 +1,211 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| Textos de pantalla
+|--------------------------------------------------------------------------
+|
+| Lo que se ve en el panel y todavía no tenía su clave: etiquetas, ayudas y
+| mensajes de acciones, widgets, tablas y exportaciones. Las claves van en
+| inglés (como el resto del código) y el texto en el idioma del archivo.
+|
+*/
+
+return [
+    'credits' => [
+        'relation_title' => 'Créditos',
+        'financed_short' => 'Financiado',
+        'fixed_prefix' => 'Fijo ',
+        'calculated_prefix' => 'Calculado ',
+        'rate_suffix' => '% por cuota',
+        'down_payment_entry' => 'Pago inicial',
+        'interest_total_short' => 'Intereses',
+        'total_to_pay' => 'Total a pagar',
+        'installments_status' => 'Estado de las cuotas',
+        'installments_summary' => '%d pagadas · %d pendientes · %d atrasadas',
+        'refinanced_from' => 'Refinanciado de',
+        'items' => 'Bienes del crédito',
+        'item' => 'Bien',
+        'price' => 'Precio',
+        'label' => 'Crédito',
+        'customer' => 'Cliente',
+        'article' => 'Artículo',
+        'article_by_quantity' => 'Artículo (por cantidad)',
+        'quantity' => 'Cantidad',
+        'installments_count' => 'Número de cuotas',
+        'interest_auto' => 'Calculado (según la cuota)',
+        'interest_fixed' => 'Fijo (tasa pactada)',
+        'rate_per_installment' => 'Tasa por cuota',
+    ],
+
+    'refinance' => [
+        'title' => 'Refinanciar crédito',
+        'description' => 'Se creará un crédito nuevo por el saldo pendiente. El actual queda cerrado como refinanciado.',
+        'balance' => 'Saldo a refinanciar',
+        'installments' => 'Número de cuotas',
+        'installment_amount' => 'Monto de cada cuota',
+        'installment_help' => 'Subí la cuota para cobrar intereses: el total es cuota × cuotas.',
+        'first_due_date' => 'Vencimiento de la primera cuota',
+        'resulting_installment' => 'Cuota resultante',
+        'auto_option' => 'Calculado según la cuota',
+        'no_credit' => 'No hay un crédito activo con saldo para refinanciar.',
+        'created_title' => 'Crédito refinanciado',
+        'created_body' => 'Crédito #%d por $%s. El #%d quedó cerrado.',
+    ],
+
+    'inflow' => [
+        'section_main' => 'Información principal del ingreso',
+        'section_payment' => 'Pago',
+        'section_payment_help' => 'Detalles del cobro y su estado',
+        'amount_paid_help' => '0 = pendiente · igual al monto = pagado · en medio = parcial',
+        'items' => 'Artículos',
+        'items_help' => 'Si la venta incluye artículos del inventario, se descuentan del stock al guardar.',
+        'item' => 'Artículo',
+        'quantity' => 'Cantidad',
+        'unit_price' => 'Precio unitario',
+        'add_item' => 'Agregar artículo',
+        'section_docs' => 'Documentación',
+        'section_docs_help' => 'Observaciones y archivos relacionados con el ingreso',
+    ],
+
+    'outflow' => [
+        'items_help' => 'Si la compra es de artículos para el inventario, se suman al stock al guardar.',
+        'item' => 'Artículo',
+        'quantity' => 'Cantidad',
+        'unit_price' => 'Precio unitario',
+        'add_item' => 'Agregar artículo',
+    ],
+
+    // Columnas de los Excel: las mismas en export e import.
+    'columns' => [
+        'invoice_number' => 'Número de factura',
+        'invoice_date' => 'Fecha de factura',
+        'invoice_code' => 'Código de factura',
+        'date' => 'Fecha',
+        'description' => 'Descripción',
+        'customer' => 'Cliente',
+        'amount' => 'Monto',
+        'collected' => 'Cobrado',
+        'company' => 'Empresa',
+        'receivable' => 'Por cobrar',
+        'payment_method' => 'Método de pago',
+        'transfer_number' => 'Número de transferencia',
+        'bank' => 'Banco',
+        'transfer_date' => 'Fecha de transferencia',
+        'payment_status' => 'Estado de pago',
+        'salesperson' => 'Vendedor',
+        'notes' => 'Notas',
+        'quantity' => 'Cantidad',
+        'area' => 'Área',
+        'document_type' => 'Tipo de documento',
+        'document_number' => 'Número de documento',
+        'email' => 'Correo electrónico',
+        'primary_phone' => 'Teléfono principal',
+        'secondary_phone' => 'Teléfono secundario',
+        'economic_activity' => 'Actividad económica',
+        'address' => 'Dirección',
+        'created_at' => 'Fecha de creación',
+        'updated_at' => 'Última actualización',
+    ],
+
+    'widgets' => [
+        'cash_flow' => 'Flujo de caja',
+        'inflows' => 'Entradas',
+        'inflows_desc' => 'Dinero que ingresó',
+        'outflows' => 'Salidas',
+        'balance_desc' => 'Entradas menos salidas',
+        'collected' => 'Cobrado',
+        'collected_desc' => 'De lo facturado en el rango',
+        'receivable' => 'Por cobrar',
+        'receivable_desc' => 'Facturado que todavía no entró',
+        'credits' => 'Créditos',
+        'active_credits' => 'Créditos activos',
+        'pending_balance' => 'Saldo por cobrar',
+        'pending_balance_desc' => 'Pendiente de créditos activos',
+        'financed_desc' => 'Créditos iniciados en el período',
+        'customers' => 'Clientes',
+        'customers_total_desc' => 'Registrados en total',
+        'new_this_month' => 'Nuevos este mes',
+        'new_this_month_desc' => 'Clientes dados de alta',
+        'customers_overdue' => 'Clientes en mora',
+        'customers_overdue_desc' => 'Con cuotas vencidas sin pagar',
+        'articles' => 'Artículos',
+        'articles_desc' => 'Modelos en el catálogo',
+        'categories' => 'Categorías',
+        'categories_desc' => 'Para clasificarlos',
+        'overdue_credits' => 'Créditos vencidos',
+        'overdue_installments' => 'Cuotas vencidas',
+        'see_customer' => 'Ver cliente',
+    ],
+
+    'tables' => [
+        'total' => 'Total',
+        'items' => 'Artículos',
+        'no_attachments' => 'Sin adjuntos',
+        'date_range' => 'Rango de fechas',
+        'partials_without_payment' => 'Parciales sin cobro registrado',
+    ],
+
+    'attachments' => [
+        'section' => 'Adjuntos',
+        'section_help' => 'Facturas y fotos: por crédito, por cuota o sueltas.',
+        'file' => 'Archivo',
+        'files' => 'Archivos',
+        'size' => 'Tamaño',
+        'uploaded' => 'Subido',
+        'add' => 'Agregar adjuntos',
+        'open' => 'Abrir',
+        'replace' => 'Reemplazar',
+        'new_file' => 'Nuevo archivo',
+    ],
+
+    'clients' => [
+        'no_nrc' => 'Sin NRC',
+        'add_reference' => 'Agregar referencia',
+    ],
+
+    'cash_report' => [
+        'title' => 'Reporte de flujo de caja',
+        'description' => 'Entradas y salidas en una hoja, con resumen, gráficos y análisis. Sin fechas incluye todo.',
+        'error' => 'No se pudo generar el reporte',
+        'success_title' => 'Reporte generado',
+        'success_body' => 'Tu reporte de flujo de caja está listo.',
+        'inflows_title' => 'Reporte de entradas',
+        'outflows_title' => 'Reporte de salidas',
+
+        'no_data' => 'No hay entradas ni salidas registradas en ese rango de fechas.',
+        'python_failed' => 'Python falló sin mensaje.',
+    ],
+
+    'payment_methods' => [
+        'cash' => 'Efectivo',
+        'transfer' => 'Transferencia',
+        'card' => 'Tarjeta',
+        'cheque' => 'Cheque',
+        'quedan' => 'Quedan',
+        'bank_transfer' => 'Transferencia bancaria',
+    ],
+
+    'payment_status' => [
+        'pending' => 'Pendiente',
+        'partial' => 'Parcial',
+        'paid' => 'Pagado',
+    ],
+
+    'validation' => [
+        'document_type_invalid' => 'Tipo de documento inválido.',
+        'document_taken' => 'Ya hay un cliente con ese documento.',
+        'municipality_not_in_department' => 'Ese municipio no existe en el departamento.',
+        'district_not_in_municipality' => 'Ese distrito no existe en el municipio.',
+        'amount_positive' => 'El monto tiene que ser mayor que cero.',
+        'paid_not_negative' => 'Lo cobrado no puede ser negativo.',
+        'paid_over_amount' => 'Lo cobrado no puede superar el monto de la entrada.',
+        'initial_amount_positive' => 'El monto inicial debe ser mayor que cero.',
+        'down_payment_negative' => 'El pago inicial no puede ser negativo.',
+        'down_payment_over_initial' => 'El pago inicial no puede ser mayor al monto inicial.',
+        'installments_positive' => 'El número de cuotas debe ser mayor que cero.',
+        'nothing_to_finance' => 'No hay saldo que financiar: el pago inicial cubre el monto total.',
+        'interest_not_negative' => 'La tasa de interés no puede ser negativa.',
+        'tag_taken' => 'Ya hay una etiqueta con ese nombre.',
+    ],
+];

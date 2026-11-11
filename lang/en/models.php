@@ -19,7 +19,7 @@ return [
         'plural' => 'banks',
     ],
 
-    'inventary' => [
+    'inventory' => [
         'category' => [
             'navigation' => 'Categories',
             'singular' => 'Category',
@@ -79,13 +79,18 @@ return [
 
     'others' => [
         'administration' => 'administration',
-        'inventary' => 'Inventary',
+        'inventory' => 'Inventary',
         'credits' => 'Credits',
         'clients' => 'Clients',
         'cash' => 'Cash',
         'settings' => 'Settings',
         'general' => 'General',
         'apps' => 'Apps',
+        'data_transfer' => 'Import & export',
+        'data_transfer_hint' => 'Every module spreadsheet, in one place.',
+        'data_transfer_export' => 'Export',
+        'data_transfer_import' => 'Import',
+        'data_transfer_all' => 'See every area',
         'apps_subheading' => 'Pick a module to start working.',
         'descriptions' => [
             'clients' => 'Client records, references and attachments',
@@ -97,5 +102,51 @@ return [
             'general' => 'General panel shortcuts',
         ],
     ],
-
+    /*
+    |--------------------------------------------------------------------------
+    | Import & export (single data screen)
+    |--------------------------------------------------------------------------
+    */
+    'data_transfer' => [
+        'customers' => [
+            'label' => 'Customers',
+            'description' => 'Full record: document, contact, address and references.',
+        ],
+        'articles' => [
+            'label' => 'Articles',
+            'description' => 'Catalog with category, prices and stock.',
+        ],
+        'article_units' => [
+            'label' => 'Serialized units',
+            'description' => 'VIN or serial number, status and price of each unit.',
+        ],
+        'categories' => [
+            'label' => 'Categories',
+            'description' => 'Inventory category tree.',
+        ],
+        'loans' => [
+            'label' => 'Credits',
+            'description' => 'Whole credit: customer, amounts, installments and interest.',
+        ],
+        'installments' => [
+            'label' => 'Installments',
+            'description' => 'Installments of every credit, with balance and status.',
+        ],
+        'payments' => [
+            'label' => 'Payments',
+            'description' => 'Receipts: credit, installment, amount, bank and date.',
+        ],
+        'inflows' => [
+            'label' => 'Inflows',
+            'description' => 'Sales: invoice, amount, collected, receivable and items.',
+        ],
+        'outflows' => [
+            'label' => 'Outflows',
+            'description' => 'Purchases and expenses: vendor, invoice, amount and area.',
+        ],
+        'banks' => [
+            'label' => 'Banks',
+            'description' => 'Bank catalog used by payments.',
+        ],
+    ],
 ];

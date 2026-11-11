@@ -32,7 +32,7 @@ class InstallmentsResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'number';
 
-    protected static ?string $slug = 'creditos/installments';
+    protected static ?string $slug = 'credits/installments';
 
     protected static ?string $modelLabel = null;
 

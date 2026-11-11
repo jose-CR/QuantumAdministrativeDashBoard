@@ -34,7 +34,7 @@ class OutflowsTableWidget extends Component implements HasActions, HasSchemas, H
     {
         return [
             ExportAction::make('exportReport')
-                ->label('Reporte de salidas')
+                ->label(__('ui.cash_report.outflows_title'))
                 ->icon('heroicon-o-chart-bar')
                 ->exporter(OutflowExporter::class)
                 ->formats([ExportFormat::Xlsx])

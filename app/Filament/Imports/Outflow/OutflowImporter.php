@@ -19,7 +19,7 @@ class OutflowImporter extends Importer
 
         return [
             ImportColumn::make('invoice_date')
-                ->label('Fecha de factura')
+                ->label(__('ui.columns.invoice_date'))
                 ->rules($rules['invoice_date']),
 
             ImportColumn::make('company')
@@ -27,19 +27,19 @@ class OutflowImporter extends Importer
                 ->rules($rules['company']),
 
             ImportColumn::make('invoice_code')
-                ->label('Código de factura')
+                ->label(__('ui.columns.invoice_code'))
                 ->rules($rules['invoice_code']),
 
             ImportColumn::make('quantity')
-                ->label('Cantidad')
+                ->label(__('ui.columns.quantity'))
                 ->rules($rules['quantity']),
 
             ImportColumn::make('amount')
-                ->label('Monto')
+                ->label(__('ui.columns.amount'))
                 ->rules($rules['amount']),
 
             ImportColumn::make('description')
-                ->label('Descripción')
+                ->label(__('ui.columns.description'))
                 ->rules($rules['description']),
 
             ImportColumn::make('source')
@@ -47,7 +47,7 @@ class OutflowImporter extends Importer
                 ->rules($rules['source']),
 
             ImportColumn::make('area')
-                ->label('Área')
+                ->label(__('ui.columns.area'))
                 ->rules($rules['area']),
         ];
     }

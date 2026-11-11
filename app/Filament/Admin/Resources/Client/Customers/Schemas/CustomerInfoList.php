@@ -192,7 +192,7 @@ class CustomerInfoList
                             ->label(__('resources.clients.fields.vehicle'))
                             ->schema([
                                 TextEntry::make('display_name')
-                                    ->label(__('resources.inventary.article.article'))
+                                    ->label(__('resources.inventory.article.article'))
                                     ->weight(FontWeight::SemiBold),
 
                                 TextEntry::make('total')
@@ -304,10 +304,10 @@ class CustomerInfoList
                  * Tres tabs: lo que se subió a cada crédito, los comprobantes de
                  * cada cuota y las facturas o fotos sueltas del cliente.
                  */
-                Section::make('Adjuntos')
-                    ->key('adjuntos')
+                Section::make(__('ui.attachments.section'))
+                    ->key('attachments')
                     ->icon(Heroicon::PaperClip)
-                    ->description('Facturas y fotos: por crédito, por cuota o sueltas.')
+                    ->description(__('ui.attachments.section_help'))
                     ->headerActions([
                         // Subir va acá, con la sección, y no en el header de la ficha.
                         AttachFileAction::make(),
@@ -325,7 +325,7 @@ class CustomerInfoList
                     ->schema([
                         TextEntry::make('nrc')
                             ->label(__('resources.clients.fields.enterprise.nrc'))
-                            ->placeholder('Sin NRC'),
+                            ->placeholder(__('ui.clients.no_nrc')),
 
                         TextEntry::make('economic_activity')
                             ->label(__('resources.clients.fields.enterprise.economic_activity'))

@@ -18,16 +18,16 @@ class CategoriesTable
         return $table
             ->columns([
                 TextColumn::make('id')
-                    ->label(__('resources.inventary.category.id')),
+                    ->label(__('resources.inventory.category.id')),
 
 
                 TextColumn::make('name')
-                    ->label(__('resources.inventary.category.name'))
+                    ->label(__('resources.inventory.category.name'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('description')
-                    ->label(__('resources.inventary.category.description'))
+                    ->label(__('resources.inventory.category.description'))
                     // str_replace(null) revienta en PHP 8.4: la columna es nulable.
                     ->formatStateUsing(fn (?string $state): ?string => $state === null
                         ? null
@@ -50,7 +50,7 @@ class CategoriesTable
                             return null;
                         }
 
-                        return __('notifications.inventary.category.delete.cascade', [
+                        return __('notifications.inventory.category.delete.cascade', [
                             'articles' => $summary['articles'],
                             'units' => $summary['units'],
                         ]);
@@ -61,8 +61,8 @@ class CategoriesTable
                         if ($summary['units_in_credits'] > 0) {
                             Notification::make()
                                 ->danger()
-                                ->title(__('notifications.inventary.category.blocked.title'))
-                                ->body(__('notifications.inventary.category.blocked.body', [
+                                ->title(__('notifications.inventory.category.blocked.title'))
+                                ->body(__('notifications.inventory.category.blocked.body', [
                                     'name' => $record->name,
                                     'units' => $summary['units_in_credits'],
                                     'credits' => $record->creditsBlockingDeletionLabel(),
@@ -83,8 +83,8 @@ class CategoriesTable
                             if ($bloqueadas->isNotEmpty()) {
                                 Notification::make()
                                     ->danger()
-                                    ->title(__('notifications.inventary.category.blocked.title'))
-                                    ->body(__('notifications.inventary.category.blocked.bulk', [
+                                    ->title(__('notifications.inventory.category.blocked.title'))
+                                    ->body(__('notifications.inventory.category.blocked.bulk', [
                                         'names' => $bloqueadas->pluck('name')->implode(', '),
                                     ]))
                                     ->send();

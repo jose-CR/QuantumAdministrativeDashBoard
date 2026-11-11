@@ -12,7 +12,7 @@ class LoanCalculatorService
 
         if ($initialAmount <= 0) {
             throw new InvalidArgumentException(
-                'El monto inicial debe ser mayor que cero.'
+                __('ui.validation.initial_amount_positive')
             );
         }
 
@@ -23,13 +23,13 @@ class LoanCalculatorService
 
         if ($downPayment < 0) {
             throw new InvalidArgumentException(
-                'El pago inicial no puede ser negativo.'
+                __('ui.validation.down_payment_negative')
             );
         }
 
         if ($downPayment > $initialAmount) {
             throw new InvalidArgumentException(
-                'El pago inicial no puede ser mayor al monto inicial.'
+                __('ui.validation.down_payment_over_initial')
             );
         }
 
@@ -42,7 +42,7 @@ class LoanCalculatorService
 
         if ($installments <= 0) {
             throw new InvalidArgumentException(
-                'El número de cuotas debe ser mayor que cero.'
+                __('ui.validation.installments_positive')
             );
         }
 
@@ -60,7 +60,7 @@ class LoanCalculatorService
             // El interés es el que se pactó: la tasa manda y la cuota sale de ella.
             if ($financedAmount <= 0) {
                 throw new InvalidArgumentException(
-                    'No hay saldo que financiar: el pago inicial cubre el monto total.'
+                    __('ui.validation.nothing_to_finance')
                 );
             }
 
@@ -69,7 +69,7 @@ class LoanCalculatorService
             $maxRate = (float) config('quantum.interest.max_rate', 20);
 
             if ($interestRate < 0) {
-                throw new InvalidArgumentException('La tasa de interés no puede ser negativa.');
+                throw new InvalidArgumentException(__('ui.validation.interest_not_negative'));
             }
 
             if ($interestRate > $maxRate) {

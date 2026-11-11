@@ -34,7 +34,7 @@ class PaymentHistoriesResource extends Resource
     // y en la búsqueda global.
     protected static ?string $recordTitleAttribute = 'receipt_number';
 
-    protected static ?string $slug = 'creditos/history';
+    protected static ?string $slug = 'credits/history';
 
     protected static ?string $modelLabel = null;
 

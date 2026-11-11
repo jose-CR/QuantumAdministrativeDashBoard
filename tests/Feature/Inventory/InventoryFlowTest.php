@@ -99,7 +99,7 @@ class InventoryFlowTest extends TestCase
 
         Livewire::test(ListCategories::class)
             ->callAction(TestAction::make('delete')->table($categoria->getKey()))
-            ->assertNotified(__('notifications.inventary.category.blocked.title'));
+            ->assertNotified(__('notifications.inventory.category.blocked.title'));
 
         $this->assertDatabaseHas('categories', ['id' => $categoria->id]);
         $this->assertDatabaseHas('article_units', ['id' => $unidad->id]);

@@ -41,7 +41,7 @@ class AttachFileTest extends TestCase
     private function subir(Customer $cliente, array $datos)
     {
         return $this->ficha($cliente)
-            ->mountAction(TestAction::make('attachFile')->schemaComponent('adjuntos'))
+            ->mountAction(TestAction::make('attachFile')->schemaComponent('attachments'))
             ->setActionData($datos)
             ->callMountedAction();
     }

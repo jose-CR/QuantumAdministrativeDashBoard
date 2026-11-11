@@ -18,17 +18,17 @@ class ArticleForm
         return $schema
             ->components([
                 Select::make('category_id')
-                    ->label(__('resources.inventary.article.category'))
+                    ->label(__('resources.inventory.article.category'))
                     ->relationship('category', 'name')
                     ->searchable(['name'])
                     ->preload()
                     ->required(),
 
                 TextInput::make('name')
-                    ->label(__('resources.inventary.article.name'))
+                    ->label(__('resources.inventory.article.name'))
                     ->maxLength(255)
-                    ->placeholder(__('resources.inventary.article.name_placeholder'))
-                    ->helperText(__('resources.inventary.article.name_help'))
+                    ->placeholder(__('resources.inventory.article.name_placeholder'))
+                    ->helperText(__('resources.inventory.article.name_help'))
                     // Dos artículos con el mismo nombre en la misma categoría son
                     // el mismo producto: se avisa aquí y no con un error de base.
                     ->unique(
@@ -38,10 +38,10 @@ class ArticleForm
                     ),
 
                 TextInput::make('sku')
-                    ->label(__('resources.inventary.article.sku'))
+                    ->label(__('resources.inventory.article.sku'))
                     ->maxLength(64)
                     ->unique(ignoreRecord: true)
-                    ->helperText(__('resources.inventary.article.sku_help')),
+                    ->helperText(__('resources.inventory.article.sku_help')),
 
                 /*
                  * El criterio de almacenamiento lo elige el usuario:
@@ -49,16 +49,16 @@ class ArticleForm
                  *  - none:   cascos, repuestos, baterías sueltas… se cuentan por stock.
                  */
                 Select::make('tracking')
-                    ->label(__('resources.inventary.article.tracking'))
+                    ->label(__('resources.inventory.article.tracking'))
                     ->options([
-                        Article::TRACKING_SERIAL => __('resources.inventary.article.tracking_serial'),
-                        Article::TRACKING_NONE => __('resources.inventary.article.tracking_none'),
+                        Article::TRACKING_SERIAL => __('resources.inventory.article.tracking_serial'),
+                        Article::TRACKING_NONE => __('resources.inventory.article.tracking_none'),
                     ])
                     ->default(Article::TRACKING_SERIAL)
                     ->required()
                     ->live()
                     ->disabled(fn (?Article $record): bool => (bool) $record?->units()->exists())
-                    ->helperText(__('resources.inventary.article.tracking_help'))
+                    ->helperText(__('resources.inventory.article.tracking_help'))
                     ->afterStateUpdated(function (?string $state, Set $set) {
                         if ($state !== Article::TRACKING_SERIAL) {
                             $set('year', null);
@@ -66,17 +66,17 @@ class ArticleForm
                     }),
 
                 TextInput::make('brand')
-                    ->label(__('resources.inventary.article.brand'))
+                    ->label(__('resources.inventory.article.brand'))
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('tracking') === Article::TRACKING_SERIAL),
 
                 TextInput::make('model')
-                    ->label(__('resources.inventary.article.model'))
+                    ->label(__('resources.inventory.article.model'))
                     ->maxLength(255)
                     ->required(fn (Get $get): bool => $get('tracking') === Article::TRACKING_SERIAL),
 
                 TextInput::make('year')
-                    ->label(__('resources.inventary.article.year'))
+                    ->label(__('resources.inventory.article.year'))
                     ->numeric()
                     ->minValue(1900)
                     ->maxValue(date('Y') + 1)
@@ -84,23 +84,23 @@ class ArticleForm
                     ->visible(fn (Get $get): bool => $get('tracking') === Article::TRACKING_SERIAL),
 
                 TextInput::make('cash_price')
-                    ->label(__('resources.inventary.article.cash_price'))
+                    ->label(__('resources.inventory.article.cash_price'))
                     ->numeric()
                     ->minValue(0)
                     ->prefix('$')
-                    ->helperText(__('resources.inventary.article.cash_price_help')),
+                    ->helperText(__('resources.inventory.article.cash_price_help')),
 
                 TextInput::make('stock')
-                    ->label(__('resources.inventary.article.stock'))
+                    ->label(__('resources.inventory.article.stock'))
                     ->numeric()
                     ->integer()
                     ->minValue(0)
                     ->default(0)
                     ->visible(fn (Get $get): bool => $get('tracking') === Article::TRACKING_NONE)
-                    ->helperText(__('resources.inventary.article.stock_help')),
+                    ->helperText(__('resources.inventory.article.stock_help')),
 
                 RichEditor::make('description')
-                    ->label(__('resources.inventary.article.description'))
+                    ->label(__('resources.inventory.article.description'))
                     ->columnSpanFull(),
             ]);
     }

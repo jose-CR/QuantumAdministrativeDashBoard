@@ -14,8 +14,8 @@ class CreateArticleUnit extends CreateRecord
     {
         return Notification::make()
             ->success()
-            ->title(__('notifications.inventary.articleUnits.create.title'))
-            ->body(__('notifications.inventary.articleUnits.create.body'));
+            ->title(__('notifications.inventory.articleUnits.create.title'))
+            ->body(__('notifications.inventory.articleUnits.create.body'));
     }
 
     protected function getRedirectUrl(): string

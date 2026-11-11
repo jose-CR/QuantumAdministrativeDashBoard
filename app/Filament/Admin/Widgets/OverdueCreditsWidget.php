@@ -14,7 +14,10 @@ class OverdueCreditsWidget extends TableWidget
 {
     protected static ?int $sort = 5;
 
-    protected static ?string $heading = 'Créditos vencidos';
+    public function getHeading(): ?string
+    {
+        return __('ui.widgets.overdue_credits');
+    }
 
     protected int|string|array $columnSpan = 'full';
 
@@ -24,10 +27,10 @@ class OverdueCreditsWidget extends TableWidget
             ->query($this->overdueCredits())
             ->columns([
                 TextColumn::make('client.full_name') // relación
-                    ->label('Cliente')
+                    ->label(__('ui.columns.customer'))
                     ->searchable(),
                 TextColumn::make('overdue_count')
-                    ->label('Cuotas vencidas')
+                    ->label(__('ui.widgets.overdue_installments'))
                     ->badge()
                     ->color('danger'),
                 TextColumn::make('oldest_due_date')
@@ -35,13 +38,13 @@ class OverdueCreditsWidget extends TableWidget
                     ->date('d/m/Y')
                     ->sortable(),
                 TextColumn::make('pending_balance')
-                    ->label('Saldo pendiente')
+                    ->label(__('resources.credits.credits.pending_balance'))
                     ->money('USD'),
             ])
             ->defaultSort('oldest_due_date')
             ->recordActions([
                 Action::make('view')
-                    ->label('Ver cliente')
+                    ->label(__('ui.widgets.see_customer'))
                     ->icon('heroicon-o-eye')
                     ->url(fn (Credit $record): string => CustomerResource::getUrl('view', [
                         'record' => $record->customer_id,

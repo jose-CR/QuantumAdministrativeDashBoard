@@ -13,7 +13,7 @@ class NotificationTest extends InventoryTestCase
         $unidad = $this->makeUnit($this->makeArticle($categoria));
         $credito = $this->makeCreditFor($unidad);
 
-        $cuerpo = __('notifications.inventary.category.blocked.body', [
+        $cuerpo = __('notifications.inventory.category.blocked.body', [
             'name' => $categoria->name,
             'units' => 1,
             'credits' => $categoria->creditsBlockingDeletionLabel(),
@@ -31,7 +31,7 @@ class NotificationTest extends InventoryTestCase
         $unidad = $this->makeUnit($articulo);
         $credito = $this->makeCreditFor($unidad);
 
-        $cuerpo = __('notifications.inventary.article.blocked.body', [
+        $cuerpo = __('notifications.inventory.article.blocked.body', [
             'name' => $articulo->full_name,
             'units' => 1,
             'credits' => $articulo->creditsBlockingDeletionLabel(),
@@ -79,7 +79,7 @@ class NotificationTest extends InventoryTestCase
 
     public function test_el_mensaje_de_confirmacion_de_la_cascada_tiene_los_numeros(): void
     {
-        $mensaje = __('notifications.inventary.category.delete.cascade', [
+        $mensaje = __('notifications.inventory.category.delete.cascade', [
             'articles' => 12,
             'units' => 34,
         ]);

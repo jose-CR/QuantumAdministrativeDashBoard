@@ -49,7 +49,7 @@ class Customer extends Model
     {
         if (! in_array($this->document_type, self::DOCUMENT_TYPES, true)) {
             throw ValidationException::withMessages([
-                'document_type' => 'Tipo de documento inválido.',
+                'document_type' => __('ui.validation.document_type_invalid'),
             ]);
         }
 
@@ -61,7 +61,7 @@ class Customer extends Model
 
         if ($duplicado) {
             throw ValidationException::withMessages([
-                'document_number' => 'Ya hay un cliente con ese documento.',
+                'document_number' => __('ui.validation.document_taken'),
             ]);
         }
 
@@ -78,13 +78,13 @@ class Customer extends Model
 
         if (! array_key_exists((string) $this->municipality, ElSalvadorCatalogo::municipalities((string) $this->department))) {
             throw ValidationException::withMessages([
-                'municipality' => 'Ese municipio no existe en el departamento.',
+                'municipality' => __('ui.validation.municipality_not_in_department'),
             ]);
         }
 
         if (! array_key_exists((string) $this->district, ElSalvadorCatalogo::districts((string) $this->municipality))) {
             throw ValidationException::withMessages([
-                'district' => 'Ese distrito no existe en el municipio.',
+                'district' => __('ui.validation.district_not_in_municipality'),
             ]);
         }
     }

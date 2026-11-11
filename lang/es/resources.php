@@ -57,7 +57,10 @@ return [
                 'PASSPORT' => 'Pasaporte',
                 'RES_CARNET' => 'Carné de residencia',
                 'Otro' => 'Otro',
-            ],
+                'otro' => 'Otro',
+            
+                'otro' => 'Otro',
+],
 
             'document_number' => 'Número de documento',
             'identity_document_placeholder' => 'Ingrese el documento de identidad',
@@ -125,7 +128,7 @@ return [
                 'departament' => 'Departamento',
                 'municipality' => 'Municipio',
                 'distric' => 'Distrito',
-                'create_at' => 'Creado el',
+                'created_at' => 'Creado el',
                 'updated_at' => 'Actualizado el',
             ],
         ],
@@ -181,7 +184,7 @@ return [
         ],
     ],
 
-    'inventary' => [
+    'inventory' => [
 
         'category' => [
 
@@ -264,7 +267,8 @@ return [
                     'card' => 'Tarjeta',
                     'cheque' => 'Cheque',
                     'transfer' => 'Transferencia',
-                    'quedan' => 'Quedan'
+                    'quedan' => 'Quedan',
+                    'bank_transfer' => 'Transferencia bancaria',
                 ],
 
                 'bank' => 'Banco',
@@ -310,7 +314,12 @@ return [
             'receipt_number' => 'Número de comprobante',
             'previous_balance' => 'Saldo anterior',
             'new_balance' => 'Nuevo saldo',
-        ],
+        
+            'credit' => 'Crédito',
+            'id' => '#',
+            'notes' => 'Notas',
+            'user' => 'Usuario',
+],
 
         'credits' => [
 
@@ -347,7 +356,39 @@ return [
             'paid_at' => 'Fecha de pago',
             'status' => 'Estado',
         ],
-    ],
+    
+            'fields' => [
+                'id' => '#',
+                'client' => 'Cliente',
+                'article_unit' => 'Unidad',
+                'down_payment' => 'Prima',
+                'financed_amount' => 'Monto financiado',
+                'initial_amount' => 'Monto inicial',
+                'installment_amount' => 'Monto de la cuota',
+                'installments' => 'Cuotas',
+                'interest_rate' => 'Tasa de interés',
+                'payment_day' => 'Día de pago',
+                'payment_month' => 'Mes de pago',
+                'pending_balance' => 'Saldo pendiente',
+                'periodicity' => 'Frecuencia de pago',
+                'refinanced_from' => 'Refinanciado de',
+                'start_date' => 'Fecha de inicio',
+                'status' => 'Estado',
+                'total_amount' => 'Monto total',
+                'total_interest' => 'Interés total',
+            ],
+
+            'references' => [
+                'id' => '#',
+                'client' => 'Cliente',
+                'reference_type' => 'Tipo de referencia',
+                'full_name' => 'Nombre completo',
+                'relationship' => 'Parentesco',
+                'phone' => 'Teléfono',
+                'address' => 'Dirección',
+                'occupation' => 'Ocupación',
+            ],
+],
 
     'alert' => [
 
@@ -399,6 +440,8 @@ return [
             'client' => 'Cliente',
             'cod_invoice' => 'Número de factura',
             'amount' => 'Monto',
+            'amount_paid' => 'Cobrado',
+            'receivable' => 'Por cobrar',
             'description' => 'Descripción',
             'payment_method' => 'Método de pago',
             'transfer_number' => 'Número de transferencia',

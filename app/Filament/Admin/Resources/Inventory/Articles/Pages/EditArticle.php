@@ -18,8 +18,8 @@ class EditArticle extends EditRecord
                 ->successNotification(
                     Notification::make()
                         ->success()
-                        ->title(__('notifications.inventary.articleUnits.delete.title'))
-                        ->body(__('notifications.inventary.articleUnits.delete.body'))
+                        ->title(__('notifications.inventory.articleUnits.delete.title'))
+                        ->body(__('notifications.inventory.articleUnits.delete.body'))
                 ),
         ];
     }
@@ -28,8 +28,8 @@ class EditArticle extends EditRecord
     {
         return Notification::make()
             ->success()
-            ->title(__('notifications.inventary.articleUnits.update.title'))
-            ->body(__('notifications.inventary.articleUnits.update.body'))
+            ->title(__('notifications.inventory.articleUnits.update.title'))
+            ->body(__('notifications.inventory.articleUnits.update.body'))
         ;
     }
 

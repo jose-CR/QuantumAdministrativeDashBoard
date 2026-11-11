@@ -58,6 +58,7 @@ return [
                 'PASSPORT' => 'Passport',
                 'RES_CARNET' => 'Residence Card',
                 'Otro' => 'Other',
+                'otro' => 'Other',
             ],
 
             'document_number' => 'Document Number',
@@ -125,7 +126,7 @@ return [
                 'departament' => 'Department',
                 'municipality' => 'Municipality',
                 'distric' => 'District',
-                'create_at' => 'Created At',
+                'created_at' => 'Created At',
                 'updated_at' => 'Updated At',
             ],
         ],
@@ -181,7 +182,7 @@ return [
         ],
     ],
 
-    'inventary' => [
+    'inventory' => [
         'category' => [
 
             'id' => 'ID',
@@ -255,13 +256,15 @@ return [
                 'installment_to_pay' => 'Installment to Pay',
                 'amount' => 'Amount to Pay',
 
-                'payment_method' => [
-                    'payment_method' => 'Payment Method',
+                'payment_method' => 'Payment Method',
+
+                'payment_methods' => [
                     'cash' => 'Cash',
                     'card' => 'Card',
                     'cheque' => 'Bank Check',
                     'transfer' => 'Transfer',
-                    'quedan' => '"Quedan" formal receipt for invoices received for future payment'
+                    'bank_transfer' => 'Bank transfer',
+                    'quedan' => '"Quedan" formal receipt for invoices received for future payment',
                 ],
 
                 'bank' => 'Bank',
@@ -311,6 +314,42 @@ return [
             'receipt_number' => 'Receipt Number',
             'previous_balance' => 'Previous Balance',
             'new_balance' => 'New Balance',
+            'credit' => 'Credit',
+            'id' => '#',
+            'notes' => 'Notes',
+            'user' => 'User',
+        ],
+
+        'fields' => [
+            'id' => '#',
+            'client' => 'Customer',
+            'article_unit' => 'Unit',
+            'down_payment' => 'Down payment',
+            'financed_amount' => 'Financed amount',
+            'initial_amount' => 'Initial amount',
+            'installment_amount' => 'Installment amount',
+            'installments' => 'Installments',
+            'interest_rate' => 'Interest rate',
+            'payment_day' => 'Payment day',
+            'payment_month' => 'Payment month',
+            'pending_balance' => 'Pending balance',
+            'periodicity' => 'Payment frequency',
+            'refinanced_from' => 'Refinanced from',
+            'start_date' => 'Start date',
+            'status' => 'Status',
+            'total_amount' => 'Total amount',
+            'total_interest' => 'Total interest',
+        ],
+
+        'references' => [
+            'id' => '#',
+            'client' => 'Customer',
+            'reference_type' => 'Reference type',
+            'full_name' => 'Full name',
+            'relationship' => 'Relationship',
+            'phone' => 'Phone',
+            'address' => 'Address',
+            'occupation' => 'Occupation',
         ],
 
         'credits' => [
@@ -398,6 +437,8 @@ return [
             'client' => 'Client',
             'cod_invoice' => 'Invoice Number',
             'amount' => 'Amount',
+            'amount_paid' => 'Collected',
+            'receivable' => 'Receivable',
             'description' => 'Description',
             'payment_method' => 'Payment Method',
             'transfer_number' => 'Transfer Number',

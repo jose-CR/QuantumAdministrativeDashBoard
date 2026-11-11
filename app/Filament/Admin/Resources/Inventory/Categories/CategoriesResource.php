@@ -21,7 +21,7 @@ class CategoriesResource extends Resource
 
     protected static function getTranslationKey(): string
     {
-        return 'models.inventary.category';
+        return 'models.inventory.category';
     }
 
     protected static ?string $model = Category::class;
@@ -32,7 +32,7 @@ class CategoriesResource extends Resource
 
     protected static string|\UnitEnum|null $navigationGroup = null;
 
-    protected static ?string $slug = 'inventary/categories';
+    protected static ?string $slug = 'inventory/categories';
 
     protected static ?string $modelLabel = null;
 
@@ -58,7 +58,7 @@ class CategoriesResource extends Resource
     */
 
     public static function getNavigationGroup(): string {
-        return __('models.others.inventary');
+        return __('models.others.inventory');
     }
 
     public static function getPages(): array

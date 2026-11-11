@@ -20,7 +20,7 @@ class ArticleUnitForm
                  * cantidad (casco, repuesto) no tienen unidades, tienen stock.
                  */
                 Select::make('article_id')
-                    ->label(__('resources.inventary.article.article'))
+                    ->label(__('resources.inventory.article.article'))
                     ->relationship(
                         'article',
                         'name',
@@ -33,7 +33,7 @@ class ArticleUnitForm
                     ->optionsLimit(50)
                     ->required()
                     ->live()
-                    ->helperText(__('resources.inventary.article_units.article_help'))
+                    ->helperText(__('resources.inventory.article_units.article_help'))
                     // Al elegir el artículo se precarga su precio de lista; se puede
                     // cambiar por unidad.
                     ->afterStateUpdated(function (?string $state, Set $set) {
@@ -45,7 +45,7 @@ class ArticleUnitForm
                     }),
 
                 TextInput::make('cash_price')
-                    ->label(__('resources.inventary.article_units.cash_price'))
+                    ->label(__('resources.inventory.article_units.cash_price'))
                     ->numeric()
                     ->minValue(0.01)
                     ->prefix('$')
@@ -54,27 +54,27 @@ class ArticleUnitForm
                     ->required(),
 
                 TextInput::make('vin')
-                    ->label(__('resources.inventary.article_units.vin'))
+                    ->label(__('resources.inventory.article_units.vin'))
                     ->required()
                     ->maxLength(20)
                     ->unique(ignoreRecord: true)
-                    ->helperText(__('resources.inventary.article_units.vin_help')),
+                    ->helperText(__('resources.inventory.article_units.vin_help')),
 
                 TextInput::make('engine_number')
-                    ->label(__('resources.inventary.article_units.engine_number'))
+                    ->label(__('resources.inventory.article_units.engine_number'))
                     ->maxLength(255),
 
                 TextInput::make('plate')
-                    ->label(__('resources.inventary.article_units.plate'))
+                    ->label(__('resources.inventory.article_units.plate'))
                     ->maxLength(255)
                     ->unique(ignoreRecord: true),
 
                 TextInput::make('color')
-                    ->label(__('resources.inventary.article_units.color'))
+                    ->label(__('resources.inventory.article_units.color'))
                     ->maxLength(255),
 
                 Select::make('status')
-                    ->label(__('resources.inventary.article_units.status'))
+                    ->label(__('resources.inventory.article_units.status'))
                     ->options([
                         'available' => 'Disponible',
                         'reserved' => 'Reservado',

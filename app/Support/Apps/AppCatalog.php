@@ -27,10 +27,10 @@ class AppCatalog
             'color' => '#16a34a',
         ],
         'inventory' => [
-            'group' => 'models.others.inventary',
+            'group' => 'models.others.inventory',
             'icon' => Heroicon::OutlinedCube,
             'color' => '#7c3aed',
-            'primary' => 'inventary/article',
+            'primary' => 'inventory/articles',
         ],
         'credits' => [
             'group' => 'models.others.credits',

@@ -22,7 +22,10 @@ class CreditsRelationManager extends RelationManager
 {
     protected static string $relationship = 'credits';
 
-    protected static ?string $title = 'Créditos';
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return __('ui.credits.relation_title');
+    }
 
     public function table(Table $table): Table
     {
@@ -34,17 +37,17 @@ class CreditsRelationManager extends RelationManager
 
                 TextColumn::make('start_date')->label('Inicio')->date('d/m/Y')->sortable(),
 
-                TextColumn::make('financed_amount')->label('Financiado')->money('USD'),
+                TextColumn::make('financed_amount')->label(__('ui.credits.financed_short'))->money('USD'),
 
                 TextColumn::make('pending_balance')
-                    ->label('Saldo pendiente')
+                    ->label(__('resources.credits.credits.pending_balance'))
                     ->money('USD')
                     ->color(fn (Credit $record): string => (float) $record->pending_balance > 0 ? 'danger' : 'gray'),
 
-                TextColumn::make('installments')->label('Cuotas'),
+                TextColumn::make('installments')->label(__('resources.credits.credits.installments')),
 
                 TextColumn::make('status')
-                    ->label('Estado')
+                    ->label(__('resources.credits.credits.status'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => CreditStatus::label($state))
                     ->color(fn (?string $state): string => CreditStatus::color($state)),
@@ -66,7 +69,7 @@ class CreditsRelationManager extends RelationManager
                         Grid::make(3)
                             ->schema([
                                 TextEntry::make('status')
-                                    ->label('Estado')
+                                    ->label(__('resources.credits.credits.status'))
                                     ->badge()
                                     ->formatStateUsing(fn (?string $state): string => CreditStatus::label($state))
                                     ->color(fn (?string $state): string => CreditStatus::color($state)),
@@ -85,49 +88,49 @@ class CreditsRelationManager extends RelationManager
                                     }),
 
                                 TextEntry::make('pending_balance')
-                                    ->label('Saldo pendiente')
+                                    ->label(__('resources.credits.credits.pending_balance'))
                                     ->money('USD')
                                     ->weight(FontWeight::Bold)
                                     ->color(fn (Credit $record): string => (float) $record->pending_balance > 0 ? 'danger' : 'gray'),
 
                                 TextEntry::make('installment_amount')
-                                    ->label('Monto de cuota')
+                                    ->label(__('resources.credits.credits.installment_amount'))
                                     ->money('USD'),
 
                                 TextEntry::make('interest_rate')
-                                    ->label('Interés')
+                                    ->label(__('resources.credits.credits.interest_type'))
                                     ->state(fn (Credit $record): string => (($record->interest_type ?? 'auto') === 'fixed'
-                                        ? 'Fijo ' : 'Calculado ')
-                                        . (float) $record->interest_rate . '% por cuota'),
+                                        ? __('ui.credits.fixed_prefix') : __('ui.credits.calculated_prefix'))
+                                        . (float) $record->interest_rate . __('ui.credits.rate_suffix')),
 
                                 TextEntry::make('initial_amount')
-                                    ->label('Monto inicial')
+                                    ->label(__('resources.credits.credits.initial_amount'))
                                     ->money('USD'),
 
                                 TextEntry::make('down_payment')
-                                    ->label('Pago inicial')
+                                    ->label(__('ui.credits.down_payment_entry'))
                                     ->money('USD'),
 
                                 TextEntry::make('financed_amount')
-                                    ->label('Financiado')
+                                    ->label(__('ui.credits.financed_short'))
                                     ->money('USD'),
 
                                 TextEntry::make('total_interest')
-                                    ->label('Intereses')
+                                    ->label(__('ui.credits.interest_total_short'))
                                     ->money('USD'),
 
                                 TextEntry::make('total_amount')
-                                    ->label('Total a pagar')
+                                    ->label(__('ui.credits.total_to_pay'))
                                     ->money('USD')
                                     ->color('success'),
 
                                 TextEntry::make('installments')
-                                    ->label('Cuotas'),
+                                    ->label(__('resources.credits.credits.installments')),
 
                                 TextEntry::make('cuotas')
-                                    ->label('Estado de las cuotas')
+                                    ->label(__('ui.credits.installments_status'))
                                     ->state(fn (Credit $record): string => sprintf(
-                                        '%d pagadas · %d pendientes · %d atrasadas',
+                                        __('ui.credits.installments_summary'),
                                         $record->installments()->where('status', 'paid')->count(),
                                         $record->installments()->where('status', 'pending')->count(),
                                         $record->installments()->where('status', 'late')->count(),
@@ -135,7 +138,7 @@ class CreditsRelationManager extends RelationManager
                                     ->columnSpan(2),
 
                                 TextEntry::make('refinanciado')
-                                    ->label('Refinanciado de')
+                                    ->label(__('ui.credits.refinanced_from'))
                                     ->state(fn (Credit $record): ?string => $record->refinanced_from_id
                                         ? '#' . $record->refinanced_from_id
                                         : null)
@@ -143,14 +146,14 @@ class CreditsRelationManager extends RelationManager
                             ]),
 
                         RepeatableEntry::make('items')
-                            ->label('Bienes del crédito')
+                            ->label(__('ui.credits.items'))
                             ->state(fn (Credit $record) => $record->items()->get())
                             ->schema([
                                 TextEntry::make('display_name')
-                                    ->label('Bien'),
+                                    ->label(__('ui.credits.item')),
 
                                 TextEntry::make('total')
-                                    ->label('Precio')
+                                    ->label(__('ui.credits.price'))
                                     ->money('USD'),
                             ])
                             ->columns(2)

@@ -2,9 +2,11 @@
 
 namespace App\Filament\Admin\Resources\Administration\Inflows\Schemas;
 
+use App\Models\Article;
 use App\Models\Inflow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
@@ -19,7 +21,7 @@ class InflowForm
         return $schema
             ->components([
                 Section::make('Datos generales')
-                    ->description('Información principal del ingreso')
+                    ->description(__('ui.inflow.section_main'))
                     ->schema([
                         TextInput::make('invoice_number')
                             ->label(__('resources.flow.inflow.cod_invoice'))
@@ -47,21 +49,33 @@ class InflowForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('Pago')
-                    ->description('Detalles del cobro y su estado')
+                Section::make(__('ui.inflow.section_payment'))
+                    ->description(__('ui.inflow.section_payment_help'))
                     ->schema([
                         TextInput::make('amount')
                             ->label(__('resources.flow.inflow.amount'))
                             ->numeric()
-                            ->required(),
+                            ->prefix('$')
+                            ->required()
+                            ->live()
+                            // Por defecto se cobra entero: si todavía no se tocó lo
+                            // cobrado, se copia el monto.
+                            ->afterStateUpdated(function ($state, callable $set, Get $get): void {
+                                if ((float) ($get('amount_paid') ?? 0) <= 0) {
+                                    $set('amount_paid', $state);
+                                }
+                            }),
 
-                        Select::make('payment_status')
-                            ->label(__('resources.flow.inflow.payment_status'))
-                            ->options([
-                                'pending' => __('resources.clients.statuses.pending'),
-                                'partial' => __('resources.clients.statuses.partial'),
-                                'paid' => __('resources.clients.statuses.paid'),
-                            ])
+                        /*
+                         * Lo cobrado manda: el estado (pendiente, parcial o pagado)
+                         * se calcula solo al guardar.
+                         */
+                        TextInput::make('amount_paid')
+                            ->label(__('resources.flow.inflow.amount_paid'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->helperText(__('ui.inflow.amount_paid_help'))
                             ->required(),
 
                         Select::make('payment_method')
@@ -94,8 +108,56 @@ class InflowForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('Documentación')
-                    ->description('Observaciones y archivos relacionados con el ingreso')
+                Section::make(__('ui.inflow.items'))
+                    ->description(__('ui.inflow.items_help'))
+                    ->schema([
+                        Repeater::make('items')
+                            ->relationship()
+                            ->hiddenLabel()
+                            ->schema([
+                                Select::make('article_id')
+                                    ->label(__('ui.inflow.item'))
+                                    ->searchable()
+                                    ->required()
+                                    ->options(fn (): array => Article::query()
+                                        ->where('tracking', Article::TRACKING_NONE)
+                                        ->orderBy('name')
+                                        ->get()
+                                        ->mapWithKeys(fn (Article $articulo): array => [
+                                            $articulo->id => "{$articulo->full_name} (stock: {$articulo->stock})",
+                                        ])
+                                        ->all())
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                        if ($articulo = Article::find($state)) {
+                                            $set('price', (float) $articulo->cash_price);
+                                        }
+                                    }),
+
+                                TextInput::make('quantity')
+                                    ->label(__('ui.inflow.quantity'))
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+
+                                TextInput::make('price')
+                                    ->label(__('ui.inflow.unit_price'))
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->defaultItems(0)
+                            ->addActionLabel(__('ui.inflow.add_item'))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
+                    ->columnSpanFull(),
+
+                Section::make(__('ui.inflow.section_docs'))
+                    ->description(__('ui.inflow.section_docs_help'))
                     ->schema([
                         Textarea::make('notes')
                             ->label(__('resources.flow.inflow.notes'))

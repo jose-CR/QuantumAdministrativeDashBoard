@@ -18,7 +18,7 @@ return [
         ],
     ],
 
-    'inventary' => [
+    'inventory' => [
 
         'more_credits' => 'and :count more',
 
@@ -156,5 +156,10 @@ return [
         ],
         
         'message' => '%s must pay installment #%d on %s.',
+    ],
+
+    'create' => [
+        'title' => 'Record created',
+        'body' => 'The record was created successfully.',
     ],
 ];

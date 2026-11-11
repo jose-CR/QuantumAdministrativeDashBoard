@@ -55,19 +55,19 @@ return [
         'inventory' => [
             'state' => 'enabled',
             'paths' => [
-                'inventary/article',
-                'inventary/articleunit',
-                'inventary/categories',
-                'inventary/transportation',
+                'inventory/articles',
+                'inventory/units',
+                'inventory/categories',
+                'inventory/transportation',
             ],
         ],
 
         'credits' => [
             'state' => 'enabled',
             'paths' => [
-                'creditos/loans',
-                'creditos/installments',
-                'creditos/history',
+                'credits/loans',
+                'credits/installments',
+                'credits/history',
             ],
         ],
 

@@ -85,10 +85,10 @@ class LoansForm
             ->components([
                 Tabs::make('loan')
                     ->tabs([
-                        Tabs\Tab::make('Crédito')
+                        Tabs\Tab::make(__('ui.credits.label'))
                             ->schema([
                                 Select::make('customer_id')
-                                    ->label('Cliente')
+                                    ->label(__('ui.credits.customer'))
                                     ->relationship('client', 'full_name')
                                     ->searchable()
                                     ->preload()
@@ -102,8 +102,8 @@ class LoansForm
                                         Select::make('item_type')
                                             ->label('Tipo')
                                             ->options([
-                                                ArticleUnit::class => 'Vehículo',
-                                                Article::class => 'Artículo (por cantidad)',
+                                                ArticleUnit::class => __('resources.credits.credits.vehicle'),
+                                                Article::class => __('ui.credits.article_by_quantity'),
                                                 Transportation::class => 'Transporte',
                                             ])
                                             ->required()
@@ -131,8 +131,8 @@ class LoansForm
                                             ->label(
                                                 fn (Get $get) => match ($get('item_type')) {
                                                     Transportation::class => 'Transporte',
-                                                    Article::class => 'Artículo',
-                                                    default => 'Vehículo',
+                                                    Article::class => __('ui.credits.article'),
+                                                    default => __('resources.credits.credits.vehicle'),
                                                 }
                                             )
                                             ->required()
@@ -421,7 +421,7 @@ class LoansForm
                                          * es lo que hay en existencia: no se puede vender lo que no está.
                                          */
                                         TextInput::make('quantity')
-                                            ->label('Cantidad')
+                                            ->label(__('ui.credits.quantity'))
                                             ->numeric()
                                             ->integer()
                                             ->default(1)
@@ -451,7 +451,7 @@ class LoansForm
                                          * PRECIO
                                          */
                                         TextInput::make('price')
-                                            ->label('Precio')
+                                            ->label(__('ui.credits.price'))
                                             ->numeric()
                                             ->prefix('$')
                                             ->required()
@@ -467,7 +467,7 @@ class LoansForm
                                  * MONTO INICIAL
                                  */
                                 TextInput::make('initial_amount')
-                                    ->label('Monto inicial')
+                                    ->label(__('resources.credits.credits.initial_amount'))
                                     ->numeric()
                                     ->prefix('$')
                                     ->readOnly()
@@ -475,7 +475,7 @@ class LoansForm
                                     ->columnSpanFull(),
 
                                 TextInput::make('down_payment')
-                                    ->label('Pago inicial')
+                                    ->label(__('ui.credits.down_payment_entry'))
                                     ->numeric()
                                     ->prefix('$')
                                     ->default(0)
@@ -484,7 +484,7 @@ class LoansForm
                                     ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installments')
-                                    ->label('Número de cuotas')
+                                    ->label(__('ui.credits.installments_count'))
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue((int) config('quantum.installments.max', 100))
@@ -500,10 +500,10 @@ class LoansForm
                                  * y el total salen de ella.
                                  */
                                 Select::make('interest_type')
-                                    ->label('Interés')
+                                    ->label(__('resources.credits.credits.interest_type'))
                                     ->options([
-                                        'auto' => 'Calculado (según la cuota)',
-                                        'fixed' => 'Fijo (tasa pactada)',
+                                        'auto' => __('ui.credits.interest_auto'),
+                                        'fixed' => __('ui.credits.interest_fixed'),
                                     ])
                                     ->default('auto')
                                     ->required()
@@ -511,7 +511,7 @@ class LoansForm
                                     ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('interest_rate')
-                                    ->label('Tasa por cuota')
+                                    ->label(__('ui.credits.rate_per_installment'))
                                     ->numeric()
                                     ->suffix('%')
                                     ->step('0.01')
@@ -523,7 +523,7 @@ class LoansForm
                                     ->afterStateUpdated(fn (callable $set, Get $get) => self::applyFixedRate($set, $get)),
 
                                 TextInput::make('installment_amount')
-                                    ->label('Monto de cuota')
+                                    ->label(__('resources.credits.credits.installment_amount'))
                                     ->numeric()
                                     ->prefix('$')
                                     // Con interés fijo la cuota es el resultado, no la entrada.
@@ -540,18 +540,18 @@ class LoansForm
                                     ->required(),
 
                                 DatePicker::make('start_date')
-                                    ->label('Fecha de inicio')
+                                    ->label(__('resources.credits.credits.start_date'))
                                     ->required(),
 
                                 TextInput::make('payment_day')
-                                    ->label('Día de pago')
+                                    ->label(__('resources.credits.credits.payment_day'))
                                     ->numeric()
                                     ->minValue(1)
                                     ->maxValue(31)
                                     ->required(),
 
                                 Select::make('status')
-                                    ->label('Estado')
+                                    ->label(__('resources.credits.credits.status'))
                                     ->options([
                                         'active' => 'Activo',
                                         'completed' => 'Completado',

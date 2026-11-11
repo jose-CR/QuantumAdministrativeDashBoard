@@ -2,12 +2,16 @@
 
 namespace App\Filament\Admin\Resources\Administration\Outflows\Schemas;
 
+use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\Outflow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class OutflowForm
@@ -44,6 +48,54 @@ class OutflowForm
                 TextInput::make('area')
                     ->label(__('resources.flow.outflow.area'))
                     ->required(),
+
+                Section::make('Article')
+                    ->description(__('ui.outflow.items_help'))
+                    ->schema([
+                        Repeater::make('items')
+                            ->relationship()
+                            ->hiddenLabel()
+                            ->schema([
+                                Select::make('article_id')
+                                    ->label(__('ui.outflow.item'))
+                                    ->searchable()
+                                    ->required()
+                                    ->options(fn (): array => Article::query()
+                                        ->where('tracking', Article::TRACKING_NONE)
+                                        ->orderBy('name')
+                                        ->get()
+                                        ->mapWithKeys(fn (Article $articulo): array => [
+                                            $articulo->id => "{$articulo->full_name} (stock: {$articulo->stock})",
+                                        ])
+                                        ->all())
+                                    ->live()
+                                    ->afterStateUpdated(function ($state, callable $set): void {
+                                        if ($articulo = Article::find($state)) {
+                                            $set('price', (float) $articulo->cash_price);
+                                        }
+                                    }),
+
+                                TextInput::make('quantity')
+                                    ->label(__('ui.outflow.quantity'))
+                                    ->numeric()
+                                    ->integer()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+
+                                TextInput::make('price')
+                                    ->label(__('ui.outflow.unit_price'))
+                                    ->numeric()
+                                    ->prefix('$')
+                                    ->required(),
+                            ])
+                            ->columns(3)
+                            ->defaultItems(0)
+                            ->addActionLabel(__('ui.outflow.add_item'))
+                            ->columnSpanFull(),
+                    ])
+                    ->columns(1)
+                    ->columnSpanFull(),
 
                 FileUpload::make('attachment_uploads')
                     ->label(__('resources.flow.attachment'))

@@ -21,46 +21,46 @@ class ArticlesTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('name')
-                    ->label(__('resources.inventary.article.name'))
+                    ->label(__('resources.inventory.article.name'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
 
                 TextColumn::make('category.name')
-                    ->label(__('resources.inventary.article.category'))
+                    ->label(__('resources.inventory.article.category'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('brand')
-                    ->label(__('resources.inventary.article.brand'))
+                    ->label(__('resources.inventory.article.brand'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('model')
-                    ->label(__('resources.inventary.article.model'))
+                    ->label(__('resources.inventory.article.model'))
                     ->searchable()
                     ->sortable()
                     ->toggleable(),
 
                 TextColumn::make('year')
-                    ->label(__('resources.inventary.article.year'))
+                    ->label(__('resources.inventory.article.year'))
                     ->sortable()
                     ->placeholder('—')
                     ->toggleable(),
 
                 TextColumn::make('sku')
-                    ->label(__('resources.inventary.article.sku'))
+                    ->label(__('resources.inventory.article.sku'))
                     ->searchable()
                     ->placeholder('—')
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('tracking')
-                    ->label(__('resources.inventary.article.tracking'))
+                    ->label(__('resources.inventory.article.tracking'))
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        Article::TRACKING_SERIAL => __('resources.inventary.article.tracking_serial_short'),
-                        Article::TRACKING_NONE => __('resources.inventary.article.tracking_none_short'),
+                        Article::TRACKING_SERIAL => __('resources.inventory.article.tracking_serial_short'),
+                        Article::TRACKING_NONE => __('resources.inventory.article.tracking_none_short'),
                         default => (string) $state,
                     })
                     ->color(fn (?string $state): string => $state === Article::TRACKING_SERIAL
@@ -68,31 +68,31 @@ class ArticlesTable
                         : 'gray'),
 
                 TextColumn::make('cash_price')
-                    ->label(__('resources.inventary.article.cash_price'))
+                    ->label(__('resources.inventory.article.cash_price'))
                     ->money('USD')
                     ->placeholder('—')
                     ->sortable(),
 
                 // Unidades serializadas (vehículos): cuántas hay registradas.
                 TextColumn::make('units_count')
-                    ->label(__('resources.inventary.article.units'))
+                    ->label(__('resources.inventory.article.units'))
                     ->counts('units')
                     ->alignCenter(),
 
                 // Existencias de los artículos que se manejan por cantidad.
                 TextColumn::make('stock')
-                    ->label(__('resources.inventary.article.stock'))
+                    ->label(__('resources.inventory.article.stock'))
                     ->alignCenter()
                     ->sortable(),
 
                 TextColumn::make('created_at')
-                    ->label(__('resources.inventary.article.created_at'))
+                    ->label(__('resources.inventory.article.created_at'))
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('updated_at')
-                    ->label(__('resources.inventary.article.updated_at'))
+                    ->label(__('resources.inventory.article.updated_at'))
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -112,7 +112,7 @@ class ArticlesTable
                             return null;
                         }
 
-                        return __('notifications.inventary.article.delete.cascade', [
+                        return __('notifications.inventory.article.delete.cascade', [
                             'units' => $summary['units'],
                         ]);
                     })
@@ -122,8 +122,8 @@ class ArticlesTable
                         if ($summary['units_in_credits'] > 0) {
                             Notification::make()
                                 ->danger()
-                                ->title(__('notifications.inventary.article.blocked.title'))
-                                ->body(__('notifications.inventary.article.blocked.body', [
+                                ->title(__('notifications.inventory.article.blocked.title'))
+                                ->body(__('notifications.inventory.article.blocked.body', [
                                     'name' => $record->full_name,
                                     'units' => $summary['units_in_credits'],
                                     'credits' => $record->creditsBlockingDeletionLabel(),
@@ -144,8 +144,8 @@ class ArticlesTable
                             if ($bloqueados->isNotEmpty()) {
                                 Notification::make()
                                     ->danger()
-                                    ->title(__('notifications.inventary.article.blocked.title'))
-                                    ->body(__('notifications.inventary.article.blocked.bulk', [
+                                    ->title(__('notifications.inventory.article.blocked.title'))
+                                    ->body(__('notifications.inventory.article.blocked.bulk', [
                                         'names' => $bloqueados->pluck('name')->implode(', '),
                                     ]))
                                     ->send();
@@ -156,8 +156,8 @@ class ArticlesTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title(__('notifications.inventary.article.delete.title'))
-                                ->body(__('notifications.inventary.article.delete.body'))
+                                ->title(__('notifications.inventory.article.delete.title'))
+                                ->body(__('notifications.inventory.article.delete.body'))
                         ),
                 ]),
             ]);

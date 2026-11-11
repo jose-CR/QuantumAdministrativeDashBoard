@@ -35,9 +35,15 @@ class InflowRules
                 'min:0.01',
             ],
 
+            'amount_paid' => [
+                'nullable',
+                'numeric',
+                'min:0',
+            ],
+
             'payment_method' => [
                 'required',
-                'in:cash,transfer',
+                'in:cash,card,transfer,cheque,quedan',
             ],
 
             'transfer_number' => [

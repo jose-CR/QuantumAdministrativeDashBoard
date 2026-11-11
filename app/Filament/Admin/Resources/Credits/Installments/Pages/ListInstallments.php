@@ -2,12 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Credits\Installments\Pages;
 
+use App\Filament\Admin\pages\DataTransfer;
 use App\Filament\Admin\Resources\Credits\Installments\InstallmentsResource;
-use App\Filament\Exports\Credits\InstallmentsExporter;
-use App\Filament\Imports\Credits\InstallmentImporter;
+use Filament\Actions\Action;
 use Filament\Actions\CreateAction;
-use Filament\Actions\ExportAction;
-use Filament\Actions\ImportAction;
 use Filament\Resources\Pages\ListRecords;
 
 class ListInstallments extends ListRecords
@@ -17,11 +15,13 @@ class ListInstallments extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            //CreateAction::make(),
-            ExportAction::make()
-                ->exporter(InstallmentsExporter::class),
-            ImportAction::make()
-                ->importer(InstallmentImporter::class)
+            CreateAction::make(),
+            // Los Excel de este módulo viven en Importar y exportar.
+            Action::make('datos')
+                ->label(__('models.others.data_transfer'))
+                ->icon('heroicon-o-arrows-right-left')
+                ->color('gray')
+                ->url(DataTransfer::getUrl(['model' => 'installments'])),
         ];
     }
 }
