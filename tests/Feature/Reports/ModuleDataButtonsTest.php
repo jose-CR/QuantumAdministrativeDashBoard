@@ -68,7 +68,8 @@ class ModuleDataButtonsTest extends TestCase
         Livewire::test(DataTransfer::class, ['model' => 'customers'])
             ->assertOk()
             ->assertSee('Clientes')
-            ->assertSee('Exportar')
+            ->assertSee('Excel')
+            ->assertSee('CSV')
             ->assertSee('Importar');
     }
 }
