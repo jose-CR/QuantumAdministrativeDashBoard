@@ -2,14 +2,16 @@
 
 namespace App\Filament\Admin\Resources\Administration\Outflows\Schemas;
 
+use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\Outflow;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
-use App\Models\Article;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
+use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 
 class OutflowForm
@@ -47,7 +49,7 @@ class OutflowForm
                     ->label(__('resources.flow.outflow.area'))
                     ->required(),
 
-                Section::make('Artículos')
+                Section::make('Article')
                     ->description('Si la compra es de artículos para el inventario, se suman al stock al guardar.')
                     ->schema([
                         Repeater::make('items')
