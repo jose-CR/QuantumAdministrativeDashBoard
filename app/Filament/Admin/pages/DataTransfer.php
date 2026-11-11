@@ -94,21 +94,21 @@ class DataTransfer extends Page
             ],
 
             'articles' => [
-                'area' => __('models.others.inventary'),
+                'area' => __('models.others.inventory'),
                 'label' => __('models.data_transfer.articles.label'),
                 'description' => __('models.data_transfer.articles.description'),
                 'exporter' => ArticlesExporter::class,
                 'importer' => ArticleImporter::class,
             ],
             'article-units' => [
-                'area' => __('models.others.inventary'),
+                'area' => __('models.others.inventory'),
                 'label' => __('models.data_transfer.article_units.label'),
                 'description' => __('models.data_transfer.article_units.description'),
                 'exporter' => UnitArticlesExporter::class,
                 'importer' => ArticleUnitImporter::class,
             ],
             'categories' => [
-                'area' => __('models.others.inventary'),
+                'area' => __('models.others.inventory'),
                 'label' => __('models.data_transfer.categories.label'),
                 'description' => __('models.data_transfer.categories.description'),
                 'exporter' => CategoriesExporter::class,

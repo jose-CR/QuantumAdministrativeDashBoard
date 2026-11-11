@@ -17,37 +17,37 @@ class ArticlesExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label(__('resources.inventary.article.id')),
+                ->label(__('resources.inventory.article.id')),
 
             ExportColumn::make('name')
-                ->label(__('resources.inventary.article.name')),
+                ->label(__('resources.inventory.article.name')),
 
             ExportColumn::make('sku')
-                ->label(__('resources.inventary.article.sku')),
+                ->label(__('resources.inventory.article.sku')),
 
             ExportColumn::make('category.name')
-                ->label(__('resources.inventary.article.category')),
+                ->label(__('resources.inventory.article.category')),
 
             ExportColumn::make('brand')
-                ->label(__('resources.inventary.article.brand')),
+                ->label(__('resources.inventory.article.brand')),
 
             ExportColumn::make('model')
-                ->label(__('resources.inventary.article.model')),
+                ->label(__('resources.inventory.article.model')),
 
             ExportColumn::make('year')
-                ->label(__('resources.inventary.article.year')),
+                ->label(__('resources.inventory.article.year')),
 
             ExportColumn::make('tracking')
-                ->label(__('resources.inventary.article.tracking')),
+                ->label(__('resources.inventory.article.tracking')),
 
             ExportColumn::make('cash_price')
-                ->label(__('resources.inventary.article.cash_price')),
+                ->label(__('resources.inventory.article.cash_price')),
 
             ExportColumn::make('stock')
-                ->label(__('resources.inventary.article.stock')),
+                ->label(__('resources.inventory.article.stock')),
 
             ExportColumn::make('description')
-                ->label(__('resources.inventary.article.description'))
+                ->label(__('resources.inventory.article.description'))
                 // Texto plano: el editor guarda HTML y en el Excel viajaba como
                 // <p>…</p>, que al reimportar se duplicaba.
                 ->formatStateUsing(fn (?string $state): ?string => Html::plain($state)),

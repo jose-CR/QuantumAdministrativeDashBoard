@@ -22,28 +22,28 @@ class CustomerExporter extends Exporter
                 ->label('ID'),
 
             ExportColumn::make('document_type')
-                ->label('Tipo de documento'),
+                ->label(__('ui.columns.document_type')),
 
             ExportColumn::make('document_number')
-                ->label('Número de documento'),
+                ->label(__('ui.columns.document_number')),
 
             ExportColumn::make('full_name')
                 ->label('Nombre completo'),
 
             ExportColumn::make('email')
-                ->label('Correo electrónico'),
+                ->label(__('ui.columns.email')),
 
             ExportColumn::make('phone_primary')
-                ->label('Teléfono principal'),
+                ->label(__('ui.columns.primary_phone')),
 
             ExportColumn::make('phone_secondary')
-                ->label('Teléfono secundario'),
+                ->label(__('ui.columns.secondary_phone')),
 
             ExportColumn::make('nrc')
                 ->label('NRC'),
 
             ExportColumn::make('economic_activity')
-                ->label('Actividad económica'),
+                ->label(__('ui.columns.economic_activity')),
 /*                 ->formatStateUsing(
                     fn ($state) => ActividadesEconomicas::activityName($state)
                 ), */
@@ -74,13 +74,13 @@ class CustomerExporter extends Exporter
                 ),
 
             ExportColumn::make('address')
-                ->label('Dirección'),
+                ->label(__('ui.columns.address')),
 
             ExportColumn::make('created_at')
-                ->label('Fecha de creación'),
+                ->label(__('ui.columns.created_at')),
 
             ExportColumn::make('updated_at')
-                ->label('Última actualización'),
+                ->label(__('ui.columns.updated_at')),
         ];
     }
 
@@ -88,7 +88,7 @@ class CustomerExporter extends Exporter
     {
         return [
             Select::make('document_type')
-                ->label('Tipo de documento')
+                ->label(__('ui.columns.document_type'))
                 ->options([
                     'ALL' => 'Todos',
                     'DUI' => 'DUI',

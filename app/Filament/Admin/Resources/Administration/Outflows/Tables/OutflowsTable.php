@@ -42,7 +42,7 @@ class OutflowsTable
                 TextColumn::make('area')->label(__('resources.flow.outflow.area')),
 
                 TextColumn::make('items_count')
-                    ->label('Artículos')
+                    ->label(__('ui.tables.items'))
                     ->counts('items')
                     ->badge()
                     ->color(fn (int $state): string => $state > 0 ? 'info' : 'gray')
@@ -53,7 +53,7 @@ class OutflowsTable
                     ->counts('attachments')
                     ->badge()
                     ->color(fn (int $state) => $state > 0 ? 'success' : 'gray')
-                    ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : 'Sin adjuntos'),
+                    ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : __('ui.tables.no_attachments')),
             ])
             ->filters([
                 //

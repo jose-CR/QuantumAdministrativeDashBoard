@@ -19,7 +19,7 @@ return [
         'plural' => 'banks',
     ],
 
-    'inventary' => [
+    'inventory' => [
         'category' => [
             'navigation' => 'Categories',
             'singular' => 'Category',
@@ -79,7 +79,7 @@ return [
 
     'others' => [
         'administration' => 'administration',
-        'inventary' => 'Inventary',
+        'inventory' => 'Inventary',
         'credits' => 'Credits',
         'clients' => 'Clients',
         'cash' => 'Cash',

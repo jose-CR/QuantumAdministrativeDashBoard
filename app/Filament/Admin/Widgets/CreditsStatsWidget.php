@@ -21,20 +21,20 @@ class CreditsStatsWidget extends StatsOverviewWidget
 
     protected function getHeading(): ?string
     {
-        return 'Créditos';
+        return __('ui.widgets.credits');
     }
 
     protected function getStats(): array
     {
         return [
-            Stat::make('Créditos activos', $this->activeCredits()->count())
+            Stat::make(__('ui.widgets.active_credits'), $this->activeCredits()->count())
                 ->description('En curso')
                 ->color('primary'),
-            Stat::make('Saldo por cobrar', $this->money($this->activeCredits()->sum('pending_balance')))
-                ->description('Pendiente de créditos activos')
+            Stat::make(__('ui.widgets.pending_balance'), $this->money($this->activeCredits()->sum('pending_balance')))
+                ->description(__('ui.widgets.pending_balance_desc'))
                 ->color('warning'),
 /*             Stat::make('Financiado', $this->money($this->financedInRange()))
-                ->description('Créditos iniciados en el período')
+                ->description(__('ui.widgets.financed_desc'))
                 ->color('success'), */
         ];
     }

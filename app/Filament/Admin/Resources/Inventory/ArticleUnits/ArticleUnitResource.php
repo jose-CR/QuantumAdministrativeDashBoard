@@ -21,7 +21,7 @@ class ArticleUnitResource extends Resource
 
     protected static function getTranslationKey(): string
     {
-        return 'models.inventary.article_units';
+        return 'models.inventory.article_units';
     }
 
     protected static ?string $model = ArticleUnit::class;
@@ -58,7 +58,7 @@ class ArticleUnitResource extends Resource
     */
 
     public static function getNavigationGroup(): string {
-        return __('models.others.inventary');
+        return __('models.others.inventory');
     }
 
     public static function getPages(): array

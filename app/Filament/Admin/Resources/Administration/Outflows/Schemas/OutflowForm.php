@@ -50,14 +50,14 @@ class OutflowForm
                     ->required(),
 
                 Section::make('Article')
-                    ->description('Si la compra es de artículos para el inventario, se suman al stock al guardar.')
+                    ->description(__('ui.outflow.items_help'))
                     ->schema([
                         Repeater::make('items')
                             ->relationship()
                             ->hiddenLabel()
                             ->schema([
                                 Select::make('article_id')
-                                    ->label('Artículo')
+                                    ->label(__('ui.outflow.item'))
                                     ->searchable()
                                     ->required()
                                     ->options(fn (): array => Article::query()
@@ -76,7 +76,7 @@ class OutflowForm
                                     }),
 
                                 TextInput::make('quantity')
-                                    ->label('Cantidad')
+                                    ->label(__('ui.outflow.quantity'))
                                     ->numeric()
                                     ->integer()
                                     ->minValue(1)
@@ -84,14 +84,14 @@ class OutflowForm
                                     ->required(),
 
                                 TextInput::make('price')
-                                    ->label('Precio unitario')
+                                    ->label(__('ui.outflow.unit_price'))
                                     ->numeric()
                                     ->prefix('$')
                                     ->required(),
                             ])
                             ->columns(3)
                             ->defaultItems(0)
-                            ->addActionLabel('Agregar artículo')
+                            ->addActionLabel(__('ui.outflow.add_item'))
                             ->columnSpanFull(),
                     ])
                     ->columns(1)

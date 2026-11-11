@@ -82,7 +82,7 @@ class AdminPanelProvider extends PanelProvider
                     ->label(__('models.others.cash'))
                     ->collapsible(false),
                 NavigationGroup::make()
-                    ->label(__('models.others.inventary'))
+                    ->label(__('models.others.inventory'))
                     ->collapsible(false),
                 NavigationGroup::make()
                     ->label(__('models.others.credits'))

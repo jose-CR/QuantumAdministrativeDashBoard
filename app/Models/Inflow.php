@@ -53,7 +53,7 @@ class Inflow extends Model
 
         if ($total <= 0) {
             throw ValidationException::withMessages([
-                'amount' => 'El monto tiene que ser mayor que cero.',
+                'amount' => __('ui.validation.amount_positive'),
             ]);
         }
 
@@ -64,13 +64,13 @@ class Inflow extends Model
 
         if ($cobrado < 0) {
             throw ValidationException::withMessages([
-                'amount_paid' => 'Lo cobrado no puede ser negativo.',
+                'amount_paid' => __('ui.validation.paid_not_negative'),
             ]);
         }
 
         if ($cobrado > $total) {
             throw ValidationException::withMessages([
-                'amount_paid' => 'Lo cobrado no puede superar el monto de la entrada.',
+                'amount_paid' => __('ui.validation.paid_over_amount'),
             ]);
         }
 

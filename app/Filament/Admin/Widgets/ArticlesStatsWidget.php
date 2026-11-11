@@ -28,14 +28,14 @@ class ArticlesStatsWidget extends StatsOverviewWidget
         $endDate = ($this->pageFilters ?? [])['endDate'] ?? null;
 
         return [
-            Stat::make('Artículos', Article::query()
+            Stat::make(__('ui.widgets.articles'), Article::query()
                     ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
                     ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
                     ->count())
-                ->description('Modelos en el catálogo')
+                ->description(__('ui.widgets.articles_desc'))
                 ->color('primary'),
-            Stat::make('Categorías', Category::count())
-                ->description('Para clasificarlos')
+            Stat::make(__('ui.widgets.categories'), Category::count())
+                ->description(__('ui.widgets.categories_desc'))
                 ->color('info'),
         ];
     }

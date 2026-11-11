@@ -45,7 +45,7 @@ class CashReport
         $outflows = static::outflows($from, $until);
 
         if (empty($inflows['rows']) && empty($outflows['rows'])) {
-            throw new \RuntimeException('No hay entradas ni salidas registradas en ese rango de fechas.');
+            throw new \RuntimeException(__('ui.cash_report.no_data'));
         }
 
         $out = storage_path('app/private/exports/cash_report_' . now()->format('Ymd_His') . '_' . Str::random(4) . '.xlsx');
@@ -71,7 +71,7 @@ class CashReport
                 base_path(config('quantum.python.script', 'python/scripts/cash_report.py')),
             ]);
 
-        throw_if($result->failed(), \RuntimeException::class, $result->errorOutput() ?: 'Python falló sin mensaje.');
+        throw_if($result->failed(), \RuntimeException::class, $result->errorOutput() ?: __('ui.cash_report.python_failed'));
 
         return $out;
     }
@@ -88,15 +88,22 @@ class CashReport
             ->mapWithKeys(fn (Customer $c) => [$c->id => $c->full_name]);
         $banks = Bank::whereIn('id', $records->pluck('bank_id')->filter()->unique())->pluck('name', 'id');
 
-        $method = ['cash' => 'Efectivo', 'transfer' => 'Transferencia'];
-        $status = ['pending' => 'Pendiente', 'partial' => 'Parcial', 'paid' => 'Pagado'];
+        $method = [
+            'cash' => __('ui.payment_methods.cash'),
+            'transfer' => __('ui.payment_methods.transfer'),
+        ];
+        $status = [
+            'pending' => __('ui.payment_status.pending'),
+            'partial' => __('ui.payment_status.partial'),
+            'paid' => __('ui.payment_status.paid'),
+        ];
 
         return [
-            'title' => 'Entradas',
+            'title' => __('ui.widgets.inflows'),
             'headers' => [
-                'Número de factura', 'Fecha', 'Descripción', 'Cliente', 'Monto', 'Cobrado', 'Por cobrar',
-                'Método de pago', 'Número de transferencia', 'Banco', 'Fecha de transferencia',
-                'Estado de pago', 'Vendedor', 'Notas',
+                __('ui.columns.invoice_number'), __('ui.columns.date'), __('ui.columns.description'), __('ui.columns.customer'), __('ui.columns.amount'), __('ui.columns.collected'), __('ui.columns.receivable'),
+                __('ui.columns.payment_method'), __('ui.columns.transfer_number'), __('ui.columns.bank'), __('ui.columns.transfer_date'),
+                __('ui.columns.payment_status'), __('ui.columns.salesperson'), __('ui.columns.notes'),
             ],
             'rows' => $records->map(fn (Inflow $i) => [
                 $i->invoice_number,
@@ -131,7 +138,7 @@ class CashReport
             ->get();
 
         return [
-            'title' => 'Salidas',
+            'title' => __('ui.widgets.outflows'),
             'headers' => [
                 'Fecha de factura', 'Empresa', 'Código de factura', 'Cantidad', 'Monto', 'Descripción', 'Origen', 'Área',
             ],

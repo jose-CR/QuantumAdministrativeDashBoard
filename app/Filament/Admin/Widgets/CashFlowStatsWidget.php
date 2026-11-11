@@ -20,7 +20,7 @@ class CashFlowStatsWidget extends StatsOverviewWidget
 
     protected function getHeading(): ?string
     {
-        return 'Flujo de caja';
+        return __('ui.widgets.cash_flow');
     }
 
     protected function getStats(): array
@@ -30,20 +30,20 @@ class CashFlowStatsWidget extends StatsOverviewWidget
         $balance = $inflows - $outflows;
 
         return [
-            Stat::make('Entradas', $this->money($inflows))
-                ->description('Dinero que ingresó')
+            Stat::make(__('ui.widgets.inflows'), $this->money($inflows))
+                ->description(__('ui.widgets.inflows_desc'))
                 ->color('success'),
-            Stat::make('Salidas', $this->money($outflows))
+            Stat::make(__('ui.widgets.outflows'), $this->money($outflows))
                 ->description('Gastos y compras')
                 ->color('danger'),
             Stat::make('Balance', $this->money($balance))
-                ->description('Entradas menos salidas')
+                ->description(__('ui.widgets.balance_desc'))
                 ->color($balance >= 0 ? 'success' : 'danger'),
-            Stat::make('Cobrado', $this->money($this->totalInRange(Inflow::class, 'date', 'amount_paid')))
-                ->description('De lo facturado en el rango')
+            Stat::make(__('ui.widgets.collected'), $this->money($this->totalInRange(Inflow::class, 'date', 'amount_paid')))
+                ->description(__('ui.widgets.collected_desc'))
                 ->color('info'),
-            Stat::make('Por cobrar', $this->money($inflows - $this->totalInRange(Inflow::class, 'date', 'amount_paid')))
-                ->description('Facturado que todavía no entró')
+            Stat::make(__('ui.widgets.receivable'), $this->money($inflows - $this->totalInRange(Inflow::class, 'date', 'amount_paid')))
+                ->description(__('ui.widgets.receivable_desc'))
                 ->color('warning'),
         ];
     }

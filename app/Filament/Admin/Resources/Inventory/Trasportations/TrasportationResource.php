@@ -48,7 +48,7 @@ class TrasportationResource extends Resource
     */
 
     public static function getNavigationGroup(): string {
-        return __('models.others.inventary');
+        return __('models.others.inventory');
     }
 
     public static function getPages(): array

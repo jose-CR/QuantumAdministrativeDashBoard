@@ -20,40 +20,40 @@ class ArticleUnitsTable
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('article_id')
-                    ->label(__('resources.inventary.article_units.article'))
+                    ->label(__('resources.inventory.article_units.article'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 // El nombre del artículo ya incluye marca y modelo (o el nombre
                 // propio de un artículo genérico). Antes se mostraban dos columnas
                 // que quedaban vacías para todo lo que no fuera vehículo.
                 TextColumn::make('article.name')
-                    ->label(__('resources.inventary.article_units.article'))
+                    ->label(__('resources.inventory.article_units.article'))
                     ->searchable()
                     ->sortable()
                     ->weight('medium'),
 
                 TextColumn::make('cash_price')
-                    ->label(__('resources.inventary.article_units.cash_price'))
+                    ->label(__('resources.inventory.article_units.cash_price'))
                     ->money('USD')
                     ->sortable(),
 
                 TextColumn::make('vin')
-                    ->label(__('resources.inventary.article_units.vin'))
+                    ->label(__('resources.inventory.article_units.vin'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('engine_number')
-                    ->label(__('resources.inventary.article_units.engine_number'))
+                    ->label(__('resources.inventory.article_units.engine_number'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('plate')
-                    ->label(__('resources.inventary.article_units.plate'))
+                    ->label(__('resources.inventory.article_units.plate'))
                     ->searchable()
                     ->sortable(),
 
                 TextColumn::make('color')
-                    ->label(__('resources.inventary.article_units.color'))
+                    ->label(__('resources.inventory.article_units.color'))
                     ->searchable()
                     ->sortable()
                     ->badge()
@@ -76,7 +76,7 @@ class ArticleUnitsTable
                     }),
 
                 TextColumn::make('status')
-                    ->label(__('resources.inventary.article_units.status'))
+                    ->label(__('resources.inventory.article_units.status'))
                     ->badge()
                     ->formatStateUsing(fn (string $state) => match ($state) {
                         'available' => 'Disponible',
@@ -94,12 +94,12 @@ class ArticleUnitsTable
                     }),
 
                 TextColumn::make('created_at')
-                    ->label(__('resources.inventary.article_units.created_at'))
+                    ->label(__('resources.inventory.article_units.created_at'))
                     ->dateTime('d/m/Y')
                     ->sortable(),
 
                 TextColumn::make('updated_at')
-                    ->label(__('resources.inventary.article_units.updated_at'))
+                    ->label(__('resources.inventory.article_units.updated_at'))
                     ->dateTime('d/m/Y')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -117,8 +117,8 @@ class ArticleUnitsTable
                         ->successNotification(
                             Notification::make()
                                 ->success()
-                                ->title(__('notifications.inventary.articleUnits.delete.title'))
-                                ->body(__('notifications.inventary.articleUnits.delete.body'))
+                                ->title(__('notifications.inventory.articleUnits.delete.title'))
+                                ->body(__('notifications.inventory.articleUnits.delete.body'))
                         ),
                 ]),
             ]);

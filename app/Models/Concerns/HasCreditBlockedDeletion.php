@@ -26,7 +26,7 @@ trait HasCreditBlockedDeletion
         $remaining = $credits->count() - $limit;
 
         return $remaining > 0
-            ? $label . ' ' . __('notifications.inventary.more_credits', ['count' => $remaining])
+            ? $label . ' ' . __('notifications.inventory.more_credits', ['count' => $remaining])
             : $label;
     }
 }

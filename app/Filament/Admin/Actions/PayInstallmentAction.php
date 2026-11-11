@@ -74,7 +74,7 @@ class PayInstallmentAction extends Action
                 Section::make(__('resources.credits.clients.pay_installment.installment_to_pay'))
                     ->schema([
                         Select::make('payment_method')
-                            ->label(__('resources.credits.clients.pay_installment.payment_method.payment_method'))
+                            ->label(__('resources.credits.clients.pay_installment.payment_method'))
                             ->options([
                                 'cash' => __('resources.credits.clients.pay_installment.payment_methods.cash'),
                                 'card' => __('resources.credits.clients.pay_installment.payment_methods.card'),

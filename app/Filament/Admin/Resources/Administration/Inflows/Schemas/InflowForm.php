@@ -21,7 +21,7 @@ class InflowForm
         return $schema
             ->components([
                 Section::make('Datos generales')
-                    ->description('Información principal del ingreso')
+                    ->description(__('ui.inflow.section_main'))
                     ->schema([
                         TextInput::make('invoice_number')
                             ->label(__('resources.flow.inflow.cod_invoice'))
@@ -49,8 +49,8 @@ class InflowForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('Pago')
-                    ->description('Detalles del cobro y su estado')
+                Section::make(__('ui.inflow.section_payment'))
+                    ->description(__('ui.inflow.section_payment_help'))
                     ->schema([
                         TextInput::make('amount')
                             ->label(__('resources.flow.inflow.amount'))
@@ -75,7 +75,7 @@ class InflowForm
                             ->numeric()
                             ->prefix('$')
                             ->default(0)
-                            ->helperText('0 = pendiente · igual al monto = pagado · en medio = parcial')
+                            ->helperText(__('ui.inflow.amount_paid_help'))
                             ->required(),
 
                         Select::make('payment_method')
@@ -108,15 +108,15 @@ class InflowForm
                     ->columns(2)
                     ->columnSpanFull(),
 
-                Section::make('Artículos')
-                    ->description('Si la venta incluye artículos del inventario, se descuentan del stock al guardar.')
+                Section::make(__('ui.inflow.items'))
+                    ->description(__('ui.inflow.items_help'))
                     ->schema([
                         Repeater::make('items')
                             ->relationship()
                             ->hiddenLabel()
                             ->schema([
                                 Select::make('article_id')
-                                    ->label('Artículo')
+                                    ->label(__('ui.inflow.item'))
                                     ->searchable()
                                     ->required()
                                     ->options(fn (): array => Article::query()
@@ -135,7 +135,7 @@ class InflowForm
                                     }),
 
                                 TextInput::make('quantity')
-                                    ->label('Cantidad')
+                                    ->label(__('ui.inflow.quantity'))
                                     ->numeric()
                                     ->integer()
                                     ->minValue(1)
@@ -143,21 +143,21 @@ class InflowForm
                                     ->required(),
 
                                 TextInput::make('price')
-                                    ->label('Precio unitario')
+                                    ->label(__('ui.inflow.unit_price'))
                                     ->numeric()
                                     ->prefix('$')
                                     ->required(),
                             ])
                             ->columns(3)
                             ->defaultItems(0)
-                            ->addActionLabel('Agregar artículo')
+                            ->addActionLabel(__('ui.inflow.add_item'))
                             ->columnSpanFull(),
                     ])
                     ->columns(1)
                     ->columnSpanFull(),
 
-                Section::make('Documentación')
-                    ->description('Observaciones y archivos relacionados con el ingreso')
+                Section::make(__('ui.inflow.section_docs'))
+                    ->description(__('ui.inflow.section_docs_help'))
                     ->schema([
                         Textarea::make('notes')
                             ->label(__('resources.flow.inflow.notes'))

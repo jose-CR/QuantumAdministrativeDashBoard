@@ -40,7 +40,7 @@ class InflowsTable
                 TextColumn::make('amount')
                     ->money('usd')
                     ->label(__('resources.flow.inflow.amount'))
-                    ->summarize(Sum::make()->label('Total')->money('usd')),
+                    ->summarize(Sum::make()->label(__('ui.tables.total'))->money('usd')),
 
                 TextColumn::make('amount_paid')
                     ->money('usd')
@@ -77,7 +77,7 @@ class InflowsTable
                     ->label(__('resources.flow.inflow.salesperson')),
 
                 TextColumn::make('items_count')
-                    ->label('Artículos')
+                    ->label(__('ui.tables.items'))
                     ->counts('items')
                     ->badge()
                     ->color(fn (int $state): string => $state > 0 ? 'info' : 'gray')
@@ -88,7 +88,7 @@ class InflowsTable
                     ->counts('attachments')
                     ->badge()
                     ->color(fn (int $state) => $state > 0 ? 'success' : 'gray')
-                    ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : 'Sin adjuntos'),
+                    ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : __('ui.tables.no_attachments')),
             ])
             ->filters([
                 SelectFilter::make('payment_status')
@@ -100,7 +100,7 @@ class InflowsTable
                     ]),
 
                 Filter::make('rango')
-                    ->label('Rango de fechas')
+                    ->label(__('ui.tables.date_range'))
                     ->form([
                         DatePicker::make('desde')->label('Desde'),
                         DatePicker::make('hasta')->label('Hasta'),
@@ -112,7 +112,7 @@ class InflowsTable
                 // Los parciales viejos no tienen monto cobrado: hay que revisarlos
                 // a mano porque el dato no se registró nunca.
                 Filter::make('parciales_sin_cobro')
-                    ->label('Parciales sin cobro registrado')
+                    ->label(__('ui.tables.partials_without_payment'))
                     ->query(fn (Builder $query): Builder => $query
                         ->where('payment_status', 'partial')
                         ->where('amount_paid', '<=', 0)),

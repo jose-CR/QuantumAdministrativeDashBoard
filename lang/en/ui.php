@@ -1,0 +1,211 @@
+<?php
+
+/*
+|--------------------------------------------------------------------------
+| UI strings
+|--------------------------------------------------------------------------
+|
+| Everything on screen that did not have a key yet: labels, helpers and
+| messages from actions, widgets, tables and exports. Keys are in English,
+| the text is the language of this file.
+|
+*/
+
+return [
+    'credits' => [
+        'relation_title' => 'Credits',
+        'financed_short' => 'Financed',
+        'fixed_prefix' => 'Fixed ',
+        'calculated_prefix' => 'Calculated ',
+        'rate_suffix' => '% per installment',
+        'down_payment_entry' => 'Down payment',
+        'interest_total_short' => 'Interest',
+        'total_to_pay' => 'Total to pay',
+        'installments_status' => 'Installment status',
+        'installments_summary' => '%d paid · %d pending · %d overdue',
+        'refinanced_from' => 'Refinanced from',
+        'items' => 'Credit items',
+        'item' => 'Item',
+        'price' => 'Price',
+        'label' => 'Credit',
+        'customer' => 'Customer',
+        'article' => 'Article',
+        'article_by_quantity' => 'Article (by quantity)',
+        'quantity' => 'Quantity',
+        'installments_count' => 'Number of installments',
+        'interest_auto' => 'Calculated (from the installment)',
+        'interest_fixed' => 'Fixed (agreed rate)',
+        'rate_per_installment' => 'Rate per installment',
+    ],
+
+    'refinance' => [
+        'title' => 'Refinance credit',
+        'description' => 'A new credit is created for the pending balance. The current one is closed as refinanced.',
+        'balance' => 'Balance to refinance',
+        'installments' => 'Number of installments',
+        'installment_amount' => 'Amount of each installment',
+        'installment_help' => 'Raise the installment to charge interest: the total is installment × count.',
+        'first_due_date' => 'First installment due date',
+        'resulting_installment' => 'Resulting installment',
+        'auto_option' => 'Calculated from the installment',
+        'no_credit' => 'There is no active credit with a balance to refinance.',
+        'created_title' => 'Credit refinanced',
+        'created_body' => 'Credit #%d for $%s. #%d was closed.',
+    ],
+
+    'inflow' => [
+        'section_main' => 'Main inflow information',
+        'section_payment' => 'Payment',
+        'section_payment_help' => 'Collection details and its status',
+        'amount_paid_help' => '0 = pending · same as amount = paid · in between = partial',
+        'items' => 'Items',
+        'items_help' => 'If the sale includes inventory items, they are taken out of stock on save.',
+        'item' => 'Article',
+        'quantity' => 'Quantity',
+        'unit_price' => 'Unit price',
+        'add_item' => 'Add article',
+        'section_docs' => 'Documentation',
+        'section_docs_help' => 'Notes and files related to the inflow',
+    ],
+
+    'outflow' => [
+        'items_help' => 'If the purchase is for inventory items, they are added to stock on save.',
+        'item' => 'Article',
+        'quantity' => 'Quantity',
+        'unit_price' => 'Unit price',
+        'add_item' => 'Add article',
+    ],
+
+    // Spreadsheet columns: the same in export and import.
+    'columns' => [
+        'invoice_number' => 'Invoice number',
+        'invoice_date' => 'Invoice date',
+        'invoice_code' => 'Invoice code',
+        'date' => 'Date',
+        'description' => 'Description',
+        'customer' => 'Customer',
+        'amount' => 'Amount',
+        'collected' => 'Collected',
+        'company' => 'Company',
+        'receivable' => 'Receivable',
+        'payment_method' => 'Payment method',
+        'transfer_number' => 'Transfer number',
+        'bank' => 'Bank',
+        'transfer_date' => 'Transfer date',
+        'payment_status' => 'Payment status',
+        'salesperson' => 'Salesperson',
+        'notes' => 'Notes',
+        'quantity' => 'Quantity',
+        'area' => 'Area',
+        'document_type' => 'Document type',
+        'document_number' => 'Document number',
+        'email' => 'Email',
+        'primary_phone' => 'Primary phone',
+        'secondary_phone' => 'Secondary phone',
+        'economic_activity' => 'Economic activity',
+        'address' => 'Address',
+        'created_at' => 'Created at',
+        'updated_at' => 'Last update',
+    ],
+
+    'widgets' => [
+        'cash_flow' => 'Cash flow',
+        'inflows' => 'Inflows',
+        'inflows_desc' => 'Money that came in',
+        'outflows' => 'Outflows',
+        'balance_desc' => 'Inflows minus outflows',
+        'collected' => 'Collected',
+        'collected_desc' => 'Of what was invoiced in the range',
+        'receivable' => 'Receivable',
+        'receivable_desc' => 'Invoiced and not collected yet',
+        'credits' => 'Credits',
+        'active_credits' => 'Active credits',
+        'pending_balance' => 'Receivable balance',
+        'pending_balance_desc' => 'Pending from active credits',
+        'financed_desc' => 'Credits started in the period',
+        'customers' => 'Customers',
+        'customers_total_desc' => 'Total registered',
+        'new_this_month' => 'New this month',
+        'new_this_month_desc' => 'Customers created',
+        'customers_overdue' => 'Customers overdue',
+        'customers_overdue_desc' => 'With overdue installments',
+        'articles' => 'Articles',
+        'articles_desc' => 'Models in the catalog',
+        'categories' => 'Categories',
+        'categories_desc' => 'To classify them',
+        'overdue_credits' => 'Overdue credits',
+        'overdue_installments' => 'Overdue installments',
+        'see_customer' => 'See customer',
+    ],
+
+    'tables' => [
+        'total' => 'Total',
+        'items' => 'Items',
+        'no_attachments' => 'No attachments',
+        'date_range' => 'Date range',
+        'partials_without_payment' => 'Partials with no payment recorded',
+    ],
+
+    'attachments' => [
+        'section' => 'Attachments',
+        'section_help' => 'Invoices and photos: by credit, by installment or loose.',
+        'file' => 'File',
+        'files' => 'Files',
+        'size' => 'Size',
+        'uploaded' => 'Uploaded',
+        'add' => 'Add attachments',
+        'open' => 'Open',
+        'replace' => 'Replace',
+        'new_file' => 'New file',
+    ],
+
+    'clients' => [
+        'no_nrc' => 'No NRC',
+        'add_reference' => 'Add reference',
+    ],
+
+    'cash_report' => [
+        'title' => 'Cash flow report',
+        'description' => 'Inflows and outflows in one sheet, with summary, charts and analysis. No dates means everything.',
+        'error' => 'The report could not be generated',
+        'success_title' => 'Report generated',
+        'success_body' => 'Your cash flow report is ready.',
+        'inflows_title' => 'Inflows report',
+        'outflows_title' => 'Outflows report',
+
+        'no_data' => 'There are no inflows or outflows in that date range.',
+        'python_failed' => 'Python failed without a message.',
+    ],
+
+    'payment_methods' => [
+        'cash' => 'Cash',
+        'transfer' => 'Transfer',
+        'card' => 'Card',
+        'cheque' => 'Check',
+        'quedan' => 'Quedan',
+        'bank_transfer' => 'Bank transfer',
+    ],
+
+    'payment_status' => [
+        'pending' => 'Pending',
+        'partial' => 'Partial',
+        'paid' => 'Paid',
+    ],
+
+    'validation' => [
+        'document_type_invalid' => 'Invalid document type.',
+        'document_taken' => 'A customer with that document already exists.',
+        'municipality_not_in_department' => 'That municipality does not exist in the department.',
+        'district_not_in_municipality' => 'That district does not exist in the municipality.',
+        'amount_positive' => 'The amount must be greater than zero.',
+        'paid_not_negative' => 'The collected amount cannot be negative.',
+        'paid_over_amount' => 'The collected amount cannot be more than the inflow amount.',
+        'initial_amount_positive' => 'The initial amount must be greater than zero.',
+        'down_payment_negative' => 'The down payment cannot be negative.',
+        'down_payment_over_initial' => 'The down payment cannot be more than the initial amount.',
+        'installments_positive' => 'The number of installments must be greater than zero.',
+        'nothing_to_finance' => 'Nothing to finance: the down payment covers the total amount.',
+        'interest_not_negative' => 'The interest rate cannot be negative.',
+        'tag_taken' => 'A tag with that name already exists.',
+    ],
+];

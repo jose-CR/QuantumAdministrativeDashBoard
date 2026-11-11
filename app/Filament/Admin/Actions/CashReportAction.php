@@ -23,13 +23,13 @@ class CashReportAction extends Action
         $range = CashReport::dateRange();
 
         $this
-            ->label('Reporte de flujo de caja')
+            ->label(__('ui.cash_report.title'))
             ->icon('heroicon-o-arrow-down-tray')
-            ->modalHeading('Reporte de flujo de caja')
+            ->modalHeading(__('ui.cash_report.title'))
             ->modalDescription(
                 $range['min'] && $range['max']
                     ? "Entradas y salidas en una hoja, con resumen, gráficos y análisis. Datos disponibles entre {$range['min']} y {$range['max']}. Sin fechas incluye todo."
-                    : 'Entradas y salidas en una hoja, con resumen, gráficos y análisis. Sin fechas incluye todo.'
+                    : __('ui.cash_report.description')
             )
             ->modalSubmitActionLabel('Generar y descargar')
             ->schema([
@@ -49,7 +49,7 @@ class CashReportAction extends Action
                 } catch (\Throwable $e) {
                     report($e);
                     Notification::make()
-                        ->title('No se pudo generar el reporte')
+                        ->title(__('ui.cash_report.error'))
                         ->body($e->getMessage())
                         ->danger()
                         ->send();
@@ -66,8 +66,8 @@ class CashReportAction extends Action
                 $recipient = Auth::user();
 
                 Notification::make()
-                    ->title('Reporte generado')
-                    ->body('Tu reporte de flujo de caja está listo.')
+                    ->title(__('ui.cash_report.success_title'))
+                    ->body(__('ui.cash_report.success_body'))
                     ->success()
                     ->actions([
                         Action::make('download')

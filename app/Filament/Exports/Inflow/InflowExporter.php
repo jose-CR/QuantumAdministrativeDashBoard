@@ -16,29 +16,29 @@ class InflowExporter extends Exporter
     {
         return [
             ExportColumn::make('invoice_number')
-                ->label('Número de factura'),
+                ->label(__('ui.columns.invoice_number')),
 
             ExportColumn::make('date')
-                ->label('Fecha'),
+                ->label(__('ui.columns.date')),
 
             ExportColumn::make('description')
-                ->label('Descripción'),
+                ->label(__('ui.columns.description')),
 
             ExportColumn::make('customer')
-                ->label('Cliente')
+                ->label(__('ui.columns.customer'))
                 ->state(fn (Inflow $record) => $record->customer_id),
 
             ExportColumn::make('amount_paid')
                 ->label('Cobrado'),
 
             ExportColumn::make('receivable')
-                ->label('Por cobrar'),
+                ->label(__('ui.columns.receivable')),
 
             ExportColumn::make('amount')
-                ->label('Monto'),
+                ->label(__('ui.columns.amount')),
 
             ExportColumn::make('payment_method')
-                ->label('Método de pago')
+                ->label(__('ui.columns.payment_method'))
                     ->formatStateUsing(fn (string $state): string => match ($state) {
                         'cash' => 'Efectivo',
                         'transfer' => 'Transferencia',
@@ -46,17 +46,17 @@ class InflowExporter extends Exporter
                     }),
 
             ExportColumn::make('transfer_number')
-                ->label('Número de transferencia'),
+                ->label(__('ui.columns.transfer_number')),
 
             ExportColumn::make('bank')
-                ->label('Banco')
+                ->label(__('ui.columns.bank'))
                 ->state(fn (Inflow $record) => $record->bank_id),
 
             ExportColumn::make('transfer_date')
-                ->label('Fecha de transferencia'),
+                ->label(__('ui.columns.transfer_date')),
 
             ExportColumn::make('payment_status')
-                ->label('Estado de pago')
+                ->label(__('ui.columns.payment_status'))
                 ->formatStateUsing(fn (string $state): string => match ($state) {
                         'pending' => 'Pendiente',
                         'partial' => 'Parcial',
@@ -65,10 +65,10 @@ class InflowExporter extends Exporter
                     }),
 
             ExportColumn::make('salesperson')
-                ->label('Vendedor'),
+                ->label(__('ui.columns.salesperson')),
 
             ExportColumn::make('notes')
-                ->label('Notas'),
+                ->label(__('ui.columns.notes')),
             
             ExportColumn::make('id')
                 ->label('ID interno'),

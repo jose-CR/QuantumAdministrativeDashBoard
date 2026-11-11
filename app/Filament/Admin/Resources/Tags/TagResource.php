@@ -46,7 +46,7 @@ class TagResource extends Resource
                             ->contains(fn (Tag $tag): bool => mb_strtolower(trim((string) $tag->name)) === $buscado);
 
                         if ($existe) {
-                            $fail('Ya hay una etiqueta con ese nombre.');
+                            $fail(__('ui.validation.tag_taken'));
                         }
                     };
                 }),
@@ -54,7 +54,7 @@ class TagResource extends Resource
             Select::make('type')
                 ->label('Tipo')
                 ->options([
-                    'customer' => 'Clientes',
+                    'customer' => __('ui.widgets.customers'),
                 ])
                 ->default('customer')
                 ->required(),
@@ -73,7 +73,7 @@ class TagResource extends Resource
                     ->label('Tipo')
                     ->badge()
                     ->formatStateUsing(fn (?string $state): string => match ($state) {
-                        'customer' => 'Clientes',
+                        'customer' => __('ui.widgets.customers'),
                         default => (string) $state,
                     }),
 

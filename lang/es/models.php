@@ -19,7 +19,7 @@ return [
         'plural' => 'Bancos',
     ],
 
-    'inventary' => [
+    'inventory' => [
         'category' => [
             'navigation' => 'Categorías',
             'singular' => 'Categoría',
@@ -79,7 +79,7 @@ return [
 
     'others' => [
         'administration' => 'Administración',
-        'inventary' => 'Inventario',
+        'inventory' => 'Inventario',
         'credits' => 'Créditos',
         'clients' => 'Clientes',
         'cash' => 'Caja',

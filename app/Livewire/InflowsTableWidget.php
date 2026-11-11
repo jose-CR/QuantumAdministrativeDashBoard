@@ -35,7 +35,7 @@ class InflowsTableWidget extends Component implements HasActions, HasTable, HasS
     {
         return[
             ExportAction::make('exportReport')
-                ->label('Reporte de entradas')
+                ->label(__('ui.cash_report.inflows_title'))
                 ->icon('heroicon-o-chart-bar')
                 ->exporter(InflowExporter::class)
                 ->formats([ExportFormat::Xlsx])

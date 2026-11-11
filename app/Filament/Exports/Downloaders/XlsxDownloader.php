@@ -24,24 +24,33 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class XlsxDownloader implements Downloader
 {
-    private const REPORT_META = [
-        \App\Filament\Exports\Inflow\InflowExporter::class => [
-            'title' => 'Entradas',
-            'amount' => 'Monto',
-            'date' => 'Fecha',
-            'invoice' => 'Número de factura',
-            'party' => 'Cliente',
-            'group_by' => 'Método de pago',
-        ],
-        \App\Filament\Exports\Outflow\OutflowExporter::class => [
-            'title' => 'Salidas',
-            'amount' => 'Monto',
-            'date' => 'Fecha de factura',
-            'invoice' => 'Código de factura',
-            'party' => 'Empresa',
-            'group_by' => 'Área',
-        ],
-    ];
+    /**
+     * Metadatos del reporte por exportador. Es un método y no una constante porque
+     * los títulos se traducen.
+     *
+     * @return array<class-string, array<string, string>>
+     */
+    private static function reportMeta(): array
+    {
+        return [
+            \App\Filament\Exports\Inflow\InflowExporter::class => [
+                'title' => __('ui.widgets.inflows'),
+                'amount' => __('ui.columns.amount'),
+                'date' => __('ui.columns.date'),
+                'invoice' => __('ui.columns.invoice_number'),
+                'party' => __('ui.columns.customer'),
+                'group_by' => __('ui.columns.payment_method'),
+            ],
+            \App\Filament\Exports\Outflow\OutflowExporter::class => [
+                'title' => __('ui.widgets.outflows'),
+                'amount' => __('ui.columns.amount'),
+                'date' => __('ui.columns.invoice_date'),
+                'invoice' => __('ui.columns.invoice_code'),
+                'party' => __('ui.columns.company'),
+                'group_by' => __('ui.columns.area'),
+            ],
+        ];
+    }
 
     private const MODEL_MAP = [
         \App\Filament\Exports\Inflow\InflowExporter::class => Inflow::class,
@@ -70,8 +79,10 @@ class XlsxDownloader implements Downloader
         // Solo enriquecer (TOTAL / Resumen / Análisis) para exporters que tengan
         // metadata de flujo de caja (Inflow/Outflow). Otros exporters (ej. Customer)
         // se descargan tal cual, sin pasar por cash_report.py.
-        if (array_key_exists($export->exporter, self::REPORT_META)) {
-            $reportPayload = ['path' => $tmpXlsx] + self::REPORT_META[$export->exporter];
+        $reportMeta = static::reportMeta();
+
+        if (array_key_exists($export->exporter, $reportMeta)) {
+            $reportPayload = ['path' => $tmpXlsx] + $reportMeta[$export->exporter];
 
             $result = Process::timeout(60)
                 ->input(json_encode($reportPayload, JSON_UNESCAPED_UNICODE))

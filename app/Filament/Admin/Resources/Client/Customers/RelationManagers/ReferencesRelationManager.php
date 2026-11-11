@@ -108,7 +108,7 @@ class ReferencesRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->label('Agregar referencia'),
+                    ->label(__('ui.clients.add_reference')),
             ])
             ->recordActions([
                 EditAction::make(),

@@ -17,7 +17,10 @@ class AttachmentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'attachments';
 
-    protected static ?string $title = 'Adjuntos';
+    public static function getTitle(\Illuminate\Database\Eloquent\Model $ownerRecord, string $pageClass): string
+    {
+        return __('ui.attachments.section');
+    }
 
     public function isReadOnly(): bool
     {
@@ -31,7 +34,7 @@ class AttachmentsRelationManager extends RelationManager
 
             ->columns([
                 TextColumn::make('original_name')
-                    ->label('Archivo')
+                    ->label(__('ui.attachments.file'))
                     ->searchable(),
 
                 TextColumn::make('mime_type')
@@ -39,22 +42,22 @@ class AttachmentsRelationManager extends RelationManager
                     ->badge(),
 
                 TextColumn::make('formatted_size')
-                    ->label('Tamaño'),
+                    ->label(__('ui.attachments.size')),
 
                 TextColumn::make('created_at')
-                    ->label('Subido')
+                    ->label(__('ui.attachments.uploaded'))
                     ->dateTime()
                     ->sortable(),
             ])
 
             ->headerActions([
                 Action::make('subir')
-                    ->label('Agregar adjuntos')
+                    ->label(__('ui.attachments.add'))
                     ->icon('heroicon-o-paper-clip')
 
                     ->schema([
                         FileUpload::make('files')
-                            ->label('Archivos')
+                            ->label(__('ui.attachments.files'))
                             ->multiple()
                             ->required()
                             ->disk('attachments')
@@ -84,7 +87,7 @@ class AttachmentsRelationManager extends RelationManager
 
             ->recordActions([
                 Action::make('abrir')
-                    ->label('Abrir')
+                    ->label(__('ui.attachments.open'))
                     ->icon('heroicon-o-arrow-top-right-on-square')
                     ->url(
                         fn (Attachment $record) => $record->url,
@@ -92,11 +95,11 @@ class AttachmentsRelationManager extends RelationManager
                     ),
                     
                 Action::make('reemplazar')
-                    ->label('Reemplazar')
+                    ->label(__('ui.attachments.replace'))
                     ->icon('heroicon-o-arrow-path')
                     ->schema([
                         FileUpload::make('file')
-                            ->label('Nuevo archivo')
+                            ->label(__('ui.attachments.new_file'))
                             ->required()
                             ->disk('attachments')
                             ->storeFileNamesIn('file_name'),

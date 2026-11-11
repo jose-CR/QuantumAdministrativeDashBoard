@@ -13,7 +13,7 @@ class CategoriesForm
             ->components([
 
                 TextInput::make('name')
-                    ->label(__('resources.inventary.category.name'))
+                    ->label(__('resources.inventory.category.name'))
                     ->required()
                     ->maxLength(255)
                     // Sin esta regla, un nombre repetido llegaba a la base y
@@ -23,7 +23,7 @@ class CategoriesForm
                 // Era 'descripcion': la columna real es `description`, así que lo
                 // que se escribía aquí no se guardaba nunca.
                 TextInput::make('description')
-                    ->label(__('resources.inventary.category.description'))
+                    ->label(__('resources.inventory.category.description'))
                     ->maxLength(255),
             ]);
     }

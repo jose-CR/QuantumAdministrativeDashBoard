@@ -20,7 +20,7 @@ class CustomersStatsWidget extends StatsOverviewWidget
 
     protected function getHeading(): ?string
     {
-        return 'Clientes';
+        return __('ui.widgets.customers');
     }
 
     protected function getStats(): array
@@ -37,11 +37,11 @@ class CustomersStatsWidget extends StatsOverviewWidget
         $startDate = ($this->pageFilters ?? [])['startDate'] ?? null;
         $endDate = ($this->pageFilters ?? [])['endDate'] ?? null;
 
-        return Stat::make('Clientes', Customer::query()
+        return Stat::make(__('ui.widgets.customers'), Customer::query()
                     ->when($startDate, fn (Builder $query) => $query->whereDate('created_at', '>=', $startDate))
                     ->when($endDate, fn (Builder $query) => $query->whereDate('created_at', '<=', $endDate))
                     ->count())
-            ->description('Registrados en total')
+            ->description(__('ui.widgets.customers_total_desc'))
             ->color('primary');
     }
 
@@ -49,8 +49,8 @@ class CustomersStatsWidget extends StatsOverviewWidget
     {
         $count = Customer::where('created_at', '>=', now()->startOfMonth())->count();
 
-        return Stat::make('Nuevos este mes', $count)
-            ->description('Clientes dados de alta')
+        return Stat::make(__('ui.widgets.new_this_month'), $count)
+            ->description(__('ui.widgets.new_this_month_desc'))
             ->descriptionIcon(Heroicon::ArrowTrendingUp)
             ->color('success');
     }
@@ -59,8 +59,8 @@ class CustomersStatsWidget extends StatsOverviewWidget
     {
         $count = Credit::overdue()->distinct('customer_id')->count('customer_id');
 
-        return Stat::make('Clientes en mora', $count)
-            ->description('Con cuotas vencidas sin pagar')
+        return Stat::make(__('ui.widgets.customers_overdue'), $count)
+            ->description(__('ui.widgets.customers_overdue_desc'))
             ->descriptionIcon(Heroicon::ExclamationTriangle)
             ->color($count > 0 ? 'danger' : 'success');
     }

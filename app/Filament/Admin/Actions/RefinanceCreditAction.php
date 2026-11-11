@@ -89,8 +89,8 @@ class RefinanceCreditAction extends Action
             ->color('warning')
             ->visible(fn (Model $record): bool => $this->resolveCredit($record) !== null
                 && (bool) auth()->user()?->can('Create:Credit'))
-            ->modalHeading('Refinanciar crédito')
-            ->modalDescription('Se creará un crédito nuevo por el saldo pendiente. El actual queda cerrado como refinanciado.')
+            ->modalHeading(__('ui.refinance.title'))
+            ->modalDescription(__('ui.refinance.description'))
             ->modalSubmitActionLabel('Refinanciar')
             ->fillForm(function (Model $record): array {
                 $credit = $this->resolveCredit($record);
@@ -117,7 +117,7 @@ class RefinanceCreditAction extends Action
                     'payment_day' => $credit->payment_day,
                     'interest_label' => $tipoInteres === 'fixed'
                         ? 'Fijo: ' . (float) $credit->interest_rate . '% por cuota'
-                        : 'Calculado según la cuota',
+                        : __('ui.refinance.auto_option'),
                 ];
 
                 try {
@@ -141,7 +141,7 @@ class RefinanceCreditAction extends Action
             })
             ->schema([
                 TextInput::make('initial_amount')
-                    ->label('Saldo a refinanciar')
+                    ->label(__('ui.refinance.balance'))
                     ->prefix('$')
                     ->disabled()
                     ->dehydrated(false),
@@ -152,7 +152,7 @@ class RefinanceCreditAction extends Action
                     ->dehydrated(false),
 
                 TextInput::make('installments')
-                    ->label('Número de cuotas')
+                    ->label(__('ui.refinance.installments'))
                     ->numeric()
                     ->minValue(1)
                     ->maxValue((int) config('quantum.installments.max', 100))
@@ -161,11 +161,11 @@ class RefinanceCreditAction extends Action
                     ->afterStateUpdated(fn (callable $set, Get $get) => self::preview($set, $get)),
 
                 TextInput::make('installment_amount')
-                    ->label('Monto de cada cuota')
+                    ->label(__('ui.refinance.installment_amount'))
                     ->numeric()
                     ->minValue(0.01)
                     ->prefix('$')
-                    ->helperText('Subí la cuota para cobrar intereses: el total es cuota × cuotas.')
+                    ->helperText(__('ui.refinance.installment_help'))
                     ->visible(fn (Get $get) => ($get('interest_type') ?? 'auto') === 'auto')
                     ->required(fn (Get $get) => ($get('interest_type') ?? 'auto') === 'auto')
                     ->live()
@@ -181,7 +181,7 @@ class RefinanceCreditAction extends Action
                     ->required(),
 
                 DatePicker::make('start_date')
-                    ->label('Vencimiento de la primera cuota')
+                    ->label(__('ui.refinance.first_due_date'))
                     ->required(),
 
                 TextInput::make('payment_day')
@@ -196,7 +196,7 @@ class RefinanceCreditAction extends Action
                  * calcula con el mismo servicio que guarda, no con una fórmula aparte.
                  */
                 TextInput::make('preview_installment')
-                    ->label('Cuota resultante')
+                    ->label(__('ui.refinance.resulting_installment'))
                     ->prefix('$')
                     ->disabled()
                     ->dehydrated(false),
@@ -219,7 +219,7 @@ class RefinanceCreditAction extends Action
                 if (! $credit) {
                     Notification::make()
                         ->title('No se pudo refinanciar')
-                        ->body('No hay un crédito activo con saldo para refinanciar.')
+                        ->body(__('ui.refinance.no_credit'))
                         ->danger()
                         ->send();
 
@@ -239,9 +239,9 @@ class RefinanceCreditAction extends Action
                 }
 
                 Notification::make()
-                    ->title('Crédito refinanciado')
+                    ->title(__('ui.refinance.created_title'))
                     ->body(sprintf(
-                        'Crédito #%d por $%s. El #%d quedó cerrado.',
+                        __('ui.refinance.created_body'),
                         $nuevo->id,
                         number_format((float) $nuevo->total_amount, 2),
                         $credit->id,
