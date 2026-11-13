@@ -54,6 +54,8 @@ return [
     ],
 
     'inflow' => [
+        'salesperson_help' => 'Pick a salesperson from the list or create a new one with the button below.',
+        'new_salesperson' => 'New salesperson',
         'pick_attachment' => 'Use a file the customer already has',
         'pick_attachment_help' => 'Pick an invoice, photo or receipt already on the customer, their credits or installments. If it is not there, upload it below and it also stays on the customer.',
         'section_main' => 'Main inflow information',

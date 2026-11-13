@@ -8,6 +8,7 @@ use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\Inflow;
 use App\Models\Installment;
+use App\Support\Salespeople;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -42,9 +43,25 @@ class InflowForm
                             ->label(__('resources.flow.inflow.date'))
                             ->required(),
 
-                        TextInput::make('salesperson')
+                        // Lista de vendedores ya usados, con opción de crear uno nuevo
+                        // desde el mismo select.
+                        Select::make('salesperson')
                             ->label(__('resources.flow.inflow.salesperson'))
-                            ->required(),
+                            ->searchable()
+                            ->getSearchResultsUsing(fn (string $search): array => Salespeople::search($search))
+                            ->getOptionLabelUsing(fn (?string $value): ?string => $value)
+                            ->native(false)
+                            ->required()
+                            ->helperText(__('ui.inflow.salesperson_help'))
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label(__('ui.inflow.new_salesperson'))
+                                    ->required()
+                                    ->minLength(2)
+                                    ->maxLength(255),
+                            ])
+                            ->createOptionModalHeading(__('ui.inflow.new_salesperson'))
+                            ->createOptionUsing(fn (array $data): ?string => Salespeople::normalize($data['name'])),
 
                         Textarea::make('description')
                             ->label(__('resources.flow.inflow.description'))

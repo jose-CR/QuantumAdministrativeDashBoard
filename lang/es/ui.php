@@ -54,6 +54,8 @@ return [
     ],
 
     'inflow' => [
+        'salesperson_help' => 'Elegí un vendedor de la lista o creá uno nuevo con el botón de abajo.',
+        'new_salesperson' => 'Nuevo vendedor',
         'pick_attachment' => 'Usar un archivo que ya tiene el cliente',
         'pick_attachment_help' => 'Elegí una factura, foto o comprobante ya cargado en el cliente, sus créditos o sus cuotas. Si no está, subilo abajo y queda también en el cliente.',
         'section_main' => 'Información principal del ingreso',
