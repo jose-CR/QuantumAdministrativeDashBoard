@@ -24,12 +24,21 @@ class AttachmentSyncService
         array $fileNames = [],
         ?string $collection = null,
         string $disk = 'attachments',
+        bool $allowEmpty = false,
     ): void {
         $paths = $this->normalizePaths($paths);
         $collection ??= (string) str($record->getTable())->snake();
         $storage = Storage::disk($disk);
 
         $current = $record->attachments()->get();
+
+        // Sin paths y sin que el formulario haya enviado el campo no se borra nada:
+        // un formulario que no llegó a hidratar los adjuntos no puede vaciarlos. Si el
+        // campo vino vacío es porque se quitaron a propósito ($allowEmpty).
+        if ($paths->isEmpty() && ! $allowEmpty) {
+            return;
+        }
+
         $retained = $this->retained($current, $paths, $storage);
 
         $this->deleteRemoved($current, $retained);

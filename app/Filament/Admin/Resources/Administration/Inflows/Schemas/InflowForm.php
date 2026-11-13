@@ -200,7 +200,6 @@ class InflowForm
                             ->multiple()
                             ->disk('attachments')
                             ->storeFileNamesIn('file_names')
-                            ->preserveFilenames()
                             ->downloadable()
                             ->openable()
                             ->previewable()

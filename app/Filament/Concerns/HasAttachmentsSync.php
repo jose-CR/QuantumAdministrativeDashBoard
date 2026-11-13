@@ -33,11 +33,15 @@ trait HasAttachmentsSync
     /** @var array<string, string> */
     protected array $attachmentFileNames = [];
 
+    /** Si el formulario envió el campo de archivos (aunque sea vacío). */
+    protected bool $attachmentFieldPresent = false;
+
     /** @var array<int, int> Adjuntos del cliente elegidos para reusar. */
     protected array $attachmentPicks = [];
 
     protected function captureAttachments(array $data): array
     {
+        $this->attachmentFieldPresent = array_key_exists('attachment_uploads', $data);
         $this->attachmentPaths = array_values(array_filter((array) ($data['attachment_uploads'] ?? [])));
         $this->attachmentFileNames = (array) ($data['file_names'] ?? []);
         $this->attachmentPicks = array_values(array_filter((array) ($data['attachment_picks'] ?? [])));
@@ -61,6 +65,7 @@ trait HasAttachmentsSync
             paths: $paths,
             fileNames: $this->attachmentFileNames,
             collection: $collection,
+            allowEmpty: $this->attachmentFieldPresent,
         );
 
         $this->attachPickedFiles();
