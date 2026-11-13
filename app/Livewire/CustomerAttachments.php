@@ -166,11 +166,14 @@ class CustomerAttachments extends Component
                 $credito = $cuotas->first()?->credit_id;
 
                 return [
+                    // Orden por número de cuota, no por el texto del título ("Cuota #10"
+                    // quedaba antes que "Cuota #2" y los tramos se iban al final).
+                    'orden' => (int) ($credito ?? 0) * 100000 + (int) ($numeros->first() ?? 0),
                     'titulo' => $this->tituloCuotas($credito, $numeros, $cuotas->first()?->due_date?->format('d/m/Y')),
                     'archivos' => collect([$grupo->first()]),
                 ];
             })
-            ->sortBy('titulo')
+            ->sortBy('orden')
             ->values()
             ->all();
     }

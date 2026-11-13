@@ -136,6 +136,50 @@ class CustomerAttachmentsTest extends TestCase
         $componente->assertSee('Cuota N° 10, 11, 12.pdf');
     }
 
+    public function test_el_visor_ordena_por_numero_de_cuota(): void
+    {
+        Storage::fake('attachments');
+
+        [$cliente, $credito] = $this->clienteConCredito();
+
+        // Cuotas 2 a 12 (la 1 ya existe) con un comprobante suelto en cada una.
+        foreach (range(2, 12) as $numero) {
+            $credito->installments()->create([
+                'number' => $numero,
+                'amount' => 100,
+                'remaining_balance' => 100,
+                'due_date' => today()->addMonths($numero)->toDateString(),
+                'status' => 'pending',
+            ]);
+        }
+
+        // Un comprobante para las cuotas 1 y 2, y otro para las 10, 11 y 12.
+        foreach ([1, 2] as $numero) {
+            $credito->installments()->where('number', $numero)->first()->attachments()->create([
+                'disk' => 'attachments',
+                'path' => 'installment/13/comprobante-1-2.pdf',
+                'original_name' => 'Comprobante 1 y 2.pdf',
+            ]);
+        }
+
+        foreach ([10, 11, 12] as $numero) {
+            $credito->installments()->where('number', $numero)->first()->attachments()->create([
+                'disk' => 'attachments',
+                'path' => 'installment/13/comprobante-10-12.pdf',
+                'original_name' => 'Comprobante 10 a 12.pdf',
+            ]);
+        }
+
+        $grupos = Livewire::test(CustomerAttachments::class, ['record' => $cliente])
+            ->call('setTab', 'installments')
+            ->instance()
+            ->grupos;
+
+        // Primero el tramo 1-2, después el 10-12: no por el texto del título.
+        $this->assertSame('Comprobante 1 y 2.pdf', $grupos[0]['archivos']->first()->original_name);
+        $this->assertSame('Comprobante 10 a 12.pdf', $grupos[1]['archivos']->first()->original_name);
+    }
+
     public function test_borrar_el_comprobante_lo_saca_de_todas_las_cuotas(): void
     {
         Storage::fake('attachments');
