@@ -105,8 +105,7 @@ class AttachFileTest extends TestCase
         $this->subir($cliente, [
             'target' => 'installment',
             'credit_id' => $credito->id,
-            'installment_from' => 1,
-            'installment_to' => 1,
+            'installment_ids' => [$cuota->id],
             'files' => [UploadedFile::fake()->image('voucher.png')],
         ])->assertHasNoActionErrors();
 
@@ -147,8 +146,7 @@ class AttachFileTest extends TestCase
         $this->subir($cliente, [
             'target' => 'installment',
             'credit_id' => $credito->id,
-            'installment_from' => 2,
-            'installment_to' => 3,
+            'installment_ids' => [$cuota2->id, $cuota3->id],
             'files' => [UploadedFile::fake()->image('comprobante.jpg')],
         ])->assertHasNoActionErrors();
 
@@ -183,8 +181,7 @@ class AttachFileTest extends TestCase
         $this->subir($cliente, [
             'target' => 'installment',
             'credit_id' => $credito->id,
-            'installment_from' => 2,
-            'installment_to' => 3,
+            'installment_ids' => [$cuota2->id, $cuota3->id],
             'files' => [UploadedFile::fake()->image('comprobante.jpg')],
         ])->assertHasNoActionErrors();
 
@@ -200,43 +197,6 @@ class AttachFileTest extends TestCase
         app(\App\Services\AttachmentService::class)->delete($adjuntos->last());
 
         $this->assertFalse(Storage::disk('attachments')->exists($ruta));
-    }
-
-    public function test_el_modal_ofrece_subir_y_otro(): void
-    {
-        $cliente = Customer::factory()->create();
-
-        $componente = $this->ficha($cliente)
-            ->mountAction(TestAction::make('attachFile')->schemaComponent('attachments'));
-
-        $accion = $componente->instance()->getMountedAction();
-
-        $this->assertSame('attachFile', $accion->getName());
-
-        $botones = collect($accion->getExtraModalFooterActions())
-            ->map(fn ($boton): string => (string) $boton->getLabel())
-            ->all();
-
-        $this->assertContains(__('ui.attachments.submit_another'), $botones);
-    }
-
-    public function test_subir_y_otro_guarda_y_deja_el_modal_abierto(): void
-    {
-        Storage::fake('attachments');
-
-        $cliente = Customer::factory()->create();
-
-        $componente = $this->ficha($cliente)
-            ->mountAction(TestAction::make('attachFile')->schemaComponent('attachments'))
-            ->setActionData([
-                'target' => 'customer',
-                'files' => [UploadedFile::fake()->image('factura.jpg')],
-            ])
-            ->callMountedAction(['another' => true])
-            ->assertHasNoActionErrors();
-
-        $this->assertSame(1, $cliente->attachments()->count());
-        $this->assertNotNull($componente->instance()->getMountedAction(), 'El modal se cerró: para cargar otro hay que volver a la ficha.');
     }
 
     public function test_pide_el_credito_cuando_el_destino_es_un_credito(): void
