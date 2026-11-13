@@ -54,6 +54,8 @@ return [
     ],
 
     'inflow' => [
+        'pick_attachment' => 'Usar un archivo que ya tiene el cliente',
+        'pick_attachment_help' => 'Elegí una factura, foto o comprobante ya cargado en el cliente, sus créditos o sus cuotas. Si no está, subilo abajo y queda también en el cliente.',
         'section_main' => 'Información principal del ingreso',
         'section_payment' => 'Pago',
         'section_payment_help' => 'Detalles del cobro y su estado',
@@ -177,6 +179,9 @@ return [
     ],
 
     'attachments' => [
+        'context_loose' => 'suelto del cliente',
+        'context_credit' => 'crédito #:id',
+        'context_installment' => 'cuota #:number del crédito #:credit',
         'action_title' => 'Adjuntar archivo',
         'action_description' => 'La prima, una factura, una foto: se guarda en el cliente, en un crédito o en una o varias cuotas.',
         'target' => '¿A qué se adjunta?',

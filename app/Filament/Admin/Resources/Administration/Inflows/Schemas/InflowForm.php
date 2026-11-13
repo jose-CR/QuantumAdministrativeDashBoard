@@ -3,7 +3,11 @@
 namespace App\Filament\Admin\Resources\Administration\Inflows\Schemas;
 
 use App\Models\Article;
+use App\Models\Attachment;
+use App\Models\Credit;
+use App\Models\Customer;
 use App\Models\Inflow;
+use App\Models\Installment;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -163,6 +167,17 @@ class InflowForm
                             ->label(__('resources.flow.inflow.notes'))
                             ->columnSpanFull(),
 
+                        // Reusar lo que el cliente ya tiene cargado (factura de una
+                        // cuota, foto del crédito, suelto) sin volver a subirlo.
+                        Select::make('attachment_picks')
+                            ->label(__('ui.inflow.pick_attachment'))
+                            ->multiple()
+                            ->searchable()
+                            ->options(fn (Get $get): array => static::customerAttachmentOptions($get('customer_id')))
+                            ->helperText(__('ui.inflow.pick_attachment_help'))
+                            ->visible(fn (Get $get): bool => filled($get('customer_id')))
+                            ->columnSpanFull(),
+
                         FileUpload::make('attachment_uploads')
                             ->label(__('resources.flow.attachment'))
                             ->multiple()
@@ -194,5 +209,47 @@ class InflowForm
                     ->columns(2)
                     ->columnSpanFull(),
             ]);
+    }
+
+    /**
+     * Adjuntos que ya cuelgan del cliente (suelto, de un crédito o de una cuota),
+     * para poder reusarlos en la entrada sin volver a subir el archivo.
+     *
+     * @return array<int, string>
+     */
+    protected static function customerAttachmentOptions(mixed $customerId): array
+    {
+        if (blank($customerId)) {
+            return [];
+        }
+
+        $credits = Credit::query()->where('customer_id', $customerId)->select('id');
+        $installments = Installment::query()->whereIn('credit_id', $credits)->select('id');
+
+        return Attachment::query()
+            ->where(fn ($query) => $query
+                ->where(fn ($sub) => $sub->where('attachable_type', Customer::class)->where('attachable_id', $customerId))
+                ->orWhere(fn ($sub) => $sub->where('attachable_type', Credit::class)->whereIn('attachable_id', $credits))
+                ->orWhere(fn ($sub) => $sub->where('attachable_type', Installment::class)->whereIn('attachable_id', $installments)))
+            ->with('attachable')
+            ->orderByDesc('id')
+            ->get()
+            ->mapWithKeys(fn (Attachment $attachment): array => [
+                $attachment->id => ($attachment->original_name ?? basename($attachment->path))
+                    . ' · ' . static::attachmentContext($attachment),
+            ])
+            ->all();
+    }
+
+    protected static function attachmentContext(Attachment $attachment): string
+    {
+        return match ($attachment->attachable_type) {
+            Credit::class => __('ui.attachments.context_credit', ['id' => $attachment->attachable_id]),
+            Installment::class => __('ui.attachments.context_installment', [
+                'number' => $attachment->attachable?->number ?? '?',
+                'credit' => $attachment->attachable?->credit_id ?? '?',
+            ]),
+            default => __('ui.attachments.context_loose'),
+        };
     }
 }

@@ -54,6 +54,8 @@ return [
     ],
 
     'inflow' => [
+        'pick_attachment' => 'Use a file the customer already has',
+        'pick_attachment_help' => 'Pick an invoice, photo or receipt already on the customer, their credits or installments. If it is not there, upload it below and it also stays on the customer.',
         'section_main' => 'Main inflow information',
         'section_payment' => 'Payment',
         'section_payment_help' => 'Collection details and its status',
@@ -177,6 +179,9 @@ return [
     ],
 
     'attachments' => [
+        'context_loose' => 'customer loose file',
+        'context_credit' => 'credit #:id',
+        'context_installment' => 'installment #:number of credit #:credit',
         'action_title' => 'Attach file',
         'action_description' => 'The down payment, an invoice, a photo: it is saved on the customer, on a credit or on one or more installments.',
         'target' => 'What is it attached to?',
