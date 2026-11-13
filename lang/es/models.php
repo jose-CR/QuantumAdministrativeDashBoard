@@ -136,7 +136,7 @@ return [
         ],
         'payments' => [
             'label' => 'Pagos',
-            'description' => 'Recibos: crédito, cuota, monto, banco y fecha.',
+            'description' => 'Recibos: crédito, cliente, monto, banco, usuario y fecha.',
         ],
         'inflows' => [
             'label' => 'Entradas',

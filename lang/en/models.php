@@ -136,7 +136,7 @@ return [
         ],
         'payments' => [
             'label' => 'Payments',
-            'description' => 'Receipts: credit, installment, amount, bank and date.',
+            'description' => 'Receipts: credit, customer, amount, bank, user and date.',
         ],
         'inflows' => [
             'label' => 'Inflows',

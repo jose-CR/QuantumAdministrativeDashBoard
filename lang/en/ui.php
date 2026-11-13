@@ -78,6 +78,7 @@ return [
 
     // Spreadsheet columns: the same in export and import.
     'columns' => [
+        'items_sold' => 'Items sold',
         'invoice_number' => 'Invoice number',
         'invoice_date' => 'Invoice date',
         'invoice_code' => 'Invoice code',
@@ -94,6 +95,12 @@ return [
         'transfer_date' => 'Transfer date',
         'payment_status' => 'Payment status',
         'salesperson' => 'Salesperson',
+        'due_date' => 'Due date',
+        'payment_date' => 'Payment date',
+        'receipt_number' => 'Receipt number',
+        'previous_balance' => 'Previous balance',
+        'new_balance' => 'New balance',
+        'name' => 'Name',
         'notes' => 'Notes',
         'quantity' => 'Quantity',
         'area' => 'Area',
@@ -104,6 +111,29 @@ return [
         'secondary_phone' => 'Secondary phone',
         'economic_activity' => 'Economic activity',
         'address' => 'Address',
+        'internal_id' => 'Internal ID',
+        'items' => 'What is financed',
+        'interest_type' => 'Interest type',
+        'periodicity' => 'Payment frequency',
+        'refinanced_from' => 'Refinanced from',
+        'user' => 'User',
+        'credit' => 'Credit',
+        'installment_number' => 'Installment',
+        'down_payment' => 'Down payment',
+        'financed_amount' => 'Financed amount',
+        'initial_amount' => 'Initial amount',
+        'installment_amount' => 'Installment amount',
+        'installments' => 'Installments',
+        'interest_rate' => 'Rate per installment',
+        'total_interest' => 'Total interest',
+        'total_amount' => 'Total to pay',
+        'pending_balance' => 'Pending balance',
+        'remaining_balance' => 'Remaining balance',
+        'paid_amount' => 'Paid amount',
+        'start_date' => 'Start date',
+        'payment_day' => 'Payment day',
+        'payment_month' => 'Payment month',
+        'status' => 'Status',
         'created_at' => 'Created at',
         'updated_at' => 'Last update',
     ],
@@ -156,6 +186,7 @@ return [
         'add' => 'Add attachments',
         'open' => 'Open',
         'replace' => 'Replace',
+        'delete' => 'Delete',
         'new_file' => 'New file',
     ],
 
@@ -175,6 +206,10 @@ return [
 
         'no_data' => 'There are no inflows or outflows in that date range.',
         'python_failed' => 'Python failed without a message.',
+    ],
+
+    'exports' => [
+        'done' => ':count rows exported.',
     ],
 
     'payment_methods' => [
@@ -207,5 +242,51 @@ return [
         'nothing_to_finance' => 'Nothing to finance: the down payment covers the total amount.',
         'interest_not_negative' => 'The interest rate cannot be negative.',
         'tag_taken' => 'A tag with that name already exists.',
+    ],
+
+    'installment_status' => [
+        'pending' => 'Pending',
+        'paid' => 'Paid',
+        'late' => 'Late',
+        'cancelled' => 'Cancelled',
+        'refinanced' => 'Refinanced',
+        'completed' => 'Completed',
+    ],
+
+    'credit_status' => [
+        'pending' => 'Pending',
+        'active' => 'Active',
+        'paid' => 'Paid',
+        'refinanced' => 'Refinanced',
+        'cancelled' => 'Cancelled',
+        'defaulted' => 'Overdue',
+        'completed' => 'Completed',
+    ],
+
+    'periodicity' => [
+        'monthly' => 'Monthly',
+        'weekly' => 'Weekly',
+        'biweekly' => 'Biweekly',
+        'yearly' => 'Yearly',
+    ],
+
+    'unit_status' => [
+        'available' => 'Available',
+        'reserved' => 'Reserved',
+        'sold' => 'Sold',
+        'in_repair' => 'In repair',
+    ],
+
+    'tracking' => [
+        'serial' => 'Serialized',
+        'none' => 'By quantity',
+    ],
+
+    'confirm' => [
+        'title' => 'Delete?',
+        'cancel' => 'Cancel',
+        'accept' => 'Yes, delete',
+        'delete_title' => 'Delete this attachment?',
+        'delete_description' => 'The file is removed and cannot be restored.',
     ],
 ];

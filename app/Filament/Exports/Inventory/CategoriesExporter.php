@@ -16,9 +16,12 @@ class CategoriesExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('id'),
-            ExportColumn::make('name'),
+            ExportColumn::make('id')
+                ->label(__('resources.inventory.category.id')),
+            ExportColumn::make('name')
+                ->label(__('resources.inventory.category.name')),
             ExportColumn::make('description')
+                ->label(__('resources.inventory.category.description'))
                 // Texto plano: el editor guarda HTML y en el Excel viajaba como
                 // <p>…</p>, que al reimportar se duplicaba.
                 ->formatStateUsing(fn (?string $state): ?string => Html::plain($state)),

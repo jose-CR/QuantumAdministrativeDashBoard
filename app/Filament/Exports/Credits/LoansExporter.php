@@ -8,6 +8,12 @@ use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Support\Number;
 
+/**
+ * Créditos: lo que se prestó, cómo se paga y qué se está financiando.
+ *
+ * Antes pedía `client_id` y `article_unit_id`, que no existen en `credits`: el
+ * cliente y el bien salían en blanco.
+ */
 class LoansExporter extends Exporter
 {
     protected static ?string $model = Credit::class;
@@ -16,69 +22,80 @@ class LoansExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label(__('resources.credits.fields.id')),
+                ->label(__('ui.columns.internal_id')),
 
-            ExportColumn::make('client_id')
-                ->label(__('resources.credits.fields.client')),
+            ExportColumn::make('customer')
+                ->label(__('ui.columns.customer'))
+                ->state(fn (Credit $record): ?string => $record->customer?->full_name),
 
-            ExportColumn::make('article_unit_id')
-                ->label(__('resources.credits.fields.article_unit')),
-
-            ExportColumn::make('refinanced_from_id')
-                ->label(__('resources.credits.fields.refinanced_from')),
+            // Qué se está financiando: los bienes del crédito con su cantidad.
+            ExportColumn::make('items')
+                ->label(__('ui.columns.items'))
+                ->state(fn (Credit $record): string => $record->items
+                    ->map(fn ($item): string => (string) $item->display_name)
+                    ->implode(', ')),
 
             ExportColumn::make('initial_amount')
-                ->label(__('resources.credits.fields.initial_amount')),
+                ->label(__('ui.columns.initial_amount')),
 
             ExportColumn::make('down_payment')
-                ->label(__('resources.credits.fields.down_payment')),
+                ->label(__('ui.columns.down_payment')),
 
             ExportColumn::make('financed_amount')
-                ->label(__('resources.credits.fields.financed_amount')),
+                ->label(__('ui.columns.financed_amount')),
 
             ExportColumn::make('installments')
-                ->label(__('resources.credits.fields.installments')),
+                ->label(__('ui.columns.installments')),
 
             ExportColumn::make('installment_amount')
-                ->label(__('resources.credits.fields.installment_amount')),
+                ->label(__('ui.columns.installment_amount')),
 
             ExportColumn::make('periodicity')
-                ->label(__('resources.credits.fields.periodicity')),
+                ->label(__('ui.columns.periodicity'))
+                ->formatStateUsing(fn (?string $state): string => filled($state)
+                    ? __('ui.periodicity.' . $state)
+                    : ''),
+
+            ExportColumn::make('interest_type')
+                ->label(__('ui.columns.interest_type'))
+                ->formatStateUsing(fn (?string $state): string => $state === 'fixed'
+                    ? __('ui.credits.interest_fixed')
+                    : __('ui.credits.interest_auto')),
 
             ExportColumn::make('interest_rate')
-                ->label(__('resources.credits.fields.interest_rate')),
+                ->label(__('ui.columns.interest_rate')),
 
             ExportColumn::make('total_interest')
-                ->label(__('resources.credits.fields.total_interest')),
+                ->label(__('ui.columns.total_interest')),
 
             ExportColumn::make('total_amount')
-                ->label(__('resources.credits.fields.total_amount')),
+                ->label(__('ui.columns.total_amount')),
 
             ExportColumn::make('pending_balance')
-                ->label(__('resources.credits.fields.pending_balance')),
+                ->label(__('ui.columns.pending_balance')),
 
             ExportColumn::make('start_date')
-                ->label(__('resources.credits.fields.start_date')),
+                ->label(__('ui.columns.start_date')),
 
             ExportColumn::make('payment_day')
-                ->label(__('resources.credits.fields.payment_day')),
+                ->label(__('ui.columns.payment_day')),
 
             ExportColumn::make('payment_month')
-                ->label(__('resources.credits.fields.payment_month')),
+                ->label(__('ui.columns.payment_month')),
 
             ExportColumn::make('status')
-                ->label(__('resources.credits.fields.status')),
+                ->label(__('ui.columns.status'))
+                ->formatStateUsing(fn (?string $state): string => filled($state)
+                    ? __('ui.credit_status.' . $state)
+                    : ''),
+
+            ExportColumn::make('refinanced_from_id')
+                ->label(__('ui.columns.refinanced_from')),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your loans export has completed and ' . Number::format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
-
-        if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
-        }
-
-        return $body;
+        return __('ui.exports.done', ['count' => Number::format($export->successful_rows)]);
     }
 }

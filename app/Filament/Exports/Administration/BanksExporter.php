@@ -15,8 +15,10 @@ class BanksExporter extends Exporter
     public static function getColumns(): array
     {
         return [
-            ExportColumn::make('id'),
-            ExportColumn::make('name'),
+            ExportColumn::make('id')
+                ->label(__('ui.columns.internal_id')),
+            ExportColumn::make('name')
+                ->label(__('ui.columns.name')),
         ];
     }
 

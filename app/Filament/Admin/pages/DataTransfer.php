@@ -188,7 +188,10 @@ class DataTransfer extends Page
         }
 
         return collect($registry)
-            ->groupBy('area')
+            // preserveKeys: sin esto Laravel reindexa cada grupo desde 0 y todas las
+            // tarjetas terminan con las acciones de la primera (artículos exportaba
+            // clientes, porque el nombre de la acción era export-0 en todas).
+            ->groupBy('area', preserveKeys: true)
             ->map(fn ($models, string $area): Section => Section::make($area)
                 ->columns(2)
                 ->schema(
@@ -210,12 +213,15 @@ class DataTransfer extends Page
             ->key($key)
             ->description($model['description'])
             ->schema([
+                // Cada tarjeta lleva su propia key: sin ella, las acciones de todas
+                // las tarjetas comparten contexto y Filament resuelve la primera
+                // (el botón de artículos exportaba clientes).
                 SchemaActions::make([
                     $this->exportAction($key, $model, ExportFormat::Xlsx, __('models.others.data_transfer_excel'), Heroicon::OutlinedTableCells),
                     // El CSV es el respaldo que se puede volver a importar tal cual.
                     $this->exportAction($key, $model, ExportFormat::Csv, __('models.others.data_transfer_csv'), Heroicon::OutlinedDocumentText, suffix: 'csv'),
                     $this->importAction($key, $model),
-                ]),
+                ])->key("{$key}-actions"),
             ]);
     }
 

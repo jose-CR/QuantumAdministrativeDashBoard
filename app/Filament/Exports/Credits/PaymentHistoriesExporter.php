@@ -8,6 +8,9 @@ use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
 use Illuminate\Support\Number;
 
+/**
+ * Pagos: recibo, crédito, cuota, monto, quién lo cargó, banco y fecha.
+ */
 class PaymentHistoriesExporter extends Exporter
 {
     protected static ?string $model = PaymentHistory::class;
@@ -16,48 +19,48 @@ class PaymentHistoriesExporter extends Exporter
     {
         return [
             ExportColumn::make('id')
-                ->label(__('resources.credits.payment_histories.id')),
-
-            ExportColumn::make('credit_id')
-                ->label(__('resources.credits.payment_histories.credit')),
-
-            ExportColumn::make('user_id')
-                ->label(__('resources.credits.payment_histories.user')),
-
-            ExportColumn::make('bank_id')
-                ->label(__('resources.credits.payment_histories.bank')),
-
-            ExportColumn::make('amount')
-                ->label(__('resources.credits.payment_histories.amount')),
-
-            ExportColumn::make('payment_method')
-                ->label(__('resources.credits.payment_histories.payment_method')),
-
-            ExportColumn::make('payment_date')
-                ->label(__('resources.credits.payment_histories.payment_date')),
+                ->label(__('ui.columns.internal_id')),
 
             ExportColumn::make('receipt_number')
-                ->label(__('resources.credits.payment_histories.receipt_number')),
+                ->label(__('ui.columns.receipt_number')),
+
+            ExportColumn::make('credit_id')
+                ->label(__('ui.columns.credit')),
+
+            ExportColumn::make('credit.customer.full_name')
+                ->label(__('ui.columns.customer')),
+
+            ExportColumn::make('amount')
+                ->label(__('ui.columns.amount')),
+
+            ExportColumn::make('payment_method')
+                ->label(__('ui.columns.payment_method'))
+                ->formatStateUsing(fn (?string $state): string => filled($state)
+                    ? __('ui.payment_methods.' . $state)
+                    : ''),
+
+            ExportColumn::make('bank.name')
+                ->label(__('ui.columns.bank')),
+
+            ExportColumn::make('user.name')
+                ->label(__('ui.columns.user')),
+
+            ExportColumn::make('payment_date')
+                ->label(__('ui.columns.payment_date')),
 
             ExportColumn::make('previous_balance')
-                ->label(__('resources.credits.payment_histories.previous_balance')),
+                ->label(__('ui.columns.previous_balance')),
 
             ExportColumn::make('new_balance')
-                ->label(__('resources.credits.payment_histories.new_balance')),
+                ->label(__('ui.columns.new_balance')),
 
             ExportColumn::make('notes')
-                ->label(__('resources.credits.payment_histories.notes')),
+                ->label(__('ui.columns.notes')),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your payment histories export has completed and ' . Number::format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
-
-        if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
-        }
-
-        return $body;
+        return __('ui.exports.done', ['count' => Number::format($export->successful_rows)]);
     }
 }

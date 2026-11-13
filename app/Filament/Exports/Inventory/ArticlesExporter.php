@@ -38,7 +38,10 @@ class ArticlesExporter extends Exporter
                 ->label(__('resources.inventory.article.year')),
 
             ExportColumn::make('tracking')
-                ->label(__('resources.inventory.article.tracking')),
+                ->label(__('resources.inventory.article.tracking'))
+                ->formatStateUsing(fn (?string $state): string => $state === 'serial'
+                    ? __('resources.inventory.article.tracking_serial_short')
+                    : __('resources.inventory.article.tracking_none_short')),
 
             ExportColumn::make('cash_price')
                 ->label(__('resources.inventory.article.cash_price')),

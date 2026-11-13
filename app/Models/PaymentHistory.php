@@ -69,6 +69,14 @@ class PaymentHistory extends Model
         });
     }
 
+    /**
+     * Quién cargó el pago (los históricos quedaron sin usuario).
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function bank()
     {
         return $this->belongsTo(Bank::class);

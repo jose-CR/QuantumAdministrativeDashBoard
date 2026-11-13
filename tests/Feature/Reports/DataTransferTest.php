@@ -77,6 +77,31 @@ class DataTransferTest extends TestCase
         $this->assertSame('import-customers', $componente->instance()->getMountedAction()?->getName());
     }
 
+    public function test_cada_tarjeta_exporta_su_propio_modelo(): void
+    {
+        // El bug que vio el taller: todas las tarjetas montaban la acción de la
+        // primera (artículos exportaba clientes) porque el nombre era export-0.
+        $html = Livewire::test(DataTransfer::class)->html();
+
+        foreach (array_keys(DataTransfer::registry()) as $clave) {
+            $this->assertStringContainsString("mountAction('export-{$clave}'", $html, "La tarjeta {$clave} no monta su export.");
+            $this->assertStringContainsString("mountAction('export-csv-{$clave}'", $html, "La tarjeta {$clave} no monta su CSV.");
+        }
+
+        $this->assertStringNotContainsString("mountAction('export-0'", $html);
+    }
+
+    public function test_el_export_de_creditos_trae_cliente_montos_cuotas_e_interes(): void
+    {
+        $columnas = collect(\App\Filament\Exports\Credits\LoansExporter::getColumns())
+            ->map(fn ($columna): string => $columna->getName())
+            ->all();
+
+        foreach (['customer', 'items', 'initial_amount', 'down_payment', 'financed_amount', 'installments', 'installment_amount', 'interest_rate', 'total_interest', 'total_amount', 'pending_balance', 'status'] as $columna) {
+            $this->assertContains($columna, $columnas, "Al export de créditos le falta {$columna}.");
+        }
+    }
+
     public function test_cada_tarjeta_ofrece_excel_y_csv(): void
     {
         $componente = Livewire::test(DataTransfer::class, ['model' => 'inflows']);

@@ -18,9 +18,6 @@ class UnitArticlesExporter extends Exporter
             ExportColumn::make('id')
                 ->label(__('resources.inventory.article_units.id')),
 
-            ExportColumn::make('article_id')
-                ->label(__('resources.inventory.article_units.article')),
-
             ExportColumn::make('article.name')
                 ->label(__('resources.inventory.article_units.article')),
 
@@ -40,18 +37,15 @@ class UnitArticlesExporter extends Exporter
                 ->label(__('resources.inventory.article_units.cash_price')),
 
             ExportColumn::make('status')
-                ->label(__('resources.inventory.article_units.status')),
+                ->label(__('resources.inventory.article_units.status'))
+                ->formatStateUsing(fn (?string $state): string => filled($state)
+                    ? __('ui.unit_status.' . $state)
+                    : ''),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your unit articles export has completed and ' . Number::format($export->successful_rows) . ' ' . str('row')->plural($export->successful_rows) . ' exported.';
-
-        if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' ' . Number::format($failedRowsCount) . ' ' . str('row')->plural($failedRowsCount) . ' failed to export.';
-        }
-
-        return $body;
+        return __('ui.exports.done', ['count' => Number::format($export->successful_rows)]);
     }
 }

@@ -78,6 +78,7 @@ return [
 
     // Columnas de los Excel: las mismas en export e import.
     'columns' => [
+        'items_sold' => 'Artículos vendidos',
         'invoice_number' => 'Número de factura',
         'invoice_date' => 'Fecha de factura',
         'invoice_code' => 'Código de factura',
@@ -94,6 +95,12 @@ return [
         'transfer_date' => 'Fecha de transferencia',
         'payment_status' => 'Estado de pago',
         'salesperson' => 'Vendedor',
+        'due_date' => 'Fecha de vencimiento',
+        'payment_date' => 'Fecha de pago',
+        'receipt_number' => 'Número de comprobante',
+        'previous_balance' => 'Saldo anterior',
+        'new_balance' => 'Nuevo saldo',
+        'name' => 'Nombre',
         'notes' => 'Notas',
         'quantity' => 'Cantidad',
         'area' => 'Área',
@@ -104,6 +111,29 @@ return [
         'secondary_phone' => 'Teléfono secundario',
         'economic_activity' => 'Actividad económica',
         'address' => 'Dirección',
+        'internal_id' => 'ID interno',
+        'items' => 'Qué se financia',
+        'interest_type' => 'Tipo de interés',
+        'periodicity' => 'Frecuencia de pago',
+        'refinanced_from' => 'Refinanciado de',
+        'user' => 'Usuario',
+        'credit' => 'Crédito',
+        'installment_number' => 'Cuota',
+        'down_payment' => 'Prima',
+        'financed_amount' => 'Monto financiado',
+        'initial_amount' => 'Monto inicial',
+        'installment_amount' => 'Monto de cuota',
+        'installments' => 'Cuotas',
+        'interest_rate' => 'Tasa por cuota',
+        'total_interest' => 'Interés total',
+        'total_amount' => 'Total a pagar',
+        'pending_balance' => 'Saldo pendiente',
+        'remaining_balance' => 'Saldo restante',
+        'paid_amount' => 'Monto pagado',
+        'start_date' => 'Fecha de inicio',
+        'payment_day' => 'Día de pago',
+        'payment_month' => 'Mes de pago',
+        'status' => 'Estado',
         'created_at' => 'Fecha de creación',
         'updated_at' => 'Última actualización',
     ],
@@ -156,6 +186,7 @@ return [
         'add' => 'Agregar adjuntos',
         'open' => 'Abrir',
         'replace' => 'Reemplazar',
+        'delete' => 'Eliminar',
         'new_file' => 'Nuevo archivo',
     ],
 
@@ -175,6 +206,10 @@ return [
 
         'no_data' => 'No hay entradas ni salidas registradas en ese rango de fechas.',
         'python_failed' => 'Python falló sin mensaje.',
+    ],
+
+    'exports' => [
+        'done' => ':count filas exportadas.',
     ],
 
     'payment_methods' => [
@@ -207,5 +242,51 @@ return [
         'nothing_to_finance' => 'No hay saldo que financiar: el pago inicial cubre el monto total.',
         'interest_not_negative' => 'La tasa de interés no puede ser negativa.',
         'tag_taken' => 'Ya hay una etiqueta con ese nombre.',
+    ],
+
+    'installment_status' => [
+        'pending' => 'Pendiente',
+        'paid' => 'Pagada',
+        'late' => 'Atrasada',
+        'cancelled' => 'Cancelada',
+        'refinanced' => 'Refinanciada',
+        'completed' => 'Completada',
+    ],
+
+    'credit_status' => [
+        'pending' => 'Pendiente',
+        'active' => 'Activo',
+        'paid' => 'Pagado',
+        'refinanced' => 'Refinanciado',
+        'cancelled' => 'Cancelado',
+        'defaulted' => 'En mora',
+        'completed' => 'Completado',
+    ],
+
+    'periodicity' => [
+        'monthly' => 'Mensual',
+        'weekly' => 'Semanal',
+        'biweekly' => 'Quincenal',
+        'yearly' => 'Anual',
+    ],
+
+    'unit_status' => [
+        'available' => 'Disponible',
+        'reserved' => 'Reservada',
+        'sold' => 'Vendida',
+        'in_repair' => 'En taller',
+    ],
+
+    'tracking' => [
+        'serial' => 'Serializado',
+        'none' => 'Por cantidad',
+    ],
+
+    'confirm' => [
+        'title' => '¿Eliminar?',
+        'cancel' => 'Cancelar',
+        'accept' => 'Sí, eliminar',
+        'delete_title' => '¿Eliminar este adjunto?',
+        'delete_description' => 'Se borra el archivo y no se puede recuperar.',
     ],
 ];

@@ -26,10 +26,10 @@ class InflowExporter extends Exporter
 
             ExportColumn::make('customer')
                 ->label(__('ui.columns.customer'))
-                ->state(fn (Inflow $record) => $record->customer_id),
+                ->state(fn (Inflow $record): ?string => $record->customer?->full_name),
 
             ExportColumn::make('amount_paid')
-                ->label('Cobrado'),
+                ->label(__('ui.widgets.collected')),
 
             ExportColumn::make('receivable')
                 ->label(__('ui.columns.receivable')),
@@ -39,58 +39,46 @@ class InflowExporter extends Exporter
 
             ExportColumn::make('payment_method')
                 ->label(__('ui.columns.payment_method'))
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'cash' => 'Efectivo',
-                        'transfer' => 'Transferencia',
-                        default => $state,
-                    }),
+                    ->formatStateUsing(fn (?string $state): string => filled($state)
+                        ? __('ui.payment_methods.' . $state)
+                        : ''),
 
             ExportColumn::make('transfer_number')
                 ->label(__('ui.columns.transfer_number')),
 
             ExportColumn::make('bank')
                 ->label(__('ui.columns.bank'))
-                ->state(fn (Inflow $record) => $record->bank_id),
+                ->state(fn (Inflow $record): ?string => $record->bank?->name),
 
             ExportColumn::make('transfer_date')
                 ->label(__('ui.columns.transfer_date')),
 
             ExportColumn::make('payment_status')
                 ->label(__('ui.columns.payment_status'))
-                ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'pending' => 'Pendiente',
-                        'partial' => 'Parcial',
-                        'paid' => 'Pagado',
-                        default => $state,
-                    }),
+                ->formatStateUsing(fn (?string $state): string => filled($state)
+                        ? __('ui.payment_status.' . $state)
+                        : ''),
 
             ExportColumn::make('salesperson')
                 ->label(__('ui.columns.salesperson')),
+
+            ExportColumn::make('items')
+                ->label(__('ui.columns.items_sold'))
+                ->state(fn (Inflow $record): string => $record->items
+                    ->map(fn ($item): string => ((int) $item->quantity > 1 ? $item->quantity . ' × ' : '')
+                        . ($item->article?->name ?? '—'))
+                    ->implode(', ')),
 
             ExportColumn::make('notes')
                 ->label(__('ui.columns.notes')),
             
             ExportColumn::make('id')
-                ->label('ID interno'),
+                ->label(__('ui.columns.internal_id')),
         ];
     }
 
     public static function getCompletedNotificationBody(Export $export): string
     {
-        $body = 'Your inflow export has completed and '
-            . Number::format($export->successful_rows)
-            . ' '
-            . str('row')->plural($export->successful_rows)
-            . ' exported.';
-
-        if ($failedRowsCount = $export->getFailedRowsCount()) {
-            $body .= ' '
-                . Number::format($failedRowsCount)
-                . ' '
-                . str('row')->plural($failedRowsCount)
-                . ' failed to export.';
-        }
-
-        return $body;
+        return __('ui.exports.done', ['count' => Number::format($export->successful_rows)]);
     }
 }
