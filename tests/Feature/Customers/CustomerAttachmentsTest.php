@@ -102,6 +102,75 @@ class CustomerAttachmentsTest extends TestCase
         $componente->assertDontSee('wire:confirm', false);
     }
 
+    public function test_el_visor_agrupa_por_comprobante_y_no_por_cuota(): void
+    {
+        Storage::fake('attachments');
+
+        [$cliente, $credito] = $this->clienteConCredito();
+
+        // La cuota #1 ya la crea clienteConCredito().
+        $cuotas = collect(range(2, 12))->map(fn (int $numero) => $credito->installments()->create([
+            'number' => $numero,
+            'amount' => 100,
+            'remaining_balance' => 100,
+            'due_date' => today()->addMonths($numero)->toDateString(),
+            'status' => 'pending',
+        ]));
+
+        // Un comprobante que cubre las cuotas 10, 11 y 12: tres filas, un archivo.
+        foreach ([10, 11, 12] as $numero) {
+            $cuotas->firstWhere('number', $numero)->attachments()->create([
+                'disk' => 'attachments',
+                'path' => 'installment/13/comprobante-10-11-12.pdf',
+                'original_name' => 'Cuota N° 10, 11, 12.pdf',
+            ]);
+        }
+
+        $componente = Livewire::test(CustomerAttachments::class, ['record' => $cliente])
+            ->call('setTab', 'installments')
+            ->assertOk();
+
+        // Una sola tarjeta, con las tres cuotas en el título.
+        $this->assertSame(1, $componente->instance()->counts['installments']);
+        $componente->assertSee('Cuotas #10, #11, #12');
+        $componente->assertSee('Cuota N° 10, 11, 12.pdf');
+    }
+
+    public function test_borrar_el_comprobante_lo_saca_de_todas_las_cuotas(): void
+    {
+        Storage::fake('attachments');
+
+        [$cliente, $credito] = $this->clienteConCredito();
+        $cuota = $credito->installments()->first();
+
+        $adjunto = $cuota->attachments()->create([
+            'disk' => 'attachments',
+            'path' => 'installment/1/comprobante.pdf',
+            'original_name' => 'comprobante.pdf',
+        ]);
+
+        $otra = $credito->installments()->create([
+            'number' => 2,
+            'amount' => 100,
+            'remaining_balance' => 100,
+            'due_date' => today()->addMonth()->toDateString(),
+            'status' => 'pending',
+        ]);
+
+        $otra->attachments()->create([
+            'disk' => 'attachments',
+            'path' => 'installment/1/comprobante.pdf',
+            'original_name' => 'comprobante.pdf',
+        ]);
+
+        Livewire::test(CustomerAttachments::class, ['record' => $cliente])
+            ->call('setTab', 'installments')
+            ->call('delete', $adjunto->id)
+            ->assertHasNoErrors();
+
+        $this->assertSame(0, \App\Models\Attachment::query()->where('path', 'installment/1/comprobante.pdf')->count());
+    }
+
     public function test_borra_un_adjunto_del_credito(): void
     {
         Storage::fake('attachments');

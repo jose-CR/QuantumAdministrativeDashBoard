@@ -10,6 +10,7 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 
 /**
  * Subir un archivo desde la ficha del cliente con el FileUpload de Filament.
@@ -35,6 +36,11 @@ class AttachFileAction extends Action
             ->modalHeading(__('ui.attachments.action_title'))
             ->modalDescription(__('ui.attachments.action_description'))
             ->modalSubmitActionLabel(__('ui.attachments.submit'))
+            ->extraModalFooterActions(fn (Action $action): array => [
+                // Sube y deja el modal abierto y vacío para cargar el siguiente.
+                $action->makeModalSubmitAction('attachAnother', arguments: ['another' => true])
+                    ->label(__('ui.attachments.submit_another')),
+            ])
             ->schema([
                 Select::make('target')
                     ->label(__('ui.attachments.target'))
@@ -65,6 +71,7 @@ class AttachFileAction extends Action
                 Select::make('installment_ids')
                     ->label(__('ui.attachments.installments'))
                     ->multiple()
+                    ->searchable()
                     ->options(function (Get $get): array {
                         if (blank($get('credit_id'))) {
                             return [];
@@ -95,7 +102,7 @@ class AttachFileAction extends Action
                     ->storeFileNamesIn('file_names')
                     ->helperText(__('ui.attachments.files_help')),
             ])
-            ->action(function (Customer $record, array $data, AttachmentService $service): void {
+            ->action(function (Customer $record, array $data, array $arguments, Schema $schema, AttachmentService $service): void {
                 $targets = $this->resolveTargets($record, $data);
 
                 if ($targets === []) {
@@ -140,6 +147,14 @@ class AttachFileAction extends Action
                         : __('ui.attachments.saved_many', ['count' => $saved]))
                     ->success()
                     ->send();
+
+                if ($arguments['another'] ?? false) {
+                    // Formulario limpio y modal abierto, sin volver a la ficha.
+                    $schema->fill();
+                    $schema->dispatchClientSideStateReset();
+
+                    $this->halt();
+                }
             });
     }
 

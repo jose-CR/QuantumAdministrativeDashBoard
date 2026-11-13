@@ -41,10 +41,16 @@ class CustomerAttachments extends Component
     #[Computed]
     public function counts(): array
     {
+        // Cuenta comprobantes, no filas: un archivo que cubre tres cuotas es uno.
+        $porArchivo = fn ($adjuntos) => $adjuntos
+            ->get()
+            ->unique(fn (Attachment $adjunto): string => $adjunto->disk . '|' . $adjunto->path)
+            ->count();
+
         return [
-            'credits' => $this->creditAttachmentsQuery()->count(),
-            'installments' => $this->installmentAttachmentsQuery()->count(),
-            'loose' => $this->record->attachments()->count(),
+            'credits' => $porArchivo($this->creditAttachmentsQuery()),
+            'installments' => $porArchivo($this->installmentAttachmentsQuery()),
+            'loose' => $porArchivo($this->record->attachments()),
         ];
     }
 
@@ -68,7 +74,16 @@ class CustomerAttachments extends Component
         // Solo lo que cuelga de este cliente, sus créditos o sus cuotas.
         $adjunto = $this->allowedAttachments()->whereKey($attachmentId)->firstOrFail();
 
-        $service->delete($adjunto);
+        // Un comprobante que cubre varias cuotas es un archivo con una fila por
+        // cuota: se borra entero. El archivo físico se va con la última fila.
+        $hermanos = $this->allowedAttachments()
+            ->where('disk', $adjunto->disk)
+            ->where('path', $adjunto->path)
+            ->get();
+
+        foreach ($hermanos as $hermano) {
+            $service->delete($hermano);
+        }
 
         unset($this->grupos, $this->counts);
     }
@@ -116,26 +131,76 @@ class CustomerAttachments extends Component
             ->filter(fn (Credit $credito): bool => $credito->attachments->isNotEmpty())
             ->map(fn (Credit $credito): array => [
                 'titulo' => 'Crédito #' . $credito->id . ' · ' . CreditStatus::label($credito->status),
-                'archivos' => $credito->attachments,
+                'archivos' => $this->unArchivoPorPath($credito->attachments),
             ])
             ->values()
             ->all();
     }
 
+    /**
+     * Un comprobante puede pagar varias cuotas: se agrupa POR ARCHIVO y el título
+     * dice qué cuotas cubre. Antes salía una tarjeta por cuota y el mismo PDF se
+     * repetía tres veces (con 50 cuotas la lista era interminable).
+     */
     protected function porCuota(): array
     {
-        return Installment::query()
-            ->whereIn('credit_id', $this->record->credits()->select('id'))
-            ->whereIn('id', $this->installmentAttachmentsQuery()->select('attachable_id'))
-            ->with(['attachments' => fn ($query) => $query->latest()])
-            ->orderBy('credit_id')
-            ->orderBy('number')
-            ->get()
-            ->map(fn (Installment $cuota): array => [
-                'titulo' => "Crédito #{$cuota->credit_id} · Cuota #{$cuota->number} · vence " . $cuota->due_date?->format('d/m/Y'),
-                'archivos' => $cuota->attachments,
-            ])
+        $adjuntos = Attachment::query()
+            ->where('attachable_type', Installment::class)
+            ->whereIn('attachable_id', Installment::query()
+                ->whereIn('credit_id', $this->record->credits()->select('id'))
+                ->select('id'))
+            ->with('attachable')
+            ->orderByDesc('id')
+            ->get();
+
+        return $adjuntos
+            ->groupBy(fn (Attachment $adjunto): string => $adjunto->disk . '|' . $adjunto->path)
+            ->map(function ($grupo): array {
+                $cuotas = $grupo
+                    ->map(fn (Attachment $adjunto) => $adjunto->attachable)
+                    ->filter()
+                    ->sortBy('number')
+                    ->values();
+
+                $numeros = $cuotas->pluck('number')->unique()->sort()->values();
+                $credito = $cuotas->first()?->credit_id;
+
+                return [
+                    'titulo' => $this->tituloCuotas($credito, $numeros, $cuotas->first()?->due_date?->format('d/m/Y')),
+                    'archivos' => collect([$grupo->first()]),
+                ];
+            })
+            ->sortBy('titulo')
+            ->values()
             ->all();
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, int>  $numeros
+     */
+    protected function tituloCuotas(?int $credito, $numeros, ?string $vence): string
+    {
+        $prefijo = $credito ? "Crédito #{$credito} · " : '';
+
+        if ($numeros->count() === 1) {
+            return $prefijo . "Cuota #{$numeros->first()}" . ($vence ? " · vence {$vence}" : '');
+        }
+
+        return $prefijo . 'Cuotas #' . $numeros->implode(', #') . " · {$numeros->count()} cuotas";
+    }
+
+    /**
+     * Deja una fila por archivo: si el mismo comprobante está en varias cuotas, se
+     * muestra una sola tarjeta.
+     *
+     * @param  \Illuminate\Support\Collection<int, Attachment>  $archivos
+     * @return \Illuminate\Support\Collection<int, Attachment>
+     */
+    protected function unArchivoPorPath($archivos)
+    {
+        return $archivos
+            ->unique(fn (Attachment $adjunto): string => $adjunto->disk . '|' . $adjunto->path)
+            ->values();
     }
 
     protected function sueltos(): array
