@@ -10,13 +10,15 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Schema;
 
 /**
  * Subir un archivo desde la ficha del cliente con el FileUpload de Filament.
  *
  * El archivo puede quedar en el cliente (factura o foto suelta), en un crédito
- * (la prima, la boleta firmada) o en **una o varias cuotas**: un solo comprobante
- * que paga las cuotas 2 y 3 se guarda una vez y queda colgado de las dos.
+ * (la prima, la boleta firmada) o en un **tramo de cuotas**: un comprobante que
+ * paga las cuotas 2 y 3 se elige con "desde 2 hasta 3", no de una lista de 50.
+ * Se guarda un solo archivo y queda colgado de cada cuota del tramo.
  */
 class AttachFileAction extends Action
 {
@@ -35,6 +37,11 @@ class AttachFileAction extends Action
             ->modalHeading(__('ui.attachments.action_title'))
             ->modalDescription(__('ui.attachments.action_description'))
             ->modalSubmitActionLabel(__('ui.attachments.submit'))
+            ->extraModalFooterActions(fn (Action $action): array => [
+                // Sube y deja el modal abierto y vacío para cargar el siguiente.
+                $action->makeModalSubmitAction('attachAnother', arguments: ['another' => true])
+                    ->label(__('ui.attachments.submit_another')),
+            ])
             ->schema([
                 Select::make('target')
                     ->label(__('ui.attachments.target'))
@@ -62,26 +69,35 @@ class AttachFileAction extends Action
                     ->required(fn (Get $get): bool => in_array($get('target'), ['credit', 'installment'], true))
                     ->live(),
 
-                Select::make('installment_ids')
-                    ->label(__('ui.attachments.installments'))
-                    ->multiple()
-                    ->options(function (Get $get): array {
-                        if (blank($get('credit_id'))) {
-                            return [];
+                // Tramo de cuotas: dos selects cortos en vez de una lista de 50.
+                Select::make('installment_from')
+                    ->label(__('ui.attachments.from_installment'))
+                    ->options(fn (Get $get): array => $this->installmentOptions($get('credit_id')))
+                    ->default(1)
+                    ->visible(fn (Get $get): bool => $get('target') === 'installment')
+                    ->required(fn (Get $get): bool => $get('target') === 'installment')
+                    ->live(),
+
+                Select::make('installment_to')
+                    ->label(__('ui.attachments.to_installment'))
+                    ->options(fn (Get $get): array => $this->installmentOptions($get('credit_id')))
+                    ->visible(fn (Get $get): bool => $get('target') === 'installment')
+                    ->required(fn (Get $get): bool => $get('target') === 'installment')
+                    ->live()
+                    ->helperText(function (Get $get): string {
+                        $desde = (int) $get('installment_from');
+                        $hasta = (int) ($get('installment_to') ?: $desde);
+
+                        if ($desde <= 0) {
+                            return '';
                         }
 
-                        return Installment::query()
-                            ->where('credit_id', $get('credit_id'))
-                            ->orderBy('number')
-                            ->get()
-                            ->mapWithKeys(fn (Installment $installment): array => [
-                                $installment->id => "Cuota #{$installment->number} · vence " . $installment->due_date?->format('d/m/Y'),
-                            ])
-                            ->all();
-                    })
-                    ->helperText(__('ui.attachments.installments_help'))
-                    ->visible(fn (Get $get): bool => $get('target') === 'installment')
-                    ->required(fn (Get $get): bool => $get('target') === 'installment'),
+                        [$desde, $hasta] = $desde <= $hasta ? [$desde, $hasta] : [$hasta, $desde];
+
+                        return $desde === $hasta
+                            ? __('ui.attachments.range_one', ['number' => $desde])
+                            : __('ui.attachments.range_many', ['from' => $desde, 'to' => $hasta, 'count' => $hasta - $desde + 1]);
+                    }),
 
                 FileUpload::make('files')
                     ->label(__('ui.attachments.files'))
@@ -95,72 +111,115 @@ class AttachFileAction extends Action
                     ->storeFileNamesIn('file_names')
                     ->helperText(__('ui.attachments.files_help')),
             ])
-            ->action(function (Customer $record, array $data, AttachmentService $service): void {
+            ->action(function (Customer $record, array $data, array $arguments, Schema $schema, AttachmentService $service): void {
                 $targets = $this->resolveTargets($record, $data);
 
                 if ($targets === []) {
                     return;
                 }
 
-                $saved = 0;
-
-                $primary = $targets[0];
-                $others = array_slice($targets, 1);
-
-                foreach ((array) ($data['files'] ?? []) as $path) {
-                    if (blank($path)) {
-                        continue;
-                    }
-
-                    $name = $data['file_names'][$path] ?? basename($path);
-
-                    // El primer destino mueve el archivo a su carpeta; los demás
-                    // apuntan al mismo archivo, así no queda duplicado en el disco.
-                    $attachment = $service->storeFromPath(
-                        record: $primary,
-                        temporaryPath: $path,
-                        originalName: $name,
-                        collection: 'default',
-                    );
-
-                    foreach ($others as $target) {
-                        $service->attachFromPath(
-                            record: $target,
-                            path: $attachment->path,
-                            collection: 'default',
-                        );
-                    }
-
-                    $saved++;
-                }
+                $this->saveFiles($service, $targets, $data);
 
                 Notification::make()
-                    ->title($saved === 1
-                        ? __('ui.attachments.saved')
-                        : __('ui.attachments.saved_many', ['count' => $saved]))
+                    ->title(isset($data['files']) && count((array) $data['files']) > 1
+                        ? __('ui.attachments.saved_many', ['count' => count((array) $data['files'])])
+                        : __('ui.attachments.saved'))
                     ->success()
                     ->send();
+
+                if ($arguments['another'] ?? false) {
+                    // Formulario limpio y modal abierto, sin volver a la ficha.
+                    $schema->fill();
+                    $schema->rawState($schema->getRawState());
+                    $schema->dispatchClientSideStateReset();
+
+                    $this->halt();
+                }
             });
     }
 
     /**
-     * A qué registros se cuelga el archivo: uno por cada cuota elegida.
+     * Guarda los archivos una sola vez: el primero mueve el archivo a su carpeta y
+     * los demás destinos apuntan al mismo path (una fila por cuota, un archivo).
+     *
+     * @param  array<int, \Illuminate\Database\Eloquent\Model>  $targets
+     */
+    protected function saveFiles(AttachmentService $service, array $targets, array $data): void
+    {
+        $primary = $targets[0];
+        $others = array_slice($targets, 1);
+
+        foreach ((array) ($data['files'] ?? []) as $path) {
+            if (blank($path)) {
+                continue;
+            }
+
+            $attachment = $service->storeFromPath(
+                record: $primary,
+                temporaryPath: $path,
+                originalName: $data['file_names'][$path] ?? basename($path),
+                collection: 'default',
+            );
+
+            foreach ($others as $target) {
+                $service->attachFromPath(
+                    record: $target,
+                    path: $attachment->path,
+                    collection: 'default',
+                );
+            }
+        }
+    }
+
+    /**
+     * A qué registros se cuelga el archivo: uno por cada cuota del tramo.
      *
      * @return array<int, \Illuminate\Database\Eloquent\Model>
      */
     protected function resolveTargets(Customer $record, array $data): array
     {
-        return match ($data['target']) {
-            'credit' => [$record->credits()->findOrFail($data['credit_id'])],
+        if ($data['target'] === 'credit') {
+            return [$record->credits()->findOrFail($data['credit_id'])];
+        }
 
-            'installment' => Installment::query()
-                ->whereIn('credit_id', $record->credits()->select('id'))
-                ->whereIn('id', array_filter((array) ($data['installment_ids'] ?? [])))
-                ->orderBy('number')
-                ->get()
-                ->all(),
+        if ($data['target'] !== 'installment') {
+            return [$record];
+        }
 
-            default => [$record],
-        };
+        $desde = (int) ($data['installment_from'] ?? 0);
+        $hasta = (int) ($data['installment_to'] ?? $desde);
+
+        if ($desde <= 0) {
+            return [];
+        }
+
+        [$desde, $hasta] = $desde <= $hasta ? [$desde, $hasta] : [$hasta, $desde];
+
+        return Installment::query()
+            ->whereIn('credit_id', $record->credits()->select('id'))
+            ->where('credit_id', $data['credit_id'])
+            ->whereBetween('number', [$desde, $hasta])
+            ->orderBy('number')
+            ->get()
+            ->all();
+    }
+
+    /**
+     * Números de cuota del crédito, para los dos selects del tramo.
+     *
+     * @return array<int, int>
+     */
+    protected function installmentOptions(mixed $creditId): array
+    {
+        if (blank($creditId)) {
+            return [];
+        }
+
+        return Installment::query()
+            ->where('credit_id', $creditId)
+            ->orderBy('number')
+            ->pluck('number')
+            ->mapWithKeys(fn ($number): array => [(int) $number => (int) $number])
+            ->all();
     }
 }
