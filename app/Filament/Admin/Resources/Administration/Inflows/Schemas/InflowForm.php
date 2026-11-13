@@ -77,15 +77,7 @@ class InflowForm
                             ->label(__('resources.flow.inflow.amount'))
                             ->numeric()
                             ->prefix('$')
-                            ->required()
-                            ->live()
-                            // Por defecto se cobra entero: si todavía no se tocó lo
-                            // cobrado, se copia el monto.
-                            ->afterStateUpdated(function ($state, callable $set, Get $get): void {
-                                if ((float) ($get('amount_paid') ?? 0) <= 0) {
-                                    $set('amount_paid', $state);
-                                }
-                            }),
+                            ->required(),
 
                         /*
                          * Lo cobrado manda: el estado (pendiente, parcial o pagado)
@@ -95,9 +87,10 @@ class InflowForm
                             ->label(__('resources.flow.inflow.amount_paid'))
                             ->numeric()
                             ->prefix('$')
-                            ->default(0)
-                            ->helperText(__('ui.inflow.amount_paid_help'))
-                            ->required(),
+                            // Sin default: vacío quiere decir que no se cobró nada.
+                            // Un 0 guardado también se muestra vacío.
+                            ->formatStateUsing(fn ($state) => (float) $state > 0 ? $state : null)
+                            ->helperText(__('ui.inflow.amount_paid_help')),
 
                         Select::make('payment_method')
                             ->label(__('resources.flow.inflow.payment_method'))
