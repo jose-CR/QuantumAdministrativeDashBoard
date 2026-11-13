@@ -188,6 +188,7 @@ return [
         'installments_help' => 'If one receipt pays several installments, select them all: the file is stored once and shows up on each.',
         'files_help' => 'PDF or images, up to 10 MB each.',
         'submit' => 'Upload',
+        'submit_another' => 'Upload & another',
         'saved' => 'Attachment saved',
         'saved_many' => ':count attachments saved',
         'section' => 'Attachments',

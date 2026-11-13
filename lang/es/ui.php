@@ -188,6 +188,7 @@ return [
         'installments_help' => 'Si un comprobante paga varias cuotas, elegilas todas: el archivo se guarda una sola vez y queda en cada una.',
         'files_help' => 'PDF o imágenes, hasta 10 MB cada uno.',
         'submit' => 'Subir',
+        'submit_another' => 'Subir y otro',
         'saved' => 'Adjunto guardado',
         'saved_many' => ':count adjuntos guardados',
         'section' => 'Adjuntos',
