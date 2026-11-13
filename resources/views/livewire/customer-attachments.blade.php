@@ -66,15 +66,13 @@
                                     Abrir
                                 </x-filament::button>
 
-                                <x-filament::button
-                                    size="xs"
-                                    color="danger"
-                                    icon="heroicon-m-trash"
-                                    wire:click="delete({{ $archivo->id }})"
-                                    wire:confirm="¿Eliminar este adjunto?"
-                                >
-                                    Eliminar
-                                </x-filament::button>
+                                <x-confirm-button
+                                    :action="'delete(' . $archivo->id . ')'"
+                                    :label="__('ui.attachments.delete')"
+                                    :heading="__('ui.confirm.delete_title')"
+                                    :description="__('ui.confirm.delete_description')"
+                                    :confirm-label="__('ui.confirm.accept')"
+                                />
                             </div>
                         </div>
                     </div>

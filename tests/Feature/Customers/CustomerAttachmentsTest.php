@@ -85,6 +85,23 @@ class CustomerAttachmentsTest extends TestCase
             ->call('delete', $ajeno->id);
     }
 
+    public function test_el_borrado_pide_confirmacion_en_un_modal_y_no_en_el_navegador(): void
+    {
+        Storage::fake('attachments');
+
+        [$cliente, $credito] = $this->clienteConCredito();
+
+        $credito->attachments()->create(['path' => 'a/borrar.pdf', 'original_name' => 'borrar.pdf']);
+
+        $componente = Livewire::test(CustomerAttachments::class, ['record' => $cliente])
+            ->call('setTab', 'credits')
+            ->assertOk();
+
+        // El modal del panel, no el diálogo del navegador.
+        $componente->assertSee('¿Eliminar este adjunto?');
+        $componente->assertDontSee('wire:confirm', false);
+    }
+
     public function test_borra_un_adjunto_del_credito(): void
     {
         Storage::fake('attachments');

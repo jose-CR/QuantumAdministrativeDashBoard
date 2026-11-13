@@ -311,18 +311,14 @@
 
 
                             {{-- Eliminar --}}
-                            <button
-                                type="button"
-                                wire:click="delete({{ $attachment->id }})"
-                                wire:confirm="¿Estás seguro de eliminar este comprobante?"
-                                title="Eliminar"
-                                class="inline-flex h-7 w-7 items-center justify-center
-                                       rounded-md text-danger-500
-                                       transition hover:bg-danger-50
-                                       dark:hover:bg-danger-950/30"
-                            >
-                                <x-heroicon-o-trash class="h-4 w-4" />
-                            </button>
+                            <x-confirm-button
+                                :action="'delete(' . $attachment->id . ')'"
+                                :label="__('ui.attachments.delete')"
+                                :icon="'heroicon-m-trash'"
+                                :heading="__('ui.confirm.delete_title')"
+                                :description="__('ui.confirm.delete_description')"
+                                :confirm-label="__('ui.confirm.accept')"
+                            />
 
                         </div>
 
