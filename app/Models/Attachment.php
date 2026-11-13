@@ -28,7 +28,17 @@ class Attachment extends Model
     protected static function booted(): void
     {
         static::deleting(function (Attachment $attachment) {
-            Storage::disk($attachment->disk)->delete($attachment->path);
+            // Un comprobante que paga varias cuotas es un solo archivo con varias
+            // filas: se borra del disco recién cuando no queda ninguna otra.
+            $compartido = static::query()
+                ->where('disk', $attachment->disk)
+                ->where('path', $attachment->path)
+                ->whereKeyNot($attachment->getKey())
+                ->exists();
+
+            if (! $compartido) {
+                Storage::disk($attachment->disk)->delete($attachment->path);
+            }
         });
     }
 

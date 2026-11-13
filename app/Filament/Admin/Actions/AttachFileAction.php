@@ -15,8 +15,8 @@ use Filament\Schemas\Components\Utilities\Get;
  * Subir un archivo desde la ficha del cliente con el FileUpload de Filament.
  *
  * El archivo puede quedar en el cliente (factura o foto suelta), en un crédito
- * (la prima, la boleta firmada) o en una cuota (el comprobante). La subida la
- * maneja Filament de punta a punta: acá solo se registra el adjunto.
+ * (la prima, la boleta firmada) o en **una o varias cuotas**: un solo comprobante
+ * que paga las cuotas 2 y 3 se guarda una vez y queda colgado de las dos.
  */
 class AttachFileAction extends Action
 {
@@ -30,31 +30,31 @@ class AttachFileAction extends Action
         parent::setUp();
 
         $this
-            ->label('Adjuntar archivo')
+            ->label(__('ui.attachments.action_title'))
             ->icon('heroicon-o-paper-clip')
-            ->modalHeading('Adjuntar archivo')
-            ->modalDescription('La prima, una factura, una foto: se guarda en el cliente, en un crédito o en una cuota.')
-            ->modalSubmitActionLabel('Subir')
+            ->modalHeading(__('ui.attachments.action_title'))
+            ->modalDescription(__('ui.attachments.action_description'))
+            ->modalSubmitActionLabel(__('ui.attachments.submit'))
             ->schema([
                 Select::make('target')
-                    ->label('¿A qué se adjunta?')
+                    ->label(__('ui.attachments.target'))
                     ->options([
-                        'customer' => 'El cliente (suelto)',
-                        'credit' => 'Un crédito',
-                        'installment' => 'Una cuota',
+                        'customer' => __('ui.attachments.target_customer'),
+                        'credit' => __('ui.attachments.target_credit'),
+                        'installment' => __('ui.attachments.target_installments'),
                     ])
                     ->default('customer')
                     ->live()
                     ->required(),
 
                 Select::make('credit_id')
-                    ->label('Crédito')
+                    ->label(__('ui.attachments.credit'))
                     ->options(function (Customer $record): array {
                         return $record->credits()
                             ->orderByDesc('id')
                             ->get()
-                            ->mapWithKeys(fn ($credito): array => [
-                                $credito->id => "Crédito #{$credito->id} · \${$credito->amount} · {$credito->status}",
+                            ->mapWithKeys(fn ($credit): array => [
+                                $credit->id => "Crédito #{$credit->id} · \${$credit->amount} · {$credit->status}",
                             ])
                             ->all();
                     })
@@ -62,9 +62,10 @@ class AttachFileAction extends Action
                     ->required(fn (Get $get): bool => in_array($get('target'), ['credit', 'installment'], true))
                     ->live(),
 
-                Select::make('installment_id')
-                    ->label('Cuota')
-                    ->options(function (Get $get, Customer $record): array {
+                Select::make('installment_ids')
+                    ->label(__('ui.attachments.installments'))
+                    ->multiple()
+                    ->options(function (Get $get): array {
                         if (blank($get('credit_id'))) {
                             return [];
                         }
@@ -73,16 +74,17 @@ class AttachFileAction extends Action
                             ->where('credit_id', $get('credit_id'))
                             ->orderBy('number')
                             ->get()
-                            ->mapWithKeys(fn (Installment $cuota): array => [
-                                $cuota->id => "Cuota #{$cuota->number} · vence " . $cuota->due_date?->format('d/m/Y'),
+                            ->mapWithKeys(fn (Installment $installment): array => [
+                                $installment->id => "Cuota #{$installment->number} · vence " . $installment->due_date?->format('d/m/Y'),
                             ])
                             ->all();
                     })
+                    ->helperText(__('ui.attachments.installments_help'))
                     ->visible(fn (Get $get): bool => $get('target') === 'installment')
                     ->required(fn (Get $get): bool => $get('target') === 'installment'),
 
                 FileUpload::make('files')
-                    ->label('Archivos')
+                    ->label(__('ui.attachments.files'))
                     ->multiple()
                     ->required()
                     ->disk('attachments')
@@ -91,38 +93,74 @@ class AttachFileAction extends Action
                     ->maxSize(10240)
                     ->maxFiles(10)
                     ->storeFileNamesIn('file_names')
-                    ->helperText('PDF o imágenes, hasta 10 MB cada uno.'),
+                    ->helperText(__('ui.attachments.files_help')),
             ])
             ->action(function (Customer $record, array $data, AttachmentService $service): void {
-                $destino = match ($data['target']) {
-                    'credit' => $record->credits()->findOrFail($data['credit_id']),
-                    'installment' => Installment::query()
-                        ->whereIn('credit_id', $record->credits()->select('id'))
-                        ->findOrFail($data['installment_id']),
-                    default => $record,
-                };
+                $targets = $this->resolveTargets($record, $data);
 
-                $guardados = 0;
+                if ($targets === []) {
+                    return;
+                }
+
+                $saved = 0;
+
+                $primary = $targets[0];
+                $others = array_slice($targets, 1);
 
                 foreach ((array) ($data['files'] ?? []) as $path) {
                     if (blank($path)) {
                         continue;
                     }
 
-                    $service->storeFromPath(
-                        record: $destino,
+                    $name = $data['file_names'][$path] ?? basename($path);
+
+                    // El primer destino mueve el archivo a su carpeta; los demás
+                    // apuntan al mismo archivo, así no queda duplicado en el disco.
+                    $attachment = $service->storeFromPath(
+                        record: $primary,
                         temporaryPath: $path,
-                        originalName: $data['file_names'][$path] ?? basename($path),
-                        collection: $destino->getTable(),
+                        originalName: $name,
+                        collection: 'default',
                     );
 
-                    $guardados++;
+                    foreach ($others as $target) {
+                        $service->attachFromPath(
+                            record: $target,
+                            path: $attachment->path,
+                            collection: 'default',
+                        );
+                    }
+
+                    $saved++;
                 }
 
                 Notification::make()
-                    ->title($guardados === 1 ? 'Adjunto guardado' : "{$guardados} adjuntos guardados")
+                    ->title($saved === 1
+                        ? __('ui.attachments.saved')
+                        : __('ui.attachments.saved_many', ['count' => $saved]))
                     ->success()
                     ->send();
             });
+    }
+
+    /**
+     * A qué registros se cuelga el archivo: uno por cada cuota elegida.
+     *
+     * @return array<int, \Illuminate\Database\Eloquent\Model>
+     */
+    protected function resolveTargets(Customer $record, array $data): array
+    {
+        return match ($data['target']) {
+            'credit' => [$record->credits()->findOrFail($data['credit_id'])],
+
+            'installment' => Installment::query()
+                ->whereIn('credit_id', $record->credits()->select('id'))
+                ->whereIn('id', array_filter((array) ($data['installment_ids'] ?? [])))
+                ->orderBy('number')
+                ->get()
+                ->all(),
+
+            default => [$record],
+        };
     }
 }

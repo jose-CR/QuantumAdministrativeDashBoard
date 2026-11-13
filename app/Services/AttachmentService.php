@@ -82,9 +82,12 @@ class AttachmentService
         return $this->updateFile($attachment, $path, $originalName);
     }
 
+    /**
+     * Borra el adjunto. El archivo del disco lo borra el modelo, que sabe si otro
+     * adjunto (otra cuota) apunta al mismo path.
+     */
     public function delete(Attachment $attachment): void
     {
-        $this->files->delete($attachment->disk, $attachment->path);
         $attachment->delete();
     }
 
