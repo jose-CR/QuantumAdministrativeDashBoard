@@ -34,6 +34,9 @@ class DatabaseSeeder extends Seeder
             CreditItemSeeder::class,
             OutflowSeeder::class,
             InflowSeeder::class,
+
+            // Después de las entradas: saca los vendedores de ahí.
+            EmployeeSeeder::class,
         ]);
     }
 }
