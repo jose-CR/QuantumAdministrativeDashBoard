@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\Inflow;
 use App\Models\Installment;
 use App\Support\Salespeople;
+use App\Utils\Filament\FilamentSearch;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -32,12 +33,15 @@ class InflowForm
                             ->label(__('resources.flow.inflow.cod_invoice'))
                             ->required(),
 
-                        Select::make('customer_id')
-                            ->label(__('resources.flow.inflow.client'))
-                            ->relationship('customer', 'full_name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
+                        FilamentSearch::searchable(
+                            Select::make('customer_id')
+                                ->label(__('resources.flow.inflow.client'))
+                                ->relationship('customer', 'full_name')
+                                ->required(),
+                            Customer::query(),
+                            ['full_name', 'document_number', 'phone'],
+                            ['full_name', 'document_number'],
+                        ),
 
                         DatePicker::make('date')
                             ->label(__('resources.flow.inflow.date'))
@@ -129,24 +133,20 @@ class InflowForm
                             ->relationship()
                             ->hiddenLabel()
                             ->schema([
-                                Select::make('article_id')
-                                    ->label(__('ui.inflow.item'))
-                                    ->searchable()
-                                    ->required()
-                                    ->options(fn (): array => Article::query()
-                                        ->where('tracking', Article::TRACKING_NONE)
-                                        ->orderBy('name')
-                                        ->get()
-                                        ->mapWithKeys(fn (Article $articulo): array => [
-                                            $articulo->id => "{$articulo->full_name} (stock: {$articulo->stock})",
-                                        ])
-                                        ->all())
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set): void {
-                                        if ($articulo = Article::find($state)) {
-                                            $set('price', (float) $articulo->cash_price);
-                                        }
-                                    }),
+                                FilamentSearch::searchable(
+                                    Select::make('article_id')
+                                        ->label(__('ui.inflow.item'))
+                                        ->required()
+                                        ->live()
+                                        ->afterStateUpdated(function ($state, callable $set): void {
+                                            if ($articulo = Article::find($state)) {
+                                                $set('price', (float) $articulo->cash_price);
+                                            }
+                                        }),
+                                    Article::query()->where('tracking', Article::TRACKING_NONE)->orderBy('name'),
+                                    ['name', 'sku', 'brand', 'model'],
+                                    fn (Article $articulo): string => "{$articulo->full_name} (stock: {$articulo->stock})",
+                                ),
 
                                 TextInput::make('quantity')
                                     ->label(__('ui.inflow.quantity'))

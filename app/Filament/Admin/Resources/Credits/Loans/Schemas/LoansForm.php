@@ -4,9 +4,11 @@ namespace App\Filament\Admin\Resources\Credits\Loans\Schemas;
 
 use App\Models\Article;
 use App\Models\ArticleUnit;
+use App\Models\Customer;
 use App\Models\Transportation;
 use App\Services\LoanCalculatorService;
 use App\Support\ElSalvadorCatalogo;
+use App\Utils\Filament\FilamentSearch;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
@@ -87,13 +89,16 @@ class LoansForm
                     ->tabs([
                         Tabs\Tab::make(__('ui.credits.label'))
                             ->schema([
-                                Select::make('customer_id')
-                                    ->label(__('ui.credits.customer'))
-                                    ->relationship('client', 'full_name')
-                                    ->searchable()
-                                    ->preload()
-                                    ->required()
-                                    ->columnSpanFull(),
+                                FilamentSearch::searchable(
+                                    Select::make('customer_id')
+                                        ->label(__('ui.credits.customer'))
+                                        ->relationship('client', 'full_name')
+                                        ->required()
+                                        ->columnSpanFull(),
+                                    Customer::query(),
+                                    ['full_name', 'document_number', 'phone'],
+                                    ['full_name', 'document_number'],
+                                ),
 
                                 Repeater::make('items')
                                     ->relationship('items')
@@ -268,22 +273,15 @@ class LoansForm
                                                  * (cascos, baterías sueltas: no tienen serie)
                                                  */
                                                 if ($get('item_type') === Article::class) {
-                                                    return Article::query()
-                                                        ->where('tracking', Article::TRACKING_NONE)
-                                                        ->where('stock', '>', 0)
-                                                        ->where(function ($query) use ($search) {
-                                                            $query->where('name', 'ilike', "%{$search}%")
-                                                                ->orWhere('sku', 'ilike', "%{$search}%")
-                                                                ->orWhere('brand', 'ilike', "%{$search}%")
-                                                                ->orWhere('model', 'ilike', "%{$search}%");
-                                                        })
-                                                        ->orderBy('name')
-                                                        ->take(50)
-                                                        ->get()
-                                                        ->mapWithKeys(fn (Article $article) => [
-                                                            $article->id => "{$article->full_name} (stock: {$article->stock})",
-                                                        ])
-                                                        ->toArray();
+                                                    return FilamentSearch::options(
+                                                        Article::query()
+                                                            ->where('tracking', Article::TRACKING_NONE)
+                                                            ->where('stock', '>', 0)
+                                                            ->orderBy('name'),
+                                                        $search,
+                                                        ['name', 'sku', 'brand', 'model'],
+                                                        fn (Article $article): string => "{$article->full_name} (stock: {$article->stock})",
+                                                    );
                                                 }
 
                                                 return [];

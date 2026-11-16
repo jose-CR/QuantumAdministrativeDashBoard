@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Credits\PaymentHistories\Schemas;
 
 use App\Models\Bank;
 use App\Models\Credit;
+use App\Utils\Filament\FilamentSearch;
 use App\Utils\Filament\FilamentSelect;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\RichEditor;
@@ -17,15 +18,15 @@ class PaymentHistoriesForm
     {
         return $schema
             ->components([
-                Select::make('credit_id')
-                    ->options(
-                        FilamentSelect::options(
-                            Credit::class,
-                            ['id', 'client.full_name']
-                        )
-                    )
-                    ->searchable()
-                    ->required()
+                FilamentSearch::searchable(
+                    Select::make('credit_id')
+                        ->required(),
+                    Credit::query()->with('client'),
+                    ['id'],
+                    fn (Credit $credito): string => "#{$credito->id} - {$credito->client?->full_name}",
+                    castColumns: ['id'],
+                    relations: ['client' => ['full_name']],
+                )
                     // Un pago ya registrado no cambia de crédito ni de monto: editarlo
                     // no recalcula cuotas ni saldo, así que solo se corrigen los datos
                     // de referencia (recibo, banco, notas).

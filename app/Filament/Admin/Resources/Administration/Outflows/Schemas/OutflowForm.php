@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Administration\Outflows\Schemas;
 use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\Outflow;
+use App\Utils\Filament\FilamentSearch;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Repeater;
@@ -56,24 +57,20 @@ class OutflowForm
                             ->relationship()
                             ->hiddenLabel()
                             ->schema([
-                                Select::make('article_id')
-                                    ->label(__('ui.outflow.item'))
-                                    ->searchable()
-                                    ->required()
-                                    ->options(fn (): array => Article::query()
-                                        ->where('tracking', Article::TRACKING_NONE)
-                                        ->orderBy('name')
-                                        ->get()
-                                        ->mapWithKeys(fn (Article $articulo): array => [
-                                            $articulo->id => "{$articulo->full_name} (stock: {$articulo->stock})",
-                                        ])
-                                        ->all())
-                                    ->live()
-                                    ->afterStateUpdated(function ($state, callable $set): void {
-                                        if ($articulo = Article::find($state)) {
-                                            $set('price', (float) $articulo->cash_price);
-                                        }
-                                    }),
+                                FilamentSearch::searchable(
+                                    Select::make('article_id')
+                                        ->label(__('ui.outflow.item'))
+                                        ->required()
+                                        ->live()
+                                        ->afterStateUpdated(function ($state, callable $set): void {
+                                            if ($articulo = Article::find($state)) {
+                                                $set('price', (float) $articulo->cash_price);
+                                            }
+                                        }),
+                                    Article::query()->where('tracking', Article::TRACKING_NONE)->orderBy('name'),
+                                    ['name', 'sku', 'brand', 'model'],
+                                    fn (Article $articulo): string => "{$articulo->full_name} (stock: {$articulo->stock})",
+                                ),
 
                                 TextInput::make('quantity')
                                     ->label(__('ui.outflow.quantity'))
