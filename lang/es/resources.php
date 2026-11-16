@@ -1,6 +1,59 @@
 <?php
 
 return [
+    'employees' => [
+        'sections' => [
+            'identity' => 'Datos de la persona',
+            'contact' => 'Contacto',
+            'employment' => 'Puesto y estado',
+        ],
+
+        'fields' => [
+            'code' => 'Código',
+            'code_help' => 'Código interno o de nómina. Se puede dejar vacío.',
+            'name' => 'Nombre completo',
+            'document_type' => 'Tipo de documento',
+            'document_number' => 'Número de documento',
+            'job_title' => 'Puesto',
+            'phone' => 'Teléfono',
+            'email' => 'Correo electrónico',
+            'address' => 'Dirección',
+            'hire_date' => 'Fecha de alta',
+            'termination_date' => 'Fecha de baja',
+            'status' => 'Estado',
+            'user' => 'Usuario del panel',
+            'user_help' => 'Solo si esta persona entra al panel. No es obligatorio.',
+            'no_user' => 'Sin usuario',
+            'notes' => 'Notas',
+        ],
+
+        'job_titles' => [
+            'vendedor' => 'Vendedor',
+            'tecnico' => 'Técnico',
+            'bodega' => 'Bodega',
+            'administracion' => 'Administración',
+            'otro' => 'Otro',
+        ],
+
+        'statuses' => [
+            'active' => 'Activo',
+            'inactive' => 'De baja',
+        ],
+
+        'document_types' => [
+            'dui' => 'DUI',
+            'nit' => 'NIT',
+            'passport' => 'Pasaporte',
+            'res_carnet' => 'Carné de residente',
+            'otro' => 'Otro',
+        ],
+
+        'actions' => [
+            'deactivate' => 'Dar de baja',
+            'reactivate' => 'Reactivar',
+        ],
+    ],
+
 
     'users' => [
 

@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'employees' => [
+        'navigation' => 'Empleados',
+        'singular' => 'Empleado',
+        'plural' => 'Empleados',
+    ],
+
     'users' => [
         'navigation' => 'Usuarios',
         'singular' => 'Usuario',

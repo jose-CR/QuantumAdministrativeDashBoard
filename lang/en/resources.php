@@ -2,6 +2,59 @@
 <?php
 
 return [
+    'employees' => [
+        'sections' => [
+            'identity' => 'Person details',
+            'contact' => 'Contact',
+            'employment' => 'Position and status',
+        ],
+
+        'fields' => [
+            'code' => 'Code',
+            'code_help' => 'Internal or payroll code. Can be left empty.',
+            'name' => 'Full name',
+            'document_type' => 'Document type',
+            'document_number' => 'Document number',
+            'job_title' => 'Position',
+            'phone' => 'Phone',
+            'email' => 'Email',
+            'address' => 'Address',
+            'hire_date' => 'Hire date',
+            'termination_date' => 'Termination date',
+            'status' => 'Status',
+            'user' => 'Panel user',
+            'user_help' => 'Only if this person signs in to the panel. Not required.',
+            'no_user' => 'No user',
+            'notes' => 'Notes',
+        ],
+
+        'job_titles' => [
+            'vendedor' => 'Salesperson',
+            'tecnico' => 'Technician',
+            'bodega' => 'Warehouse',
+            'administracion' => 'Administration',
+            'otro' => 'Other',
+        ],
+
+        'statuses' => [
+            'active' => 'Active',
+            'inactive' => 'Inactive',
+        ],
+
+        'document_types' => [
+            'dui' => 'DUI',
+            'nit' => 'NIT',
+            'passport' => 'Passport',
+            'res_carnet' => 'Resident card',
+            'otro' => 'Other',
+        ],
+
+        'actions' => [
+            'deactivate' => 'Deactivate',
+            'reactivate' => 'Reactivate',
+        ],
+    ],
+
 
     'users' => [
 
