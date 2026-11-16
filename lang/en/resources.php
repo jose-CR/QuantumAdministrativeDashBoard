@@ -52,6 +52,7 @@ return [
         'actions' => [
             'deactivate' => 'Deactivate',
             'reactivate' => 'Reactivate',
+            'cannot_delete' => 'Cannot delete: this employee has sales on record',
         ],
     ],
 

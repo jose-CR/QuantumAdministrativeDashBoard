@@ -9,6 +9,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Notifications\Notification;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -112,11 +113,28 @@ class EmployeesTable
                         'termination_date' => null,
                     ])),
 
-                DeleteAction::make(),
+                // Un empleado con ventas no se borra: se da de baja.
+                DeleteAction::make()
+                    ->visible(fn (Employee $record): bool => ! $record->hasHistory()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make(),
+                    DeleteBulkAction::make()
+                        // La baja masiva tampoco se lleva a quien tiene historial.
+                        ->before(function (DeleteBulkAction $action): void {
+                            $conHistorial = $action->getSelectedRecords()
+                                ->filter(fn (Employee $record): bool => $record->hasHistory());
+
+                            if ($conHistorial->isNotEmpty()) {
+                                Notification::make()
+                                    ->title(__('resources.employees.actions.cannot_delete'))
+                                    ->body($conHistorial->pluck('name')->implode(', '))
+                                    ->danger()
+                                    ->send();
+
+                                $action->cancel();
+                            }
+                        }),
                 ]),
             ])
             ->defaultSort('name');

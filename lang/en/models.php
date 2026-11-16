@@ -154,5 +154,10 @@ return [
             'label' => 'Banks',
             'description' => 'Bank catalog used by payments.',
         ],
+        'employees' => [
+            'label' => 'Employees',
+            'description' => 'Workshop staff: position, contact, hire and termination dates.',
+        ],
+
     ],
 ];

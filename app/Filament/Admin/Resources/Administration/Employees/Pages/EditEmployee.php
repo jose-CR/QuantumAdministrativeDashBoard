@@ -37,7 +37,9 @@ class EditEmployee extends EditRecord
                     'termination_date' => null,
                 ])),
 
-            DeleteAction::make(),
+            // Un empleado con ventas no se borra: se da de baja.
+            DeleteAction::make()
+                ->visible(fn (Employee $record): bool => ! $record->hasHistory()),
         ];
     }
 }

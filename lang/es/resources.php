@@ -51,6 +51,7 @@ return [
         'actions' => [
             'deactivate' => 'Dar de baja',
             'reactivate' => 'Reactivar',
+            'cannot_delete' => 'No se puede borrar: tiene ventas registradas',
         ],
     ],
 

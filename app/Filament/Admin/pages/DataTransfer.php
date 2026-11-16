@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\pages;
 
 use App\Filament\Exports\Administration\BanksExporter;
+use App\Filament\Exports\Administration\EmployeesExporter;
 use App\Filament\Exports\Credits\InstallmentsExporter;
 use App\Filament\Exports\Credits\LoansExporter;
 use App\Filament\Exports\Credits\PaymentHistoriesExporter;
@@ -13,6 +14,7 @@ use App\Filament\Exports\Inventory\CategoriesExporter;
 use App\Filament\Exports\Inventory\UnitArticlesExporter;
 use App\Filament\Exports\Outflow\OutflowExporter;
 use App\Filament\Imports\Administration\BankImporter;
+use App\Filament\Imports\Administration\EmployeeImporter;
 use App\Filament\Imports\Credits\InstallmentImporter;
 use App\Filament\Imports\Credits\LoanImporter;
 use App\Filament\Imports\Credits\PaymentHistoryImporter;
@@ -158,6 +160,13 @@ class DataTransfer extends Page
                 'description' => __('models.data_transfer.banks.description'),
                 'exporter' => BanksExporter::class,
                 'importer' => BankImporter::class,
+            ],
+            'employees' => [
+                'area' => __('models.others.administration'),
+                'label' => __('models.data_transfer.employees.label'),
+                'description' => __('models.data_transfer.employees.description'),
+                'exporter' => EmployeesExporter::class,
+                'importer' => EmployeeImporter::class,
             ],
         ];
     }

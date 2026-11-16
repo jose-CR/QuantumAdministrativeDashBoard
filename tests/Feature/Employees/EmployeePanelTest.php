@@ -103,6 +103,35 @@ class EmployeePanelTest extends TestCase
         $this->assertNull($empleado->deleted_at);
     }
 
+    public function test_un_empleado_con_ventas_no_se_puede_borrar(): void
+    {
+        $empleado = Employee::factory()->create(['name' => 'Vendedor Con Ventas']);
+
+        \App\Models\Inflow::factory()->create([
+            'salesperson' => 'Vendedor Con Ventas',
+            'customer_id' => \App\Models\Customer::factory()->create()->id,
+        ]);
+
+        $this->assertTrue($empleado->hasHistory());
+        $this->assertFalse($empleado->delete(), 'Se borró un empleado con ventas.');
+        $this->assertNotNull(Employee::find($empleado->id));
+
+        // El botón de borrar no aparece para él, pero sí el de dar de baja.
+        Livewire::test(ListEmployees::class)
+            ->assertTableActionHidden('delete', $empleado)
+            ->assertTableActionVisible('deactivate', $empleado);
+    }
+
+    public function test_un_empleado_sin_ventas_si_se_puede_borrar(): void
+    {
+        $empleado = Employee::factory()->create(['name' => 'Nadie Lo Uso']);
+
+        $this->assertFalse($empleado->hasHistory());
+        $empleado->delete();
+
+        $this->assertSoftDeleted($empleado);
+    }
+
     public function test_reactivar_limpia_la_fecha_de_baja(): void
     {
         $empleado = Employee::factory()->inactive()->create();

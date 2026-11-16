@@ -74,6 +74,30 @@ class Employee extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Si el empleado ya aparece en documentos del taller.
+     *
+     * Hoy las entradas guardan el vendedor por nombre (`inflows.salesperson`) y
+     * todavía no apuntan a `employees`: mientras sea así, el nombre es el vínculo.
+     * Cuando la entrada tenga `employee_id`, esta consulta pasa a esa columna.
+     */
+    public function hasHistory(): bool
+    {
+        return Inflow::query()
+            ->whereRaw('lower(salesperson) = ?', [mb_strtolower((string) $this->name)])
+            ->exists();
+    }
+
+    /**
+     * Un empleado con historial no se borra: se da de baja.
+     */
+    protected static function booted(): void
+    {
+        static::deleting(function (Employee $employee): bool {
+            return ! $employee->hasHistory();
+        });
+    }
+
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('status', self::STATUS_ACTIVE);

@@ -154,5 +154,10 @@ return [
             'label' => 'Bancos',
             'description' => 'Catálogo de bancos para los pagos.',
         ],
+        'employees' => [
+            'label' => 'Empleados',
+            'description' => 'Plantilla del taller: puesto, contacto, alta y baja.',
+        ],
+
     ],
 ];
