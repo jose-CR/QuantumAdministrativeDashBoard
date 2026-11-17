@@ -1,6 +1,12 @@
 <?php
 
 return [
+    'payroll' => [
+        'navigation' => 'Payroll',
+        'singular' => 'Pay period',
+        'plural' => 'Pay periods',
+    ],
+
     'employees' => [
         'navigation' => 'Employees',
         'singular' => 'Employee',

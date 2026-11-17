@@ -76,6 +76,7 @@ return [
             'paths' => [
                 'administration/banks',
                 'administration/employees',
+                'administration/payroll',
                 'users',
             ],
         ],

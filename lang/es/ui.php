@@ -12,6 +12,16 @@
 */
 
 return [
+    'payroll' => [
+        'settings' => 'Parámetros de la planilla',
+        'settings_help' => 'Los porcentajes de ley que se aplican al generar las boletas. Cambiarlos no modifica las boletas ya generadas.',
+        'settings_save' => 'Guardar parámetros',
+        'settings_saved' => 'Parámetros actualizados',
+        'no_payslips' => 'La quincena todavía no tiene boletas: generá las boletas primero.',
+        'excel_failed' => 'No se pudo generar el Excel de boletas',
+        'period_exists' => 'Esa quincena ya existe.',
+    ],
+
     'credits' => [
         'relation_title' => 'Créditos',
         'financed_short' => 'Financiado',

@@ -60,6 +60,12 @@ class EmployeesTable
                     ->placeholder(__('resources.employees.fields.no_user'))
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                TextColumn::make('salary_amount')
+                    ->label(__('resources.employees.fields.salary_amount'))
+                    ->money('usd')
+                    ->sortable()
+                    ->toggleable(),
+
                 TextColumn::make('hire_date')
                     ->label(__('resources.employees.fields.hire_date'))
                     ->date('d/m/Y')

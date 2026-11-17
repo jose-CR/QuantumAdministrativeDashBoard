@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -54,6 +55,7 @@ class Employee extends Model
         'email',
         'address',
         'job_title',
+        'salary_amount',
         'hire_date',
         'termination_date',
         'status',
@@ -64,6 +66,7 @@ class Employee extends Model
     protected function casts(): array
     {
         return [
+            'salary_amount' => 'decimal:2',
             'hire_date' => 'date',
             'termination_date' => 'date',
         ];
@@ -96,6 +99,11 @@ class Employee extends Model
         static::deleting(function (Employee $employee): bool {
             return ! $employee->hasHistory();
         });
+    }
+
+    public function payslips(): HasMany
+    {
+        return $this->hasMany(Payslip::class);
     }
 
     public function scopeActive(Builder $query): Builder

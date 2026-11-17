@@ -1,6 +1,71 @@
 <?php
 
 return [
+    'payroll' => [
+        'title' => 'Planilla :label',
+        'subheading' => 'Del :start al :end · Total a pagar: $:total',
+
+        'sections' => [
+            'period' => 'Quincena',
+            'period_help' => 'Elegí el mes y la quincena: las fechas se calculan solas (1 al 15, y 16 al último día del mes).',
+        ],
+
+        'fields' => [
+            'year' => 'Año',
+            'month' => 'Mes',
+            'half' => 'Quincena',
+            'half_first' => 'Primera (1 al 15)',
+            'half_second' => 'Segunda (16 al último día)',
+            'label' => 'Período',
+            'start_date' => 'Desde',
+            'end_date' => 'Hasta',
+            'payment_date' => 'Fecha de pago',
+            'payment_date_help' => 'El día en que se entrega la boleta. Va impreso en el papel.',
+            'notes' => 'Notas',
+            'employee' => 'Empleado',
+            'salary' => 'Salario',
+            'isss' => 'ISSS',
+            'afp' => 'AFP',
+            'penalty' => 'Multa',
+            'penalty_reason' => 'Motivo de la multa',
+            'loan' => 'Préstamo',
+            'bonus' => 'Bono',
+            'net' => 'Sueldo neto',
+            'total_to_receive' => 'Total a recibir',
+            'employees' => 'Empleados',
+            'total' => 'Total a pagar',
+            'status' => 'Estado',
+        ],
+
+        'statuses' => [
+            'open' => 'Abierta',
+            'paid' => 'Pagada',
+        ],
+
+        'actions' => [
+            'generate' => 'Generar boletas',
+            'generate_help' => 'Se crea una boleta por cada empleado activo con su salario y los descuentos de ley. Después se editan el bono, la multa y el préstamo.',
+            'generated' => ':count boleta(s) generada(s)',
+            'generated_skipped' => ':count ya existían y se dejaron como estaban.',
+            'generated_no_salary' => 'Sin salario cargado (no se generó boleta): :names.',
+            'excel' => 'Boletas en Excel',
+            'excel_ready' => 'Boletas listas',
+            'excel_ready_help' => 'Un solo archivo con todas las boletas, listo para imprimir y firmar.',
+            'download' => 'Descargar',
+            'mark_paid' => 'Marcar como pagada',
+            'mark_paid_help' => 'Se sella la fecha de pago en todas las boletas y la quincena queda cerrada.',
+            'marked_paid' => 'Quincena marcada como pagada',
+        ],
+
+        'settings' => [
+            'isss_rate' => 'ISSS (%)',
+            'isss_cap' => 'Tope mensual del ISSS',
+            'isss_cap_help' => 'Es mensual: la boleta aplica la mitad, porque se paga por quincena.',
+            'afp_rate' => 'AFP (%)',
+            'example_title' => 'Ejemplo con un salario quincenal de $204.40: ISSS 3 % = $6.13 · AFP 7.25 % = $14.82 · descuentos $20.95 · sueldo neto $183.45.',
+        ],
+    ],
+
     'employees' => [
         'sections' => [
             'identity' => 'Datos de la persona',
@@ -18,6 +83,8 @@ return [
             'phone' => 'Teléfono',
             'email' => 'Correo electrónico',
             'address' => 'Dirección',
+            'salary_amount' => 'Salario por quincena',
+            'salary_amount_help' => 'Lo que gana en una quincena. Las boletas de pago lo toman de acá.',
             'hire_date' => 'Fecha de alta',
             'termination_date' => 'Fecha de baja',
             'status' => 'Estado',

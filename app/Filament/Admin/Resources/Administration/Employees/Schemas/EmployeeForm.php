@@ -43,6 +43,14 @@ class EmployeeForm
                             ->maxLength(50)
                             ->unique(ignoreRecord: true),
 
+                        TextInput::make('salary_amount')
+                            ->label(__('resources.employees.fields.salary_amount'))
+                            ->numeric()
+                            ->prefix('$')
+                            ->default(0)
+                            ->minValue(0)
+                            ->helperText(__('resources.employees.fields.salary_amount_help')),
+
                         Select::make('job_title')
                             ->label(__('resources.employees.fields.job_title'))
                             ->options(collect(Employee::JOB_TITLES)
