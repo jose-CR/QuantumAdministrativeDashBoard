@@ -39,13 +39,14 @@ class DataTransferTest extends TestCase
             ->assertSee('Caja')
             ->assertSee('Administración');
 
-        // Los diez modelos con su botón de exportar e importar.
+        // Los once modelos con su botón de exportar e importar.
         $pagina->assertSee('Artículos')
             ->assertSee('Unidades con serie')
             ->assertSee('Categorías')
             ->assertSee('Entradas')
             ->assertSee('Salidas')
             ->assertSee('Bancos')
+            ->assertSee('Empleados')
             ->assertSee('Cuotas')
             ->assertSee('Pagos');
     }
@@ -66,7 +67,7 @@ class DataTransferTest extends TestCase
             $this->assertTrue(class_exists($modelo['importer']), "Falta el importador de {$clave}");
         }
 
-        $this->assertCount(10, DataTransfer::registry());
+        $this->assertCount(11, DataTransfer::registry());
     }
 
     public function test_la_accion_de_importar_abre_su_formulario(): void

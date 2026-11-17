@@ -12,6 +12,16 @@
 */
 
 return [
+    'payroll' => [
+        'settings' => 'Payroll settings',
+        'settings_help' => 'The statutory rates applied when generating payslips. Changing them does not modify payslips already generated.',
+        'settings_save' => 'Save settings',
+        'settings_saved' => 'Settings updated',
+        'no_payslips' => 'This period has no payslips yet: generate them first.',
+        'excel_failed' => 'The payslip Excel could not be generated',
+        'period_exists' => 'That pay period already exists.',
+    ],
+
     'credits' => [
         'relation_title' => 'Credits',
         'financed_short' => 'Financed',

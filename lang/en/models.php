@@ -1,6 +1,18 @@
 <?php
 
 return [
+    'payroll' => [
+        'navigation' => 'Payroll',
+        'singular' => 'Pay period',
+        'plural' => 'Pay periods',
+    ],
+
+    'employees' => [
+        'navigation' => 'Employees',
+        'singular' => 'Employee',
+        'plural' => 'Employees',
+    ],
+
     'users' => [
         'navigation' => 'Users',
         'singular' => 'User',
@@ -150,5 +162,10 @@ return [
             'label' => 'Banks',
             'description' => 'Bank catalog used by payments.',
         ],
+        'employees' => [
+            'label' => 'Employees',
+            'description' => 'Workshop staff: position, contact, hire and termination dates.',
+        ],
+
     ],
 ];

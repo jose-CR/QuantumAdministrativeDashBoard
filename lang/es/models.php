@@ -1,6 +1,18 @@
 <?php
 
 return [
+    'payroll' => [
+        'navigation' => 'Planilla',
+        'singular' => 'Quincena',
+        'plural' => 'Quincenas',
+    ],
+
+    'employees' => [
+        'navigation' => 'Empleados',
+        'singular' => 'Empleado',
+        'plural' => 'Empleados',
+    ],
+
     'users' => [
         'navigation' => 'Usuarios',
         'singular' => 'Usuario',
@@ -150,5 +162,10 @@ return [
             'label' => 'Bancos',
             'description' => 'Catálogo de bancos para los pagos.',
         ],
+        'employees' => [
+            'label' => 'Empleados',
+            'description' => 'Plantilla del taller: puesto, contacto, alta y baja.',
+        ],
+
     ],
 ];

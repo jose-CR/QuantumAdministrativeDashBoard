@@ -529,11 +529,14 @@ class LoansForm
                                     ->required(),
 
                                 Select::make('periodicity')
-                                    ->label('Periodicidad')
+                                    ->label(__('resources.credits.fields.periodicity'))
+                                    // Los mismos valores que acepta el CHECK de la
+                                    // tabla: 'biweekly' no existe en la base y
+                                    // guardarlo terminaba en 500.
                                     ->options([
-                                        'weekly' => 'Semanal',
-                                        'biweekly' => 'Quincenal',
-                                        'monthly' => 'Mensual',
+                                        'weekly' => __('resources.credits.periodicities.weekly'),
+                                        'monthly' => __('resources.credits.periodicities.monthly'),
+                                        'yearly' => __('resources.credits.periodicities.yearly'),
                                     ])
                                     ->required(),
 

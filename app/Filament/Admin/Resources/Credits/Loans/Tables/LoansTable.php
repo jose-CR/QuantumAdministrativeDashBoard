@@ -37,7 +37,8 @@ class LoansTable
                 ->state(fn ($record) => $record->items
                     ->filter(fn ($item) => ! $item->item instanceof Transportation)
                     ->map(fn ($item) => $item->display_name)
-                    ->join(', ')),
+                    ->join(', '))
+                ->placeholder(__('resources.credits.fields.no_item')),
 
             TextColumn::make('down_payment')
                 ->label(__('resources.credits.credits.down_payment'))

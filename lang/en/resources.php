@@ -2,6 +2,126 @@
 <?php
 
 return [
+    'payroll' => [
+        'title' => 'Payroll :label',
+        'subheading' => 'From :start to :end · Total to pay: $:total',
+
+        'sections' => [
+            'period' => 'Pay period',
+            'period_help' => 'Pick the month and the half: dates are calculated (1 to 15, and 16 to the last day of the month).',
+        ],
+
+        'fields' => [
+            'year' => 'Year',
+            'month' => 'Month',
+            'half' => 'Half',
+            'half_first' => 'First (1 to 15)',
+            'half_second' => 'Second (16 to last day)',
+            'label' => 'Period',
+            'start_date' => 'From',
+            'end_date' => 'To',
+            'payment_date' => 'Payment date',
+            'payment_date_help' => 'The day the payslip is handed over. It is printed on the paper.',
+            'notes' => 'Notes',
+            'employee' => 'Employee',
+            'salary' => 'Salary',
+            'isss' => 'ISSS',
+            'afp' => 'AFP',
+            'penalty' => 'Penalty',
+            'penalty_reason' => 'Penalty reason',
+            'loan' => 'Loan',
+            'bonus' => 'Bonus',
+            'net' => 'Net pay',
+            'total_to_receive' => 'Total to receive',
+            'employees' => 'Employees',
+            'total' => 'Total to pay',
+            'status' => 'Status',
+        ],
+
+        'statuses' => [
+            'open' => 'Open',
+            'paid' => 'Paid',
+        ],
+
+        'actions' => [
+            'generate' => 'Generate payslips',
+            'generate_help' => 'One payslip per active employee with their salary and statutory deductions. Bonus, penalty and loan are edited afterwards.',
+            'generated' => ':count payslip(s) generated',
+            'generated_skipped' => ':count already existed and were left untouched.',
+            'generated_no_salary' => 'No salary set (no payslip generated): :names.',
+            'excel' => 'Payslips to Excel',
+            'excel_ready' => 'Payslips ready',
+            'download' => 'Download',
+            'mark_paid' => 'Mark as paid',
+            'mark_paid_help' => 'The payment date is stamped on every payslip and the period is closed.',
+            'marked_paid' => 'Pay period marked as paid',
+        ],
+
+        'settings' => [
+            'isss_rate' => 'ISSS (%)',
+            'isss_cap' => 'Monthly ISSS cap',
+            'isss_cap_help' => 'It is monthly: the payslip applies half, because pay is every two weeks.',
+            'afp_rate' => 'AFP (%)',
+            'example_title' => 'Example with a two-week salary of $204.40: ISSS 3% = $6.13 · AFP 7.25% = $14.82 · deductions $20.95 · net pay $183.45.',
+        ],
+    ],
+
+    'employees' => [
+        'sections' => [
+            'identity' => 'Person details',
+            'contact' => 'Contact',
+            'employment' => 'Position and status',
+        ],
+
+        'fields' => [
+            'code' => 'Code',
+            'code_help' => 'Internal or payroll code. Can be left empty.',
+            'name' => 'Full name',
+            'document_type' => 'Document type',
+            'document_number' => 'Document number',
+            'job_title' => 'Position',
+            'phone' => 'Phone',
+            'email' => 'Email',
+            'address' => 'Address',
+            'salary_amount' => 'Salary per pay period',
+            'salary_amount_help' => 'What they earn every two weeks. Payslips take it from here.',
+            'hire_date' => 'Hire date',
+            'termination_date' => 'Termination date',
+            'status' => 'Status',
+            'user' => 'Panel user',
+            'user_help' => 'Only if this person signs in to the panel. Not required.',
+            'no_user' => 'No user',
+            'notes' => 'Notes',
+        ],
+
+        'job_titles' => [
+            'vendedor' => 'Salesperson',
+            'tecnico' => 'Technician',
+            'bodega' => 'Warehouse',
+            'administracion' => 'Administration',
+            'otro' => 'Other',
+        ],
+
+        'statuses' => [
+            'active' => 'Active',
+            'inactive' => 'Inactive',
+        ],
+
+        'document_types' => [
+            'dui' => 'DUI',
+            'nit' => 'NIT',
+            'passport' => 'Passport',
+            'res_carnet' => 'Resident card',
+            'otro' => 'Other',
+        ],
+
+        'actions' => [
+            'deactivate' => 'Deactivate',
+            'reactivate' => 'Reactivate',
+            'cannot_delete' => 'Cannot delete: this employee has sales on record',
+        ],
+    ],
+
 
     'users' => [
 
@@ -240,6 +360,12 @@ return [
     ],
 
     'credits' => [
+        'periodicities' => [
+            'weekly' => 'Weekly',
+            'monthly' => 'Monthly',
+            'yearly' => 'Yearly',
+        ],
+
         'clients' => [
 
             'client' => 'Client',
@@ -321,6 +447,7 @@ return [
         ],
 
         'fields' => [
+            'no_item' => 'No item recorded: add it by editing the credit',
             'id' => '#',
             'client' => 'Customer',
             'article_unit' => 'Unit',

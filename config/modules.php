@@ -75,6 +75,8 @@ return [
             'state' => 'enabled',
             'paths' => [
                 'administration/banks',
+                'administration/employees',
+                'administration/payroll',
                 'users',
             ],
         ],
