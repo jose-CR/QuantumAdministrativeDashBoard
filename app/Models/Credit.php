@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -107,6 +108,37 @@ class Credit extends Model
             'payment_day'   => 'integer',
             'payment_month'   => 'integer',
         ];
+    }
+
+    /**
+     * Cuándo vence la cuota número $number.
+     *
+     * Manda el DÍA DE PAGO pactado, no el día en que se abrió el crédito: un crédito
+     * del 10/11 con día de pago 27 vence el 27/12, el 27/01… y no el 10 de cada mes.
+     * Si el mes es más corto que el día pactado (31 en febrero), cae el último día.
+     */
+    public function dueDateFor(int $number): Carbon
+    {
+        $start = Carbon::parse($this->start_date)->startOfDay();
+
+        $base = match ($this->periodicity) {
+            // Semanal no tiene día del mes: se cuenta desde el inicio.
+            'weekly' => $start->copy()->addWeeks($number),
+            'yearly' => $start->copy()->startOfMonth()->addMonthsNoOverflow($number * 12),
+            default => $start->copy()->startOfMonth()->addMonthsNoOverflow($number),
+        };
+
+        if ($this->periodicity === 'weekly') {
+            return $base;
+        }
+
+        if ($this->periodicity === 'yearly' && filled($this->payment_month)) {
+            $base->setMonth((int) $this->payment_month);
+        }
+
+        $dia = (int) ($this->payment_day ?: $start->day);
+
+        return $base->day(min($dia, $base->daysInMonth));
     }
 
     public function scopeOverdue(Builder $query): Builder

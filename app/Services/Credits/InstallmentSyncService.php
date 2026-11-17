@@ -32,22 +32,15 @@ class InstallmentSyncService
             );
         }
 
-        // 1. Cuotas faltantes
-        $dueDate = $last->due_date->copy();
-
+        // 1. Cuotas faltantes: la fecha sale del día de pago pactado, igual que al
+        // generar el crédito (no del vencimiento de la anterior).
         for ($n = $last->number + 1; $n <= $count; $n++) {
-            $dueDate = match ($credit->periodicity) {
-                'weekly'  => $dueDate->copy()->addWeek(),
-                'monthly' => $dueDate->copy()->addMonth(),
-                'yearly'  => $dueDate->copy()->addYear(),
-            };
-
             Installment::create([
                 'credit_id'         => $credit->id,
                 'number'            => $n,
                 'amount'            => $newAmount,
                 'remaining_balance' => $newAmount,
-                'due_date'          => $dueDate->copy(),
+                'due_date'          => $credit->dueDateFor($n),
                 'status'            => 'pending',
             ]);
         }

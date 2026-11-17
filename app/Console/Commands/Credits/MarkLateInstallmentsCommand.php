@@ -30,7 +30,22 @@ class MarkLateInstallmentsCommand extends Command
                 'updated_at' => now(),
             ]);
 
+        /*
+         * Al revés también: si una cuota quedó marcada como atrasada y su vencimiento
+         * se corrió para adelante (por ejemplo al reprogramar fechas), vuelve a
+         * pendiente. Sin esto el estado miente y la cuota aparece vencida sin serlo.
+         */
+        $devueltas = Installment::query()
+            ->where('status', 'late')
+            ->where('remaining_balance', '>', 0)
+            ->whereDate('due_date', '>=', today())
+            ->update([
+                'status' => 'pending',
+                'updated_at' => now(),
+            ]);
+
         $this->info("Cuotas marcadas como atrasadas: {$marcadas}");
+        $this->info("Cuotas devueltas a pendiente: {$devueltas}");
 
         return self::SUCCESS;
     }
