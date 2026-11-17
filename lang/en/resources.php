@@ -360,6 +360,12 @@ return [
     ],
 
     'credits' => [
+        'periodicities' => [
+            'weekly' => 'Weekly',
+            'monthly' => 'Monthly',
+            'yearly' => 'Yearly',
+        ],
+
         'clients' => [
 
             'client' => 'Client',
@@ -441,6 +447,7 @@ return [
         ],
 
         'fields' => [
+            'no_item' => 'No item recorded: add it by editing the credit',
             'id' => '#',
             'client' => 'Customer',
             'article_unit' => 'Unit',

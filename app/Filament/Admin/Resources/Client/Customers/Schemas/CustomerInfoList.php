@@ -204,6 +204,17 @@ class CustomerInfoList
                             ->contained(false)
                             ->columnSpanFull(),
 
+                        // Los créditos viejos no guardaron el bien: se avisa en vez de
+                        // dejar el bloque vacío, que parece un error de la pantalla.
+                        TextEntry::make('missing_item')
+                            ->hiddenLabel()
+                            ->state(__('resources.credits.fields.no_item'))
+                            ->icon(Heroicon::ExclamationTriangle)
+                            ->color('warning')
+                            ->visible(fn (Customer $record): bool => $record->activeCredit
+                                && $record->activeCredit->items->isEmpty())
+                            ->columnSpanFull(),
+
                         TextEntry::make('activeCredit.installment_amount')
                             ->label(__('resources.clients.fields.installment_amount'))
                             ->money('USD'),

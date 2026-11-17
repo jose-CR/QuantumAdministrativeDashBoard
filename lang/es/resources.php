@@ -363,6 +363,12 @@ return [
     ],
 
     'credits' => [
+        'periodicities' => [
+            'weekly' => 'Semanal',
+            'monthly' => 'Mensual',
+            'yearly' => 'Anual',
+        ],
+
 
         'clients' => [
 
@@ -478,6 +484,7 @@ return [
         ],
     
             'fields' => [
+            'no_item' => 'Sin bien registrado: agregalo editando el crédito',
                 'id' => '#',
                 'client' => 'Cliente',
                 'article_unit' => 'Unidad',
