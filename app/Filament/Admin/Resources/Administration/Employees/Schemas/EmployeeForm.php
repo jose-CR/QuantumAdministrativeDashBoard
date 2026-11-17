@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Administration\Employees\Schemas;
 
 use App\Models\Employee;
+use App\Support\JobTitles;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -51,14 +52,24 @@ class EmployeeForm
                             ->minValue(0)
                             ->helperText(__('resources.employees.fields.salary_amount_help')),
 
+                        // Puestos del catálogo más los que ya se usaron, con la opción
+                        // de crear uno nuevo sin tocar código.
                         Select::make('job_title')
                             ->label(__('resources.employees.fields.job_title'))
-                            ->options(collect(Employee::JOB_TITLES)
-                                ->mapWithKeys(fn (string $title): array => [
-                                    $title => __('resources.employees.job_titles.' . $title),
-                                ])
-                                ->all())
-                            ->required(),
+                            ->searchable()
+                            ->native(false)
+                            ->getSearchResultsUsing(fn (string $search): array => JobTitles::search($search))
+                            ->getOptionLabelUsing(fn (?string $value): ?string => filled($value) ? JobTitles::label($value) : null)
+                            ->required()
+                            ->createOptionForm([
+                                TextInput::make('name')
+                                    ->label(__('ui.employees.new_job_title'))
+                                    ->required()
+                                    ->minLength(2)
+                                    ->maxLength(30),
+                            ])
+                            ->createOptionModalHeading(__('ui.employees.new_job_title'))
+                            ->createOptionUsing(fn (array $data): ?string => JobTitles::normalize($data['name'])),
                     ])
                     ->columns(2)
                     ->columnSpanFull(),

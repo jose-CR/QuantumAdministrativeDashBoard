@@ -12,6 +12,10 @@
 */
 
 return [
+    'employees' => [
+        'new_job_title' => 'New position',
+    ],
+
     'payroll' => [
         'settings' => 'Payroll settings',
         'settings_help' => 'The statutory rates applied when generating payslips. Changing them does not modify payslips already generated.',

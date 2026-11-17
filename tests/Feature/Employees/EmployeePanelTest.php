@@ -58,6 +58,27 @@ class EmployeePanelTest extends TestCase
         $this->assertSame('045190090', $empleado->document_number);
     }
 
+    public function test_se_puede_crear_un_empleado_con_un_puesto_nuevo(): void
+    {
+        Livewire::test(CreateEmployee::class)
+            ->fillForm([
+                'code' => 'EMP-910',
+                'name' => 'Soldador Nuevo',
+                'document_type' => 'DUI',
+                'document_number' => '045190910',
+                'job_title' => 'soldador',
+                'status' => Employee::STATUS_ACTIVE,
+            ])
+            ->call('create')
+            ->assertHasNoFormErrors();
+
+        $empleado = Employee::query()->where('name', 'Soldador Nuevo')->firstOrFail();
+
+        $this->assertSame('soldador', $empleado->job_title);
+        // Un puesto que no está en el catálogo se muestra tal cual, no como su clave.
+        $this->assertSame('Soldador', \App\Support\JobTitles::label('soldador'));
+    }
+
     public function test_el_codigo_y_el_documento_no_se_repiten(): void
     {
         Employee::factory()->create(['code' => 'EMP-901']);

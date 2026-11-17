@@ -12,6 +12,10 @@
 */
 
 return [
+    'employees' => [
+        'new_job_title' => 'Nuevo puesto',
+    ],
+
     'payroll' => [
         'settings' => 'Parámetros de la planilla',
         'settings_help' => 'Los porcentajes de ley que se aplican al generar las boletas. Cambiarlos no modifica las boletas ya generadas.',

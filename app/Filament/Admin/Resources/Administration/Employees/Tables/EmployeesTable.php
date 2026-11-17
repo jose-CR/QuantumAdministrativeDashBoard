@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Administration\Employees\Tables;
 
 use App\Models\Employee;
+use App\Support\JobTitles;
 use App\Utils\Filament\FilamentSearch;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -48,7 +49,7 @@ class EmployeesTable
                 TextColumn::make('job_title')
                     ->label(__('resources.employees.fields.job_title'))
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => __('resources.employees.job_titles.' . $state)),
+                    ->formatStateUsing(fn (string $state): string => JobTitles::label($state)),
 
                 TextColumn::make('phone')
                     ->label(__('resources.employees.fields.phone'))
@@ -87,11 +88,7 @@ class EmployeesTable
 
                 SelectFilter::make('job_title')
                     ->label(__('resources.employees.fields.job_title'))
-                    ->options(collect(Employee::JOB_TITLES)
-                        ->mapWithKeys(fn (string $title): array => [
-                            $title => __('resources.employees.job_titles.' . $title),
-                        ])
-                        ->all()),
+                    ->options(fn (): array => JobTitles::all()),
             ])
             ->recordActions([
                 EditAction::make(),

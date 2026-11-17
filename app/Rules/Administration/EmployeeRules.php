@@ -48,10 +48,11 @@ class EmployeeRules
                 'string',
                 'max:255',
             ],
+            // Acepta los puestos del catálogo y los que el taller agregue.
             'job_title' => [
                 'nullable',
                 'string',
-                'in:' . implode(',', Employee::JOB_TITLES),
+                'max:30',
             ],
             'hire_date' => [
                 'nullable',
