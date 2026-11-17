@@ -50,7 +50,6 @@ return [
             'generated_no_salary' => 'Sin salario cargado (no se generó boleta): :names.',
             'excel' => 'Boletas en Excel',
             'excel_ready' => 'Boletas listas',
-            'excel_ready_help' => 'Un solo archivo con todas las boletas, listo para imprimir y firmar.',
             'download' => 'Descargar',
             'mark_paid' => 'Marcar como pagada',
             'mark_paid_help' => 'Se sella la fecha de pago en todas las boletas y la quincena queda cerrada.',

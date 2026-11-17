@@ -51,7 +51,6 @@ return [
             'generated_no_salary' => 'No salary set (no payslip generated): :names.',
             'excel' => 'Payslips to Excel',
             'excel_ready' => 'Payslips ready',
-            'excel_ready_help' => 'A single file with every payslip, ready to print and sign.',
             'download' => 'Download',
             'mark_paid' => 'Mark as paid',
             'mark_paid_help' => 'The payment date is stamped on every payslip and the period is closed.',

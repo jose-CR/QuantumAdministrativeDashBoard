@@ -51,7 +51,6 @@ class PayslipsExcelAction extends Action
 
                 Notification::make()
                     ->title(__('resources.payroll.actions.excel_ready'))
-                    ->body(__('resources.payroll.actions.excel_ready_help'))
                     ->success()
                     ->actions([
                         Action::make('download')
