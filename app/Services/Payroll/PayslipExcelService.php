@@ -61,6 +61,9 @@ class PayslipExcelService
             $salida,
         ]);
 
+        // El JSON de entrada solo sirve para esta corrida.
+        File::delete($datos);
+
         throw_if(
             $resultado->failed() || ! File::exists($salida),
             \RuntimeException::class,
