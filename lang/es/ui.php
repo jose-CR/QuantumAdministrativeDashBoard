@@ -12,6 +12,11 @@
 */
 
 return [
+    'payments' => [
+        'amount_edit_help' => 'Si el pago se cargó mal, corregí el monto: las cuotas y el saldo del crédito se recalculan solos. La corrección queda anotada.',
+        'corrected_note' => 'Monto corregido de $:from a $:to por :user el :date.',
+    ],
+
     'employees' => [
         'new_job_title' => 'Nuevo puesto',
     ],

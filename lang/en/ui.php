@@ -12,6 +12,11 @@
 */
 
 return [
+    'payments' => [
+        'amount_edit_help' => 'If the payment was entered wrong, correct the amount: installments and the credit balance are recalculated. The correction is recorded.',
+        'corrected_note' => 'Amount corrected from $:from to $:to by :user on :date.',
+    ],
+
     'employees' => [
         'new_job_title' => 'New position',
     ],

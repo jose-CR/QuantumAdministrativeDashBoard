@@ -27,15 +27,19 @@ class PaymentHistoriesForm
                     castColumns: ['id'],
                     relations: ['client' => ['full_name']],
                 )
-                    // Un pago ya registrado no cambia de crédito ni de monto: editarlo
-                    // no recalcula cuotas ni saldo, así que solo se corrigen los datos
-                    // de referencia (recibo, banco, notas).
+                    // Cambiar el crédito de un pago dejaría el crédito viejo sin
+                    // recalcular: se corrige con un pago nuevo, no moviéndolo.
                     ->disabledOn('edit'),
 
+                /*
+                 * El monto SÍ se puede corregir: el modelo recalcula las cuotas y el
+                 * saldo cuando cambia (ver PaymentHistory::booted). Lo que no se toca
+                 * es el crédito ni la fecha, que sí dejarían el historial descuadrado.
+                 */
                 TextInput::make('amount')
                     ->numeric()
                     ->required()
-                    ->disabledOn('edit'),
+                    ->helperText(__('ui.payments.amount_edit_help')),
 
                 Select::make('payment_method')
                     ->label(__('resources.credits.clients.pay_installment.payment_method'))
