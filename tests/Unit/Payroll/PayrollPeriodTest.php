@@ -42,12 +42,27 @@ class PayrollPeriodTest extends TestCase
         PayrollPeriod::create($fechas + ['type' => 'quincenal']);
     }
 
+    public function test_la_fecha_de_la_boleta_lleva_el_periodo_completo(): void
+    {
+        $periodo = PayrollPeriod::create(
+            PayrollPeriod::datesFor(2026, 11, 'first') + ['type' => 'quincenal']
+        );
+
+        $this->assertSame('01 DE NOVIEMBRE AL 15 DE NOVIEMBRE 2026', $periodo->payslip_date);
+
+        $segunda = PayrollPeriod::create(
+            PayrollPeriod::datesFor(2026, 11, 'second') + ['type' => 'quincenal']
+        );
+
+        $this->assertSame('16 DE NOVIEMBRE AL 30 DE NOVIEMBRE 2026', $segunda->payslip_date);
+    }
+
     public function test_la_fecha_de_la_boleta_se_escribe_en_palabras(): void
     {
         $periodo = PayrollPeriod::create(
             PayrollPeriod::datesFor(2026, 2, 'first') + ['type' => 'quincenal']
         );
 
-        $this->assertSame('15 DE FEBRERO', $periodo->payslip_date);
+        $this->assertSame('01 DE FEBRERO AL 15 DE FEBRERO 2026', $periodo->payslip_date);
     }
 }

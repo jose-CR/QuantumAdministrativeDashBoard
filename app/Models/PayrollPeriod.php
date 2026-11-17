@@ -104,10 +104,14 @@ class PayrollPeriod extends Model
     }
 
     /**
-     * Fecha de pago como va en la boleta: «23 DE FEBRERO».
+     * El período como va impreso en la boleta: «01 DE NOVIEMBRE AL 15 DE NOVIEMBRE
+     * 2026». Va en las dos copias del papel (la del empleado y la de firmar).
      */
     public function getPayslipDateAttribute(): string
     {
-        return mb_strtoupper($this->payment_date->locale('es')->translatedFormat('d \\d\\e F'));
+        $inicio = mb_strtoupper($this->start_date->locale('es')->translatedFormat('d \\d\\e F'));
+        $fin = mb_strtoupper($this->end_date->locale('es')->translatedFormat('d \\d\\e F'));
+
+        return "{$inicio} AL {$fin} {$this->end_date->format('Y')}";
     }
 }
