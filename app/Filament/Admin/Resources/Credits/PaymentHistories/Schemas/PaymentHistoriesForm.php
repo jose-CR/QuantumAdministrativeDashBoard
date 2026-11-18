@@ -61,12 +61,14 @@ class PaymentHistoriesForm
                     ->visible(fn ($get) => $get('payment_method') === 'bank_transfer')
                     ->required(fn ($get) => $get('payment_method') === 'bank_transfer'),
 
+                // La fecha sí se corrige: el modelo rehace cuotas y saldo cuando
+                // cambia, y la corrección queda anotada en el pago.
                 DatePicker::make('payment_date')
+                    ->label(__('ui.payments.payment_date'))
                     ->default(now())
                     ->required()
-                    // Cambiar la fecha de un pago viejo descuadra el historial sin
-                    // recalcular nada.
-                    ->disabledOn('edit'),
+                    ->maxDate(now())
+                    ->helperText(__('ui.payments.date_edit_help')),
 
                 TextInput::make('receipt_number')
                     ->maxLength(255),

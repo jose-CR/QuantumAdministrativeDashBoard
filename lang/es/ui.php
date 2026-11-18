@@ -13,8 +13,12 @@
 
 return [
     'payments' => [
+        'payment_date' => 'Fecha de pago',
         'amount_edit_help' => 'Si el pago se cargó mal, corregí el monto: las cuotas y el saldo del crédito se recalculan solos. La corrección queda anotada.',
-        'corrected_note' => 'Monto corregido de $:from a $:to por :user el :date.',
+        'date_edit_help' => 'Si la fecha se cargó mal, corregila: las cuotas se recalculan y la corrección queda anotada.',
+        'correction_amount' => 'monto $:from → $:to',
+        'correction_date' => 'fecha :from → :to',
+        'corrected_note' => 'Corrección: :changes — por :user el :date.',
     ],
 
     'employees' => [

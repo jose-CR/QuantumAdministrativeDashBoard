@@ -28,16 +28,35 @@ class EditPaymentHistories extends EditRecord
     protected function handleRecordUpdate(Model $record, array $data): Model
     {
         $montoAnterior = (float) $record->amount;
+        $fechaAnterior = $record->payment_date?->toDateString();
 
         $record = parent::handleRecordUpdate($record, $data);
 
-        if (abs($montoAnterior - (float) $record->amount) < 0.004) {
+        // Lo que se corrigió, para que el historial diga qué cambió y quién lo hizo.
+        $cambios = [];
+
+        if (abs($montoAnterior - (float) $record->amount) >= 0.004) {
+            $cambios[] = __('ui.payments.correction_amount', [
+                'from' => number_format($montoAnterior, 2),
+                'to' => number_format((float) $record->amount, 2),
+            ]);
+        }
+
+        $fechaNueva = $record->payment_date?->toDateString();
+
+        if ($fechaAnterior && $fechaNueva && $fechaAnterior !== $fechaNueva) {
+            $cambios[] = __('ui.payments.correction_date', [
+                'from' => \Illuminate\Support\Carbon::parse($fechaAnterior)->format('d/m/Y'),
+                'to' => $record->payment_date->format('d/m/Y'),
+            ]);
+        }
+
+        if ($cambios === []) {
             return $record;
         }
 
         $nota = __('ui.payments.corrected_note', [
-            'from' => number_format($montoAnterior, 2),
-            'to' => number_format((float) $record->amount, 2),
+            'changes' => implode(' · ', $cambios),
             'user' => auth()->user()?->name ?? '—',
             'date' => now()->format('d/m/Y H:i'),
         ]);

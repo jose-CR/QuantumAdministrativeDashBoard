@@ -109,7 +109,40 @@ class PaymentCorrectionTest extends TestCase
         $this->assertStringContainsString('110.00', $pago->notes);
         $this->assertStringContainsString('220.00', $pago->notes);
         // Sin el '<p></p>' vacío del editor delante.
-        $this->assertStringStartsWith('Monto corregido', $pago->notes);
+        $this->assertStringStartsWith('Corrección: monto', $pago->notes);
+    }
+
+    public function test_corregir_la_fecha_recalcula_y_queda_anotada(): void
+    {
+        [$credito, $pago] = $this->creditoConPagoMalCargado();
+
+        Livewire::test(EditPaymentHistories::class, ['record' => $pago->getRouteKey()])
+            ->fillForm(['payment_date' => '2026-08-25'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $pago = $pago->fresh();
+
+        $this->assertSame('2026-08-25', $pago->payment_date->toDateString());
+        $this->assertStringContainsString('fecha 21/08/2026 → 25/08/2026', $pago->notes);
+        // El pago sigue cubriendo una cuota después de mover la fecha.
+        $this->assertSame(1, $credito->fresh()->installments()->where('status', 'paid')->count());
+    }
+
+    public function test_corregir_monto_y_fecha_anota_las_dos_cosas(): void
+    {
+        [$credito, $pago] = $this->creditoConPagoMalCargado();
+
+        Livewire::test(EditPaymentHistories::class, ['record' => $pago->getRouteKey()])
+            ->fillForm(['amount' => 220, 'payment_date' => '2026-08-25'])
+            ->call('save')
+            ->assertHasNoFormErrors();
+
+        $nota = $pago->fresh()->notes;
+
+        $this->assertStringContainsString('monto', $nota);
+        $this->assertStringContainsString('fecha 21/08/2026 → 25/08/2026', $nota);
+        $this->assertSame(2, $credito->fresh()->installments()->where('status', 'paid')->count());
     }
 
     public function test_si_no_cambia_el_monto_no_agrega_nota(): void

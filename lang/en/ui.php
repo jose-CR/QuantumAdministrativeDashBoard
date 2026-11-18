@@ -13,8 +13,12 @@
 
 return [
     'payments' => [
+        'payment_date' => 'Payment date',
         'amount_edit_help' => 'If the payment was entered wrong, correct the amount: installments and the credit balance are recalculated. The correction is recorded.',
-        'corrected_note' => 'Amount corrected from $:from to $:to by :user on :date.',
+        'date_edit_help' => 'If the date was entered wrong, correct it: installments are recalculated and the correction is recorded.',
+        'correction_amount' => 'amount $:from → $:to',
+        'correction_date' => 'date :from → :to',
+        'corrected_note' => 'Correction: :changes — by :user on :date.',
     ],
 
     'employees' => [
