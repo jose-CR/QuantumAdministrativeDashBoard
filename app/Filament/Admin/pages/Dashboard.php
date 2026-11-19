@@ -7,7 +7,8 @@ use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use App\Filament\Admin\Widgets\ArticlesStatsWidget;
 use App\Filament\Admin\Widgets\CashFlowStatsWidget;
-use App\Filament\Admin\Widgets\CreditsByTagWidget;
+use App\Filament\Admin\Widgets\CreditsCollectedByTagWidget;
+use App\Filament\Admin\Widgets\CreditsDueByTagWidget;
 use App\Filament\Admin\Widgets\CreditsStatsWidget;
 use App\Filament\Admin\Widgets\CustomersStatsWidget;
 use App\Filament\Admin\Widgets\OverdueCreditsWidget;
@@ -33,7 +34,8 @@ class Dashboard extends BaseDashboard
             CustomersStatsWidget::class,
             ArticlesStatsWidget::class,
             OverdueCreditsWidget::class,
-            CreditsByTagWidget::class,
+            CreditsDueByTagWidget::class,
+            CreditsCollectedByTagWidget::class,
         ];
     }
 

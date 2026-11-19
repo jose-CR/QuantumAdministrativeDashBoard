@@ -5,7 +5,8 @@ namespace Tests\Feature\Reports;
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Widgets\ArticlesStatsWidget;
 use App\Filament\Admin\Widgets\CashFlowStatsWidget;
-use App\Filament\Admin\Widgets\CreditsByTagWidget;
+use App\Filament\Admin\Widgets\CreditsCollectedByTagWidget;
+use App\Filament\Admin\Widgets\CreditsDueByTagWidget;
 use App\Filament\Admin\Widgets\CreditsStatsWidget;
 use App\Filament\Admin\Widgets\CustomersStatsWidget;
 use App\Filament\Admin\Widgets\OverdueCreditsWidget;
@@ -40,7 +41,8 @@ class DashboardTest extends TestCase
             CustomersStatsWidget::class,
             ArticlesStatsWidget::class,
             OverdueCreditsWidget::class,
-            CreditsByTagWidget::class,
+            CreditsDueByTagWidget::class,
+            CreditsCollectedByTagWidget::class,
         ] as $widget) {
             $this->assertContains($widget, $widgets);
         }
