@@ -5,6 +5,7 @@ namespace Tests\Feature\Reports;
 use App\Filament\Admin\Pages\Dashboard;
 use App\Filament\Admin\Widgets\ArticlesStatsWidget;
 use App\Filament\Admin\Widgets\CashFlowStatsWidget;
+use App\Filament\Admin\Widgets\CreditsByTagWidget;
 use App\Filament\Admin\Widgets\CreditsStatsWidget;
 use App\Filament\Admin\Widgets\CustomersStatsWidget;
 use App\Filament\Admin\Widgets\OverdueCreditsWidget;
@@ -29,7 +30,7 @@ class DashboardTest extends TestCase
         filament()->setCurrentPanel(filament()->getPanel('admin'));
     }
 
-    public function test_el_tablero_registra_los_cinco_widgets(): void
+    public function test_el_tablero_registra_sus_widgets(): void
     {
         $widgets = (new Dashboard)->getWidgets();
 
@@ -39,6 +40,7 @@ class DashboardTest extends TestCase
             CustomersStatsWidget::class,
             ArticlesStatsWidget::class,
             OverdueCreditsWidget::class,
+            CreditsByTagWidget::class,
         ] as $widget) {
             $this->assertContains($widget, $widgets);
         }
