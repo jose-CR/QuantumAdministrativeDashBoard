@@ -17,14 +17,15 @@ use Illuminate\Support\Facades\DB;
  * vence se cuenta por la fecha de la cuota y lo cobrado por la fecha del ingreso.
  * Restarlos daba diferencias negativas que no significaban nada.
  *
- * Un cliente con dos etiquetas suma en las dos filas; el total lo cuenta una vez.
+ * Un cliente con dos etiquetas suma en las dos filas; el total lo cuenta una vez. Cada
+ * fila lleva además el detalle de qué clientes la componen.
  */
 final class CreditsMonthSummary
 {
     /**
      * Lo que vence en el rango, por etiqueta.
      *
-     * @return array<int, array{tag: string, amount: float, is_total: bool}>
+     * @return array<int, array{tag: string, amount: float, is_total: bool, customers: array<int, array{name: string, amount: float}>}>
      */
     public function due(?string $from = null, ?string $to = null): array
     {
@@ -46,15 +47,19 @@ final class CreditsMonthSummary
     /**
      * Lo cobrado en caja en el rango, por etiqueta, solo de clientes con crédito.
      *
-     * @return array<int, array{tag: string, amount: float, is_total: bool}>
+     * El vendedor sale de la entrada de caja (`inflows.salesperson`), que es donde el
+     * taller lo anota hoy: el crédito todavía no guarda quién lo vendió.
+     *
+     * @return array<int, array{tag: string, amount: float, is_total: bool, customers: array<int, array{name: string, amount: float}>}>
      */
-    public function collected(?string $from = null, ?string $to = null): array
+    public function collected(?string $from = null, ?string $to = null, ?string $salesperson = null): array
     {
         [$desde, $hasta] = $this->range($from, $to);
 
         $montos = DB::table('inflows as f')
             ->whereBetween('f.date', [$desde, $hasta])
             ->whereNotNull('f.customer_id')
+            ->when(filled($salesperson), fn ($query) => $query->where('f.salesperson', $salesperson))
             ->whereExists(fn ($query) => $query
                 ->select(DB::raw(1))
                 ->from('credits as c')
@@ -72,39 +77,99 @@ final class CreditsMonthSummary
      * Arma las filas: una por etiqueta, una para los clientes sin etiqueta y el total.
      *
      * @param  array<int, float>  $montos  cliente => monto
-     * @return array<int, array{tag: string, amount: float, is_total: bool}>
+     * @return array<int, array{tag: string, amount: float, is_total: bool, customers: array<int, array{name: string, amount: float}>}>
      */
     private function rows(array $montos): array
     {
         $etiquetas = $this->tagsByCustomer();
+        $nombres = $this->customerNames(array_keys($montos));
         $filas = [];
 
         foreach ($this->tags() as $tag) {
-            $total = 0.0;
+            $incluye = fn (int $cliente): bool => in_array($tag->id, $etiquetas[$cliente] ?? [], true);
 
-            foreach ($montos as $cliente => $monto) {
-                if (in_array($tag->id, $etiquetas[$cliente] ?? [], true)) {
-                    $total += $monto;
-                }
-            }
-
-            $filas[] = $this->row($this->tagLabel($tag->name), $total);
+            $filas[] = $this->row(
+                $this->tagLabel($tag->name),
+                $this->amountFor($montos, $incluye),
+                $this->customersFor($montos, $nombres, $incluye),
+            );
         }
 
-        $sinEtiqueta = 0.0;
+        // Clientes sin ninguna etiqueta: no se pierden en el informe.
+        $sinEtiqueta = fn (int $cliente): bool => ($etiquetas[$cliente] ?? []) === [];
 
-        foreach ($montos as $cliente => $monto) {
-            if (($etiquetas[$cliente] ?? []) === []) {
-                $sinEtiqueta += $monto;
-            }
-        }
-
-        $filas[] = $this->row(__('ui.widgets.no_tag'), $sinEtiqueta);
+        $filas[] = $this->row(
+            __('ui.widgets.no_tag'),
+            $this->amountFor($montos, $sinEtiqueta),
+            $this->customersFor($montos, $nombres, $sinEtiqueta),
+        );
 
         // Total: cada cliente una sola vez, aunque tenga varias etiquetas.
-        $filas[] = $this->row(__('ui.widgets.credits_total'), array_sum($montos), true);
+        $filas[] = $this->row(
+            __('ui.widgets.credits_total'),
+            array_sum($montos),
+            $this->customersFor($montos, $nombres, fn (int $cliente): bool => true),
+            true,
+        );
 
         return $filas;
+    }
+
+    /**
+     * @param  array<int, float>  $montos
+     */
+    private function amountFor(array $montos, callable $incluir): float
+    {
+        $total = 0.0;
+
+        foreach ($montos as $cliente => $monto) {
+            if ($incluir((int) $cliente)) {
+                $total += $monto;
+            }
+        }
+
+        return round($total, 2);
+    }
+
+    /**
+     * @param  array<int, float>  $montos
+     * @param  array<int, string>  $nombres
+     * @return array<int, array{name: string, amount: float}>
+     */
+    private function customersFor(array $montos, array $nombres, callable $incluir): array
+    {
+        $clientes = [];
+
+        foreach ($montos as $cliente => $monto) {
+            if (! $incluir((int) $cliente) || $monto <= 0) {
+                continue;
+            }
+
+            $clientes[] = [
+                'name' => $nombres[$cliente] ?? '#' . $cliente,
+                'amount' => round((float) $monto, 2),
+            ];
+        }
+
+        usort($clientes, fn (array $a, array $b): int => $b['amount'] <=> $a['amount']);
+
+        return $clientes;
+    }
+
+    /**
+     * @param  array<int, int|string>  $ids
+     * @return array<int, string>
+     */
+    private function customerNames(array $ids): array
+    {
+        if ($ids === []) {
+            return [];
+        }
+
+        return Customer::query()
+            ->whereIn('id', $ids)
+            ->pluck('full_name', 'id')
+            ->all();
     }
 
     /**
@@ -140,14 +205,16 @@ final class CreditsMonthSummary
     }
 
     /**
-     * @return array{tag: string, amount: float, is_total: bool}
+     * @param  array<int, array{name: string, amount: float}>  $clientes
+     * @return array{tag: string, amount: float, is_total: bool, customers: array<int, array{name: string, amount: float}>}
      */
-    private function row(string $etiqueta, float $monto, bool $total = false): array
+    private function row(string $etiqueta, float $monto, array $clientes, bool $total = false): array
     {
         return [
             'tag' => $etiqueta,
             'amount' => round($monto, 2),
             'is_total' => $total,
+            'customers' => $clientes,
         ];
     }
 

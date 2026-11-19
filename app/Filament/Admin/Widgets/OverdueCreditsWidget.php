@@ -26,12 +26,10 @@ class OverdueCreditsWidget extends TableWidget
 
     protected int|string|array $columnSpan = 'full';
 
-    public function getHeading(): ?string
-    {
-        return __('ui.widgets.overdue_credits');
-    }
-
-    public function getSubheading(): ?string
+    /**
+     * El resumen que va debajo del título («3 créditos · 1.250,00»).
+     */
+    public function summary(): ?string
     {
         $creditos = $this->overdueCredits()->count();
 
@@ -53,6 +51,10 @@ class OverdueCreditsWidget extends TableWidget
     public function table(Table $table): Table
     {
         return $table
+            // En un TableWidget el encabezado va en la tabla; el de la clase no se usa
+            // y Filament muestra el nombre de la clase ("Overdue Credits").
+            ->heading(__('ui.widgets.overdue_credits'))
+            ->description(fn (): ?string => $this->summary())
             ->query($this->overdueCredits())
             ->columns([
                 TextColumn::make('id')

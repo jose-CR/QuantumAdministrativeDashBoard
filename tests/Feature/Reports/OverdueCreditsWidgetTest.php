@@ -94,6 +94,14 @@ class OverdueCreditsWidgetTest extends TestCase
             ->diffInDays(today(), true));
     }
 
+    public function test_el_titulo_sale_traducido(): void
+    {
+        Livewire::test(OverdueCreditsWidget::class)
+            ->assertOk()
+            ->assertSee(__('ui.widgets.overdue_credits'))
+            ->assertDontSee('Overdue Credits');
+    }
+
     public function test_sin_vencidos_muestra_el_estado_vacio(): void
     {
         Credit::query()->delete();
@@ -108,7 +116,7 @@ class OverdueCreditsWidgetTest extends TestCase
         $this->creditoVencido();
 
         $widget = Livewire::test(OverdueCreditsWidget::class)->assertOk()->instance();
-        $resumen = $widget->getSubheading();
+        $resumen = $widget->summary();
 
         $this->assertStringContainsString('1 crédito', $resumen);
         $this->assertStringContainsString('150.00', $resumen);

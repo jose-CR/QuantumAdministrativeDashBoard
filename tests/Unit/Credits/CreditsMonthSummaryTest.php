@@ -143,6 +143,41 @@ class CreditsMonthSummaryTest extends TestCase
         $this->assertSame(50.0, $total['amount']);
     }
 
+    public function test_cada_fila_trae_el_detalle_de_sus_clientes(): void
+    {
+        $this->clienteConCuota('Ana Detalle', 100, '2026-10-10', ['Crédito de ventas']);
+        $this->clienteConCuota('Beto Detalle', 50, '2026-10-12', ['Crédito de ventas']);
+
+        $fila = collect(app(CreditsMonthSummary::class)->due('2026-10-01', '2026-10-31'))
+            ->firstWhere('tag', 'Crédito de ventas');
+
+        // Ordenado de mayor a menor.
+        $this->assertSame(['Ana Detalle', 'Beto Detalle'], array_column($fila['customers'], 'name'));
+        $this->assertSame([100.0, 50.0], array_column($fila['customers'], 'amount'));
+    }
+
+    public function test_la_cobranza_filtra_por_vendedor(): void
+    {
+        $cliente = $this->clienteConCuota('Cliente Vendedor', 100, '2026-10-10', ['Crédito de ventas']);
+
+        Inflow::factory()->create([
+            'customer_id' => $cliente->id, 'amount' => 60, 'amount_paid' => 60,
+            'date' => '2026-10-05', 'salesperson' => 'Vendedor A', 'invoice_number' => 'INV-A',
+        ]);
+        Inflow::factory()->create([
+            'customer_id' => $cliente->id, 'amount' => 40, 'amount_paid' => 40,
+            'date' => '2026-10-06', 'salesperson' => 'Vendedor B', 'invoice_number' => 'INV-B',
+        ]);
+
+        $resumen = app(CreditsMonthSummary::class);
+
+        $this->assertSame(60.0, collect($resumen->collected('2026-10-01', '2026-10-31', 'Vendedor A'))
+            ->firstWhere('is_total', true)['amount']);
+
+        $this->assertSame(100.0, collect($resumen->collected('2026-10-01', '2026-10-31'))
+            ->firstWhere('is_total', true)['amount']);
+    }
+
     public function test_los_dos_widgets_se_renderizan_con_los_filtros_del_tablero(): void
     {
         $this->clienteConCuota('Cliente Visible', 120, '2026-10-10', ['Crédito de ventas']);
@@ -151,6 +186,9 @@ class CreditsMonthSummaryTest extends TestCase
 
         Livewire::test(CreditsDueByTagWidget::class, $filtros)
             ->assertOk()
+            // El título traducido, no el nombre de la clase.
+            ->assertSee(__('ui.widgets.credits_due_by_tag'))
+            ->assertDontSee('Credits Due By Tag')
             ->assertSee('Crédito de ventas')
             ->assertSee('Total');
 
