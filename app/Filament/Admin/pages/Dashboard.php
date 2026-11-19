@@ -2,9 +2,7 @@
 
 namespace App\Filament\Admin\pages;
 
-use App\Support\Salespeople;
 use Filament\Forms\Components\DatePicker;
-use Filament\Forms\Components\Select;
 use Filament\Pages\Dashboard as BaseDashboard;
 use Filament\Pages\Dashboard\Concerns\HasFiltersForm;
 use App\Filament\Admin\Widgets\ArticlesStatsWidget;
@@ -57,15 +55,8 @@ class Dashboard extends BaseDashboard
 
                         DatePicker::make('endDate')
                             ->label(__('ui.widgets.end_date')),
-
-                        // Filtra la cobranza: el vendedor se guarda en la entrada de caja.
-                        Select::make('salesperson')
-                            ->label(__('ui.columns.salesperson'))
-                            ->options(fn (): array => Salespeople::all())
-                            ->searchable()
-                            ->placeholder(__('ui.widgets.all_salespeople')),
                     ])
-                    ->columns(3)
+                    ->columns(2)
                     ->columnSpanFull(),
             ]);
     }

@@ -32,7 +32,6 @@ class CreditsCollectedByTagWidget extends TableWidget
             ->records(fn (): array => app(CreditsMonthSummary::class)->collected(
                 ($this->pageFilters ?? [])['startDate'] ?? null,
                 ($this->pageFilters ?? [])['endDate'] ?? null,
-                ($this->pageFilters ?? [])['salesperson'] ?? null,
             ))
             ->columns([
                 TextColumn::make('tag')

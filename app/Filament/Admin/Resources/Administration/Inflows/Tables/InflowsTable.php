@@ -3,7 +3,10 @@
 namespace App\Filament\Admin\Resources\Administration\Inflows\Tables;
 
 use App\Filament\Admin\Resources\Administration\Inflows\InflowResource;
+use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\Inflow;
+use App\Models\Tag;
 use App\Support\PaymentStatus;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
@@ -98,6 +101,25 @@ class InflowsTable
                         'partial' => __('resources.clients.statuses.partial'),
                         'paid' => __('resources.clients.statuses.paid'),
                     ]),
+
+                // Etiqueta del cliente: sirve para ver, por ejemplo, solo lo de mayoristas.
+                SelectFilter::make('tag')
+                    ->label(__('resources.clients.fields.tags.tags'))
+                    ->multiple()
+                    ->options(fn (): array => Tag::getWithType('customer')->pluck('name', 'name')->all())
+                    ->query(fn (Builder $query, array $data): Builder => filled($data['values'] ?? null)
+                        ? $query->whereHas('customer', fn (Builder $cliente): Builder => $cliente
+                            ->withAnyTags($data['values'], 'customer'))
+                        : $query),
+
+                // Empleado: se compara contra el vendedor anotado en la entrada. La
+                // entrada guarda el nombre escrito, no el id del empleado.
+                SelectFilter::make('employee')
+                    ->label(__('models.employees.singular'))
+                    ->options(fn (): array => Employee::query()->orderBy('name')->pluck('name', 'name')->all())
+                    ->query(fn (Builder $query, array $data): Builder => filled($data['value'] ?? null)
+                        ? $query->whereRaw('lower(salesperson) = ?', [mb_strtolower((string) $data['value'])])
+                        : $query),
 
                 Filter::make('rango')
                     ->label(__('ui.tables.date_range'))
