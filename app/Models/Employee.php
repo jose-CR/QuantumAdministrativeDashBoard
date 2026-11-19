@@ -46,6 +46,12 @@ class Employee extends Model
     /** Tipos de documento: los mismos que acepta un cliente. */
     public const DOCUMENT_TYPES = Customer::DOCUMENT_TYPES;
 
+    /**
+     * Prefijo de los códigos de vendedor: VEN-0001. Solo estos aparecen en el select
+     * de vendedor de Caja.
+     */
+    public const SALESPERSON_CODE_PREFIX = 'VEN-';
+
     protected $fillable = [
         'code',
         'name',
@@ -104,6 +110,16 @@ class Employee extends Model
     public function payslips(): HasMany
     {
         return $this->hasMany(Payslip::class);
+    }
+
+    /**
+     * Empleados que venden: los que tienen código VEN-.
+     */
+    public function scopeVendedores(Builder $query): Builder
+    {
+        return $query
+            ->where('code', 'like', self::SALESPERSON_CODE_PREFIX . '%')
+            ->orderBy('name');
     }
 
     public function scopeActive(Builder $query): Builder

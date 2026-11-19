@@ -14,7 +14,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\SpatieTagsColumn;
+use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Notifications\Notification;
@@ -47,9 +47,7 @@ class CustomersTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 
-                SpatieTagsColumn::make('tags')
-                    ->type('customer')
-                    ->label(__('resources.clients.fields.tags.tags')),
+                TagsColumn::make('customer', __('resources.clients.fields.tags.tags')),
 
                 TextColumn::make('email')
                     ->label(__('resources.users.email'))

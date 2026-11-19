@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Administration\Inflows\Tables;
 
+use App\Filament\Admin\Actions\ManageTagsAction;
 use App\Filament\Admin\Resources\Administration\Inflows\InflowResource;
 use App\Models\Customer;
 use App\Models\Employee;
@@ -15,6 +16,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -78,6 +80,10 @@ class InflowsTable
 
                 TextColumn::make('salesperson')
                     ->label(__('resources.flow.inflow.salesperson')),
+
+                // Etiquetas de la entrada (tipo `inflow`): se agregan con el botón de
+                // la fila, igual que en la ficha del cliente.
+                TagsColumn::make('inflow', __('resources.clients.fields.tags.tags')),
 
                 TextColumn::make('items_count')
                     ->label(__('ui.tables.items'))
@@ -144,6 +150,8 @@ class InflowsTable
                     EditAction::make()
                         ->url($editUrl),
                     DeleteAction::make(),
+                    ManageTagsAction::make('inflow'),
+
                     Action::make('verAdjuntos')
                         ->label(__('resources.flow.attachment'))
                         ->icon('heroicon-o-paper-clip')

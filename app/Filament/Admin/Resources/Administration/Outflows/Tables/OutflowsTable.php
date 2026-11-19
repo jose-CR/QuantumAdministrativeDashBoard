@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Administration\Outflows\Tables;
 
+use App\Filament\Admin\Actions\ManageTagsAction;
 use App\Filament\Admin\Resources\Administration\Outflows\OutflowResource;
 use App\Models\Outflow;
 use Filament\Actions\Action;
@@ -9,6 +10,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 
@@ -41,6 +43,10 @@ class OutflowsTable
 
                 TextColumn::make('area')->label(__('resources.flow.outflow.area')),
 
+                // Etiquetas de la salida (tipo `outflow`): para marcar, por ejemplo,
+                // compras de repuestos o gastos de taller.
+                TagsColumn::make('outflow', __('resources.clients.fields.tags.tags')),
+
                 TextColumn::make('items_count')
                     ->label(__('ui.tables.items'))
                     ->counts('items')
@@ -63,6 +69,8 @@ class OutflowsTable
                     ->url($editUrl),
                 DeleteAction::make()
                     ->modalHeading(fn (Outflow $record) => "__('resources.flow.delete') {$record->invoice_code}"),
+                ManageTagsAction::make('outflow'),
+
                 Action::make('verAdjuntos')
                     ->label(__('resources.flow.see_attachment'))
                     ->icon('heroicon-o-paper-clip')

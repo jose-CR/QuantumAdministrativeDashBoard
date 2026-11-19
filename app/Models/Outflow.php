@@ -3,12 +3,13 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Tags\HasTags;
 use Illuminate\Database\Eloquent\Model;
 
 class Outflow extends Model
 {
     /** @use HasFactory<\Database\Factories\OutflowFactory> */
-    use HasFactory;
+    use HasFactory, HasTags;
 
     protected $table = 'outflows';
 

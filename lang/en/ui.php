@@ -165,6 +165,14 @@ return [
         'updated_at' => 'Last update',
     ],
 
+    'tags' => [
+        'manage' => 'Tags',
+        'manage_help' => 'Type to search or create a new tag.',
+        'placeholder' => 'Type a tag and press Enter',
+        'save' => 'Save tags',
+        'saved' => 'Tags saved',
+    ],
+
     'widgets' => [
         'cash_flow' => 'Cash flow',
         'inflows' => 'Inflows',

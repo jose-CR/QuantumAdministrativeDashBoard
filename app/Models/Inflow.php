@@ -3,13 +3,14 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Spatie\Tags\HasTags;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\ValidationException;
 
 class Inflow extends Model
 {
     /** @use HasFactory<\Database\Factories\InflowFactory> */
-    use HasFactory;
+    use HasFactory, HasTags;
 
     protected $table = 'inflows';
 

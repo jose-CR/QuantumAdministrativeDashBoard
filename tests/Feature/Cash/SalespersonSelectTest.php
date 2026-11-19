@@ -4,6 +4,7 @@ namespace Tests\Feature\Cash;
 
 use App\Filament\Admin\Resources\Administration\Inflows\Pages\CreateInflow;
 use App\Models\Customer;
+use App\Models\Employee;
 use App\Models\Inflow;
 use App\Support\Salespeople;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -11,8 +12,8 @@ use Livewire\Livewire;
 use Tests\TestCase;
 
 /**
- * El vendedor se elige de una lista con los que ya se usaron y se puede crear uno
- * nuevo desde el mismo select.
+ * El vendedor de una entrada es un EMPLEADO con código VEN-: la lista sale de la
+ * plantilla, no de los nombres escritos a mano.
  */
 class SalespersonSelectTest extends TestCase
 {
@@ -25,6 +26,16 @@ class SalespersonSelectTest extends TestCase
         $this->actingAs($this->admin());
 
         filament()->setCurrentPanel(filament()->getPanel('admin'));
+    }
+
+    private function vendedor(string $nombre, string $codigo): Employee
+    {
+        return Employee::query()->create([
+            'code' => $codigo,
+            'name' => $nombre,
+            'job_title' => 'vendedor',
+            'status' => Employee::STATUS_ACTIVE,
+        ]);
     }
 
     private function datos(Customer $cliente, mixed $vendedor = null): array
@@ -41,51 +52,82 @@ class SalespersonSelectTest extends TestCase
         ];
     }
 
-    public function test_la_lista_trae_los_vendedores_ya_usados(): void
+    public function test_sin_codigos_de_vendedor_usa_el_puesto(): void
     {
-        Inflow::factory()->create(['salesperson' => 'María López']);
-        Inflow::factory()->create(['salesperson' => 'José Pérez']);
-        Inflow::factory()->create(['salesperson' => 'José Pérez']);
+        $this->vendedor('Ana Puesto', 'EMP-0100');
+
+        // Nadie tiene VEN- todavía: no se deja el select vacío.
+        $this->assertArrayHasKey('Ana Puesto', Salespeople::all());
+        $this->assertStringStartsWith('VEN-', Salespeople::nextCode());
+    }
+
+    public function test_la_lista_trae_solo_a_los_empleados_con_codigo_de_vendedor(): void
+    {
+        $this->vendedor('María López', 'VEN-0001');
+        $this->vendedor('José Pérez', 'VEN-0002');
+
+        // Mecánico y bodeguero: no venden, no van en la lista.
+        $this->vendedor('Carlos Mecánico', 'TEC-0001');
+        $this->vendedor('Beto Bodega', 'BOD-0001');
 
         $vendedores = Salespeople::all();
 
-        // La base de pruebas ya trae entradas sembradas: se comprueba que estén los
-        // dos vendedores y que el repetido aparezca una sola vez.
-        $this->assertArrayHasKey('José Pérez', $vendedores);
         $this->assertArrayHasKey('María López', $vendedores);
-        $this->assertSame(1, collect(array_keys($vendedores))->filter(fn (string $nombre): bool => $nombre === 'José Pérez')->count());
+        $this->assertArrayHasKey('José Pérez', $vendedores);
+        $this->assertArrayNotHasKey('Carlos Mecánico', $vendedores);
+        $this->assertArrayNotHasKey('Beto Bodega', $vendedores);
+
+        // Alfabético.
         $this->assertSame(array_keys($vendedores), collect(array_keys($vendedores))->sort()->values()->all());
     }
 
     public function test_el_buscador_filtra_por_lo_que_se_escribe(): void
     {
-        Inflow::factory()->create(['salesperson' => 'María López']);
-        Inflow::factory()->create(['salesperson' => 'José Pérez']);
+        $this->vendedor('María López', 'VEN-0011');
+        $this->vendedor('José Pérez', 'VEN-0012');
 
         $this->assertArrayHasKey('María López', Salespeople::search('marí'));
         $this->assertArrayHasKey('José Pérez', Salespeople::search('JOSÉ'));
         $this->assertArrayNotHasKey('José Pérez', Salespeople::search('marí'));
     }
 
-    public function test_el_select_guarda_un_vendedor_nuevo(): void
+    public function test_el_select_guarda_al_empleado_elegido(): void
     {
+        $vendedor = $this->vendedor('María López', 'VEN-0030');
         $cliente = Customer::factory()->create();
 
         Livewire::test(CreateInflow::class)
-            ->fillForm($this->datos($cliente, 'Ana Nueva'))
+            ->fillForm($this->datos($cliente, $vendedor->name))
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertSame('Ana Nueva', Inflow::query()->latest('id')->firstOrFail()->salesperson);
+        $this->assertSame('María López', Inflow::query()->latest('id')->firstOrFail()->salesperson);
+    }
+
+    public function test_un_vendedor_nuevo_se_crea_como_empleado(): void
+    {
+        // Es lo que hace el botón "Nuevo vendedor" del select.
+        $this->assertSame('Ana Nueva', Salespeople::create('Ana Nueva'));
+
+        $empleado = Employee::query()->where('name', 'Ana Nueva')->firstOrFail();
+
+        $this->assertStringStartsWith('VEN-', (string) $empleado->code);
+        $this->assertSame('vendedor', $empleado->job_title);
         $this->assertArrayHasKey('Ana Nueva', Salespeople::all());
     }
 
-    public function test_un_vendedor_existente_no_se_duplica_por_mayusculas(): void
+    public function test_el_codigo_siguiente_no_repite(): void
     {
-        Inflow::factory()->create(['salesperson' => 'José Pérez']);
+        $this->vendedor('Uno', 'VEN-0007');
 
-        $this->assertSame('José Pérez', Salespeople::normalize('  josé pérez '));
-        $this->assertSame('Marta Ruiz', Salespeople::normalize('  Marta   Ruiz '));
-        $this->assertNull(Salespeople::normalize('   '));
+        $this->assertSame('VEN-0008', Salespeople::nextCode());
+    }
+
+    public function test_un_empleado_se_encuentra_por_su_nombre(): void
+    {
+        $empleado = $this->vendedor('José Pérez', 'VEN-0020');
+
+        $this->assertSame($empleado->id, Salespeople::employee('  josé PÉREZ ')['id'] ?? null);
+        $this->assertNull(Salespeople::employee('Carlos Mecánico'));
     }
 }

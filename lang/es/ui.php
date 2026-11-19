@@ -165,6 +165,14 @@ return [
         'updated_at' => 'Última actualización',
     ],
 
+    'tags' => [
+        'manage' => 'Etiquetas',
+        'manage_help' => 'Escribí para buscar o crear una etiqueta nueva.',
+        'placeholder' => 'Escribí una etiqueta y Enter',
+        'save' => 'Guardar etiquetas',
+        'saved' => 'Etiquetas guardadas',
+    ],
+
     'widgets' => [
         'cash_flow' => 'Flujo de caja',
         'inflows' => 'Entradas',

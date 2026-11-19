@@ -52,7 +52,12 @@ class InflowForm
                         Select::make('salesperson')
                             ->label(__('resources.flow.inflow.salesperson'))
                             ->searchable()
-                            ->getSearchResultsUsing(fn (string $search): array => Salespeople::search($search))
+                            // El valor ya guardado se ofrece siempre: las entradas viejas
+                            // tienen nombres escritos a mano que no son empleados.
+                            ->getSearchResultsUsing(fn (string $search, ?string $state): array => array_replace(
+                                filled($state) ? [$state => $state] : [],
+                                Salespeople::search($search),
+                            ))
                             ->getOptionLabelUsing(fn (?string $value): ?string => $value)
                             ->native(false)
                             ->required()
@@ -65,7 +70,10 @@ class InflowForm
                                     ->maxLength(255),
                             ])
                             ->createOptionModalHeading(__('ui.inflow.new_salesperson'))
-                            ->createOptionUsing(fn (array $data): ?string => Salespeople::normalize($data['name'])),
+                            // Un vendedor nuevo es un empleado con código VEN-: si no,
+                            // no aparecería en la lista la próxima vez.
+                            ->createOptionUsing(fn (array $data): string => Salespeople::create($data['name']))
+                            ->createOptionModalHeading(__('ui.inflow.new_salesperson')),
 
                         Textarea::make('description')
                             ->label(__('resources.flow.inflow.description'))
