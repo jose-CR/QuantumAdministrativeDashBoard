@@ -15,7 +15,7 @@ class Inflow extends Model
     protected $table = 'inflows';
 
     protected $fillable = [
-        'invoice_number', 'date', 'description', 'customer_id', 'amount', 'amount_paid',
+        'invoice_number', 'document_type', 'date', 'description', 'customer_id', 'amount', 'amount_paid',
         'payment_method', 'transfer_number', 'bank_id', 'transfer_date',
         'payment_status', 'salesperson', 'notes',
     ];

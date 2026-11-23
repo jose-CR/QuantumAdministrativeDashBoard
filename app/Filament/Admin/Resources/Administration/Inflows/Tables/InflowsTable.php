@@ -8,6 +8,7 @@ use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Inflow;
 use App\Models\Tag;
+use App\Support\DocumentTypes;
 use App\Support\PaymentStatus;
 use App\Support\TagTypes;
 use Filament\Actions\Action;
@@ -36,6 +37,12 @@ class InflowsTable
                 TextColumn::make('invoice_number')
                     ->label(__('resources.flow.inflow.cod_invoice')),
                 
+                TextColumn::make('document_type')
+                    ->label(__('ui.document_types.label'))
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => DocumentTypes::label($state))
+                    ->color(fn (?string $state): string => DocumentTypes::color($state)),
+
                 TextColumn::make('date')
                     ->date()
                     ->label(__('resources.flow.inflow.date')),
@@ -108,6 +115,10 @@ class InflowsTable
                         'partial' => __('resources.clients.statuses.partial'),
                         'paid' => __('resources.clients.statuses.paid'),
                     ]),
+
+                SelectFilter::make('document_type')
+                    ->label(__('ui.document_types.label'))
+                    ->options(DocumentTypes::options(DocumentTypes::inflow())),
 
                 // Etiqueta del cliente: sirve para ver, por ejemplo, solo lo de mayoristas.
                 SelectFilter::make('tag')

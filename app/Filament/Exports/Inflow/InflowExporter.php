@@ -3,6 +3,7 @@
 namespace App\Filament\Exports\Inflow;
 
 use App\Models\Inflow;
+use App\Support\DocumentTypes;
 use Filament\Actions\Exports\ExportColumn;
 use Filament\Actions\Exports\Exporter;
 use Filament\Actions\Exports\Models\Export;
@@ -17,6 +18,10 @@ class InflowExporter extends Exporter
         return [
             ExportColumn::make('invoice_number')
                 ->label(__('ui.columns.invoice_number')),
+
+            ExportColumn::make('document_type')
+                ->label(__('ui.document_types.label'))
+                ->formatStateUsing(fn (?string $state): string => DocumentTypes::label($state)),
 
             ExportColumn::make('date')
                 ->label(__('ui.columns.date')),

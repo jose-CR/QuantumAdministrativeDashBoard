@@ -105,6 +105,9 @@ return [
 
     // Columnas de los Excel: las mismas en export e import.
     'columns' => [
+        'company' => 'Empresa',
+        'source' => 'Origen',
+        'internal_id' => 'ID interno',
         'items_sold' => 'Artículos vendidos',
         'invoice_number' => 'Número de factura',
         'invoice_date' => 'Fecha de factura',
@@ -163,6 +166,16 @@ return [
         'status' => 'Estado',
         'created_at' => 'Fecha de creación',
         'updated_at' => 'Última actualización',
+    ],
+
+    'document_types' => [
+        'label' => 'Tipo de documento',
+        'unspecified' => 'Sin especificar',
+        'cf' => 'Consumidor Final',
+        'ccf' => 'Comprobante de Crédito Fiscal',
+        'excluded' => 'Factura de sujeto excluido',
+        'receipt' => 'Recibo interno',
+        'invoice' => 'Factura de compra',
     ],
 
     'statement' => [

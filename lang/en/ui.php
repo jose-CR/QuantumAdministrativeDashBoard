@@ -105,6 +105,9 @@ return [
 
     // Spreadsheet columns: the same in export and import.
     'columns' => [
+        'company' => 'Company',
+        'source' => 'Source',
+        'internal_id' => 'Internal ID',
         'items_sold' => 'Items sold',
         'invoice_number' => 'Invoice number',
         'invoice_date' => 'Invoice date',
@@ -163,6 +166,16 @@ return [
         'status' => 'Status',
         'created_at' => 'Created at',
         'updated_at' => 'Last update',
+    ],
+
+    'document_types' => [
+        'label' => 'Document type',
+        'unspecified' => 'Unspecified',
+        'cf' => 'Consumer invoice',
+        'ccf' => 'Tax credit invoice (CCF)',
+        'excluded' => 'Excluded subject invoice',
+        'receipt' => 'Internal receipt',
+        'invoice' => 'Purchase invoice',
     ],
 
     'statement' => [

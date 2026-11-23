@@ -8,6 +8,7 @@ use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\Inflow;
 use App\Models\Installment;
+use App\Support\DocumentTypes;
 use App\Support\Salespeople;
 use App\Utils\Filament\FilamentSearch;
 use Filament\Forms\Components\DatePicker;
@@ -32,6 +33,13 @@ class InflowForm
                         TextInput::make('invoice_number')
                             ->label(__('resources.flow.inflow.cod_invoice'))
                             ->required(),
+
+                        // Tipo de documento fiscal: lista cerrada, no etiqueta.
+                        Select::make('document_type')
+                            ->label(__('ui.document_types.label'))
+                            ->options(DocumentTypes::options(DocumentTypes::inflow()))
+                            ->native(false)
+                            ->placeholder(__('ui.document_types.unspecified')),
 
                         FilamentSearch::searchable(
                             Select::make('customer_id')

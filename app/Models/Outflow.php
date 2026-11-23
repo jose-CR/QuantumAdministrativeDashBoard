@@ -14,7 +14,7 @@ class Outflow extends Model
     protected $table = 'outflows';
 
     protected $fillable = [
-        'invoice_date', 'company', 'invoice_code', 'quantity',
+        'invoice_date', 'company', 'invoice_code', 'document_type', 'quantity',
         'amount', 'description', 'source', 'area',
     ];
 

@@ -2,6 +2,9 @@
 
 namespace App\Rules\Flow;
 
+use App\Support\DocumentTypes;
+use Illuminate\Validation\Rule;
+
 class OutflowRules
 {
     public static function import(): array
@@ -22,6 +25,11 @@ class OutflowRules
                 'required',
                 'string',
                 'max:255',
+            ],
+
+            'document_type' => [
+                'nullable',
+                Rule::in(DocumentTypes::accepted(DocumentTypes::outflow())),
             ],
 
             'quantity' => [

@@ -2,6 +2,9 @@
 
 namespace App\Rules\Flow;
 
+use App\Support\DocumentTypes;
+use Illuminate\Validation\Rule;
+
 class InflowRules
 {
     public static function import(): array
@@ -11,6 +14,12 @@ class InflowRules
                 'required',
                 'string',
                 'max:255',
+            ],
+
+            // Acepta el código o el nombre que se ve en pantalla; el import lo normaliza.
+            'document_type' => [
+                'nullable',
+                Rule::in(DocumentTypes::accepted(DocumentTypes::inflow())),
             ],
 
             'date' => [

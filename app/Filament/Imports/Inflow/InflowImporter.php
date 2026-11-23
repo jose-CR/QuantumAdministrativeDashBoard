@@ -4,6 +4,7 @@ namespace App\Filament\Imports\Inflow;
 
 use App\Models\Inflow;
 use App\Rules\Flow\InflowRules;
+use App\Support\DocumentTypes;
 use Filament\Actions\Imports\ImportColumn;
 use Filament\Actions\Imports\Importer;
 use Filament\Actions\Imports\Models\Import;
@@ -19,6 +20,11 @@ class InflowImporter extends Importer
             ImportColumn::make('invoice_number')
                 ->label(__('ui.columns.invoice_number'))
                 ->rules(InflowRules::import()['invoice_number']),
+
+            ImportColumn::make('document_type')
+                ->label(__('ui.document_types.label'))
+                ->rules(InflowRules::import()['document_type'])
+                ->castStateUsing(fn (?string $state): ?string => DocumentTypes::cast($state)),
 
             ImportColumn::make('date')
                 ->label(__('ui.columns.date'))

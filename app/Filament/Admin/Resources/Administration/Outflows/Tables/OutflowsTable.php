@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Administration\Outflows\Tables;
 use App\Filament\Admin\Actions\ManageTagsAction;
 use App\Filament\Admin\Resources\Administration\Outflows\OutflowResource;
 use App\Models\Outflow;
+use App\Support\DocumentTypes;
 use App\Support\TagTypes;
 use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
@@ -13,6 +14,7 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class OutflowsTable
@@ -29,6 +31,12 @@ class OutflowsTable
 
                 TextColumn::make('company')
                     ->label(__('resources.flow.outflow.company')),
+
+                TextColumn::make('document_type')
+                    ->label(__('ui.document_types.label'))
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state): string => DocumentTypes::label($state))
+                    ->color(fn (?string $state): string => DocumentTypes::color($state)),
 
                 TextColumn::make('invoice_code')
                     ->label(__('resources.flow.outflow.cod_invoice')),
@@ -63,7 +71,9 @@ class OutflowsTable
                     ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : __('ui.tables.no_attachments')),
             ])
             ->filters([
-                //
+                SelectFilter::make('document_type')
+                    ->label(__('ui.document_types.label'))
+                    ->options(DocumentTypes::options(DocumentTypes::outflow())),
             ])
             ->recordActions([
                 EditAction::make()

@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Resources\Administration\Outflows\Schemas;
 use App\Models\Article;
 use App\Models\Attachment;
 use App\Models\Outflow;
+use App\Support\DocumentTypes;
 use App\Utils\Filament\FilamentSearch;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\FileUpload;
@@ -32,6 +33,13 @@ class OutflowForm
                 TextInput::make('invoice_code')
                     ->label(__('resources.flow.outflow.cod_invoice'))
                     ->required(),
+
+                // Tipo de documento de la compra/gasto.
+                Select::make('document_type')
+                    ->label(__('ui.document_types.label'))
+                    ->options(DocumentTypes::options(DocumentTypes::outflow()))
+                    ->native(false)
+                    ->placeholder(__('ui.document_types.unspecified')),
 
                 RichEditor::make('description')
                     ->label(__('resources.flow.outflow.description')),
