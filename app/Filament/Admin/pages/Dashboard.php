@@ -9,9 +9,11 @@ use App\Filament\Admin\Widgets\ArticlesStatsWidget;
 use App\Filament\Admin\Widgets\CashFlowStatsWidget;
 use App\Filament\Admin\Widgets\CreditsCollectedByTagWidget;
 use App\Filament\Admin\Widgets\CreditsDueByTagWidget;
+use App\Filament\Admin\Widgets\CollectedInvoicesWidget;
 use App\Filament\Admin\Widgets\CreditsStatsWidget;
 use App\Filament\Admin\Widgets\CustomersStatsWidget;
 use App\Filament\Admin\Widgets\OverdueCreditsWidget;
+use App\Filament\Admin\Widgets\ReceivableInvoicesWidget;
 use Filament\Widgets\Widget;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
@@ -36,6 +38,8 @@ class Dashboard extends BaseDashboard
             OverdueCreditsWidget::class,
             CreditsDueByTagWidget::class,
             CreditsCollectedByTagWidget::class,
+            CollectedInvoicesWidget::class,
+            ReceivableInvoicesWidget::class,
         ];
     }
 
