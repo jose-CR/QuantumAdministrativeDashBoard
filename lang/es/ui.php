@@ -182,6 +182,20 @@ return [
         'placeholder' => 'Escribí una etiqueta y Enter',
         'save' => 'Guardar etiquetas',
         'saved' => 'Etiquetas guardadas',
+        'singular' => 'Etiqueta',
+        'plural' => 'Etiquetas',
+        'name' => 'Nombre',
+        'type' => 'Tipo',
+        'type_help' => 'El tipo separa dónde se usa: clientes, ingresos o salidas de caja.',
+        'type_locked' => 'El tipo no se puede cambiar: la etiqueta ya está en uso.',
+        'uses' => 'Usos',
+        'delete_blocked' => 'No se puede eliminar: la usan :count registro(s). Quitásela a esos registros primero.',
+        'types' => [
+            'customer' => 'Clientes',
+            'inflow' => 'Ingresos',
+            'outflow' => 'Salidas',
+            'unknown' => 'Sin tipo',
+        ],
     ],
 
     'widgets' => [

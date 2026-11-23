@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Inflow;
 use App\Models\Tag;
 use App\Support\PaymentStatus;
+use App\Support\TagTypes;
 use Filament\Actions\Action;
 use Filament\Actions\ActionGroup;
 use Filament\Actions\BulkActionGroup;
@@ -83,7 +84,7 @@ class InflowsTable
 
                 // Etiquetas de la entrada (tipo `inflow`): se agregan con el botón de
                 // la fila, igual que en la ficha del cliente.
-                TagsColumn::make('inflow', __('resources.clients.fields.tags.tags')),
+                TagsColumn::make(TagTypes::INFLOW, __('resources.clients.fields.tags.tags')),
 
                 TextColumn::make('items_count')
                     ->label(__('ui.tables.items'))
@@ -112,10 +113,10 @@ class InflowsTable
                 SelectFilter::make('tag')
                     ->label(__('resources.clients.fields.tags.tags'))
                     ->multiple()
-                    ->options(fn (): array => Tag::getWithType('customer')->pluck('name', 'name')->all())
+                    ->options(fn (): array => Tag::getWithType(TagTypes::CUSTOMER)->pluck('name', 'name')->all())
                     ->query(fn (Builder $query, array $data): Builder => filled($data['values'] ?? null)
                         ? $query->whereHas('customer', fn (Builder $cliente): Builder => $cliente
-                            ->withAnyTags($data['values'], 'customer'))
+                            ->withAnyTags($data['values'], TagTypes::CUSTOMER))
                         : $query),
 
                 // Empleado: se compara contra el vendedor anotado en la entrada. La
@@ -150,7 +151,7 @@ class InflowsTable
                     EditAction::make()
                         ->url($editUrl),
                     DeleteAction::make(),
-                    ManageTagsAction::make('inflow'),
+                    ManageTagsAction::make(TagTypes::INFLOW),
 
                     Action::make('verAdjuntos')
                         ->label(__('resources.flow.attachment'))

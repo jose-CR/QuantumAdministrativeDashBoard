@@ -21,6 +21,7 @@ use Filament\Notifications\Notification;
 use Filament\Tables\Grouping\Group;
 use Filament\Tables\Table;
 use App\Models\Tag;
+use App\Support\TagTypes;
 use Illuminate\Database\Eloquent\Builder;
 
 class CustomersTable
@@ -47,7 +48,7 @@ class CustomersTable
                     ->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 
-                TagsColumn::make('customer', __('resources.clients.fields.tags.tags')),
+                TagsColumn::make(TagTypes::CUSTOMER, __('resources.clients.fields.tags.tags')),
 
                 TextColumn::make('email')
                     ->label(__('resources.users.email'))
@@ -124,9 +125,9 @@ class CustomersTable
                 SelectFilter::make('tag')
                     ->label(__('resources.clients.fields.tags.tags'))
                     ->multiple()
-                    ->options(fn () => Tag::getWithType('customer')->pluck('name', 'name'))
+                    ->options(fn () => Tag::getWithType(TagTypes::CUSTOMER)->pluck('name', 'name'))
                     ->query(fn (Builder $query, array $data): Builder => filled($data['values'] ?? null)
-                        ? $query->withAnyTags($data['values'], 'customer')
+                        ? $query->withAnyTags($data['values'], TagTypes::CUSTOMER)
                         : $query),
             ])
             ->recordActions([

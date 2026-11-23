@@ -182,6 +182,20 @@ return [
         'placeholder' => 'Type a tag and press Enter',
         'save' => 'Save tags',
         'saved' => 'Tags saved',
+        'singular' => 'Tag',
+        'plural' => 'Tags',
+        'name' => 'Name',
+        'type' => 'Type',
+        'type_help' => 'The type decides where it is used: customers, inflows or cash outflows.',
+        'type_locked' => 'The type cannot be changed: the tag is already in use.',
+        'uses' => 'Uses',
+        'delete_blocked' => 'Cannot delete: :count record(s) use it. Remove it from them first.',
+        'types' => [
+            'customer' => 'Customers',
+            'inflow' => 'Inflows',
+            'outflow' => 'Outflows',
+            'unknown' => 'No type',
+        ],
     ],
 
     'widgets' => [

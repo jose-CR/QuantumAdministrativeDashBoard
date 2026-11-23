@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Tag;
+use App\Support\TagTypes;
 use Illuminate\Database\Seeder;
 
 /**
@@ -30,7 +31,7 @@ class TagSeeder extends Seeder
         ];
 
         foreach ($etiquetas as $nombre) {
-            Tag::findOrCreate($nombre, 'customer');
+            Tag::findOrCreate($nombre, TagTypes::CUSTOMER);
         }
     }
 }
