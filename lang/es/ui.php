@@ -165,6 +165,17 @@ return [
         'updated_at' => 'Última actualización',
     ],
 
+    'statement' => [
+        'overdue' => 'Informe de estados de cuenta',
+        'customer' => 'Estado de cuenta (Excel)',
+        'heading' => 'Descargar estados de cuenta',
+        'description' => 'Un Excel con una hoja por cliente: sus datos, sus créditos, las cuotas que debe y el historial de pagos.',
+        'download' => 'Descargar',
+        'nothing' => 'No hay créditos para incluir en el informe.',
+        'failed' => 'No se pudo generar el Excel',
+        'no_salesperson' => 'Sin vendedor',
+    ],
+
     'tags' => [
         'manage' => 'Etiquetas',
         'manage_help' => 'Escribí para buscar o crear una etiqueta nueva.',

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Client\Customers\Pages;
 
+use App\Filament\Admin\Actions\CustomerStatementAction;
 use App\Filament\Admin\Actions\PayInstallmentAction;
 use App\Filament\Admin\Actions\RefinanceCreditAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
@@ -18,6 +19,7 @@ class ViewCustomer extends ViewRecord
     {
         return [
             EditAction::make(),
+            CustomerStatementAction::customer(),
             PayInstallmentAction::make(),
             RefinanceCreditAction::make(),
             Action::make('createCredit')

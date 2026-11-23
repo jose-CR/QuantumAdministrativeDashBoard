@@ -165,6 +165,17 @@ return [
         'updated_at' => 'Last update',
     ],
 
+    'statement' => [
+        'overdue' => 'Customer statements report',
+        'customer' => 'Statement (Excel)',
+        'heading' => 'Download customer statements',
+        'description' => 'One Excel file with a sheet per customer: details, credits, installments owed and payment history.',
+        'download' => 'Download',
+        'nothing' => 'There are no credits to include in the report.',
+        'failed' => 'The Excel could not be generated',
+        'no_salesperson' => 'No salesperson',
+    ],
+
     'tags' => [
         'manage' => 'Tags',
         'manage_help' => 'Type to search or create a new tag.',

@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Widgets;
 
+use App\Filament\Admin\Actions\CustomerStatementAction;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Models\Credit;
@@ -105,6 +106,9 @@ class OverdueCreditsWidget extends TableWidget
                     ->label(__('resources.credits.credits.pending_balance'))
                     ->money('usd')
                     ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->headerActions([
+                CustomerStatementAction::overdue(),
             ])
             ->defaultSort('overdue_amount', 'desc')
             ->recordActions([
