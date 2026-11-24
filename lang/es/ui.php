@@ -196,6 +196,12 @@ return [
     ],
 
     'statement' => [
+        'customer_excel' => 'Estado de cuenta (Excel)',
+        'heading_customer' => 'Descargar estado de cuenta',
+        'description_customer' => 'Todas las facturas del cliente con sus abonos, el plan de pago de lo vendido a crédito y el detalle de los recibos.',
+        'no_invoices' => 'Este cliente no tiene facturas cargadas.',
+        'credit' => 'Crédito',
+        'credit_payment' => 'Pago de cuota',
         'overdue' => 'Informe de estados de cuenta',
         'customer' => 'Estado de cuenta (Excel)',
         'heading' => 'Descargar estados de cuenta',
