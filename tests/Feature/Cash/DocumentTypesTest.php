@@ -30,26 +30,22 @@ class DocumentTypesTest extends TestCase
         filament()->setCurrentPanel(filament()->getPanel('admin'));
     }
 
-    public function test_el_catalogo_tiene_etiqueta_en_los_dos_idiomas(): void
+    public function test_las_entradas_viejas_sin_tipo_se_muestran_como_sin_especificar(): void
     {
-        foreach (DocumentTypes::all() as $tipo) {
-            $clave = 'ui.document_types.' . $tipo;
-
-            $this->assertNotSame($clave, __($clave, [], 'es'));
-            $this->assertNotSame(__($clave, [], 'es'), __($clave, [], 'en'));
-        }
-
-        // Las entradas viejas no tienen el dato: no se les inventa un tipo.
+        // No se les inventa un tipo fiscal a las filas que ya existían.
         $this->assertSame(__('ui.document_types.unspecified'), DocumentTypes::label(null));
     }
 
     public function test_normaliza_lo_que_viene_de_un_archivo(): void
     {
-        $this->assertSame(DocumentTypes::CCF, DocumentTypes::cast('CCF'));
-        $this->assertSame(DocumentTypes::CCF, DocumentTypes::cast('ccf'));
-        $this->assertSame(DocumentTypes::CCF, DocumentTypes::cast('Comprobante de Crédito Fiscal'));
-        $this->assertSame(DocumentTypes::CF, DocumentTypes::cast('Consumidor Final'));
-        $this->assertSame(DocumentTypes::EXCLUDED, DocumentTypes::cast('sujeto excluido'));
+        // Los códigos ya no son constantes del código: salen del catálogo.
+        $this->assertSame('ccf', DocumentTypes::cast('CCF'));
+        $this->assertSame('ccf', DocumentTypes::cast('ccf'));
+        $this->assertSame('ccf', DocumentTypes::cast('Comprobante de Crédito Fiscal'));
+        $this->assertSame('cf', DocumentTypes::cast('Consumidor Final'));
+        $this->assertSame('excluded', DocumentTypes::cast('sujeto excluido'));
+        // Sin tilde también.
+        $this->assertSame('ccf', DocumentTypes::cast('comprobante de credito fiscal'));
         $this->assertNull(DocumentTypes::cast('cualquier cosa'));
         $this->assertNull(DocumentTypes::cast(''));
     }
@@ -61,7 +57,7 @@ class DocumentTypesTest extends TestCase
         Livewire::test(CreateInflow::class)
             ->fillForm([
                 'invoice_number' => 'INV-DOC-' . uniqid(),
-                'document_type' => DocumentTypes::CCF,
+                'document_type' => 'ccf',
                 'customer_id' => $cliente->id,
                 'date' => now()->toDateString(),
                 'salesperson' => 'Sin vendedor',
@@ -72,24 +68,15 @@ class DocumentTypesTest extends TestCase
             ->call('create')
             ->assertHasNoFormErrors();
 
-        $this->assertSame(DocumentTypes::CCF, Inflow::query()->latest('id')->firstOrFail()->document_type);
+        $this->assertSame('ccf', Inflow::query()->latest('id')->firstOrFail()->document_type);
     }
 
-    public function test_la_base_rechaza_un_tipo_inventado(): void
+    public function test_un_tipo_inventado_no_entra_por_el_import(): void
     {
-        $this->expectException(\Illuminate\Database\QueryException::class);
-
-        DB::table('inflows')->insert([
-            'invoice_number' => 'INV-MALO-' . uniqid(),
-            'document_type' => 'c.f.',
-            'date' => now()->toDateString(),
-            'customer_id' => Customer::factory()->create()->id,
-            'amount' => 10,
-            'amount_paid' => 0,
-            'payment_method' => 'cash',
-            'payment_status' => 'pending',
-            'salesperson' => 'Sin vendedor',
-        ]);
+        // Sin CHECK en la base, la lista del catálogo es la que valida: lo que no
+        // existe se descarta en vez de guardar un código que nadie sabe mostrar.
+        $this->assertNull(DocumentTypes::cast('c.f.'));
+        $this->assertNotContains('c.f.', DocumentTypes::accepted(DocumentTypes::inflow()));
     }
 
     public function test_el_filtro_de_la_tabla_usa_la_misma_lista(): void

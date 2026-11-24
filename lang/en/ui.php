@@ -169,6 +169,23 @@ return [
     ],
 
     'document_types' => [
+        'singular' => 'Document type',
+        'plural' => 'Document types',
+        'name' => 'Name',
+        'code' => 'Code',
+        'code_help' => 'Short code stored on each inflow or outflow (cf, ccf…). It is locked once the type is in use.',
+        'scope' => [
+            'label' => 'Applies to',
+            'inflow' => 'Inflows',
+            'outflow' => 'Outflows',
+            'both' => 'Inflows and outflows',
+        ],
+        'sort' => 'Order',
+        'sort_help' => 'Sort number. Lower goes first.',
+        'active' => 'Active',
+        'active_help' => 'An inactive type stops being offered, but documents that already use it keep it.',
+        'uses' => 'Uses',
+        'delete_blocked' => 'Cannot delete: :count document(s) use it. Deactivate it instead.',
         'label' => 'Document type',
         'unspecified' => 'Unspecified',
         'cf' => 'Consumer invoice',

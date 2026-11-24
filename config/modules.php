@@ -85,6 +85,7 @@ return [
             'state' => 'enabled',
             'paths' => [
                 'tags',
+                'document-types',
                 'shield/roles',
                 'translation-manager',
             ],

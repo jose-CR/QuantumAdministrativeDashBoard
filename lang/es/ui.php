@@ -169,6 +169,23 @@ return [
     ],
 
     'document_types' => [
+        'singular' => 'Tipo de documento',
+        'plural' => 'Tipos de documento',
+        'name' => 'Nombre',
+        'code' => 'Código',
+        'code_help' => 'Código corto que se guarda en cada entrada o salida (cf, ccf…). Se fija cuando el tipo ya se usa.',
+        'scope' => [
+            'label' => 'Dónde aplica',
+            'inflow' => 'Ingresos',
+            'outflow' => 'Egresos',
+            'both' => 'Ingresos y egresos',
+        ],
+        'sort' => 'Orden',
+        'sort_help' => 'Número para ordenar la lista. Menor va primero.',
+        'active' => 'Activo',
+        'active_help' => 'Un tipo inactivo deja de ofrecerse, pero los documentos que ya lo tienen no cambian.',
+        'uses' => 'Usos',
+        'delete_blocked' => 'No se puede eliminar: lo usan :count documento(s). Desactivalo si no querés ofrecerlo más.',
         'label' => 'Tipo de documento',
         'unspecified' => 'Sin especificar',
         'cf' => 'Consumidor Final',
