@@ -157,15 +157,6 @@ class CustomerStatementTest extends TestCase
         $this->assertSame('Vendedor Real', $datos['vendedores'][0]['vendedor']);
     }
 
-    public function test_el_boton_esta_en_la_ficha_del_cliente(): void
-    {
-        [$cliente] = $this->clienteConCredito('Cliente Con Botón');
-
-        Livewire::test(ViewCustomer::class, ['record' => $cliente->getKey()])
-            ->assertOk()
-            ->assertSee(__('ui.statement.customer'));
-    }
-
     public function test_sin_creditos_no_se_puede_generar(): void
     {
         $this->expectException(\RuntimeException::class);

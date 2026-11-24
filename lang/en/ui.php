@@ -196,6 +196,7 @@ return [
     ],
 
     'statement' => [
+        'no_workspace' => 'There is no writable folder to generate the file. Please tell the server administrator.',
         'customer_excel' => 'Statement (Excel)',
         'heading_customer' => 'Download account statement',
         'description_customer' => 'Every invoice with its payments, the payment plan of credit sales and the receipt detail.',
@@ -203,7 +204,6 @@ return [
         'credit' => 'Credit',
         'credit_payment' => 'Installment payment',
         'overdue' => 'Customer statements report',
-        'customer' => 'Statement (Excel)',
         'heading' => 'Download customer statements',
         'description' => 'One Excel file with a sheet per customer: details, credits, installments owed and payment history.',
         'download' => 'Download',

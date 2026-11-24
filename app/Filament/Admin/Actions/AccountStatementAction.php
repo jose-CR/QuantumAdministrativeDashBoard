@@ -5,6 +5,7 @@ namespace App\Filament\Admin\Actions;
 use App\Models\Customer;
 use App\Services\Reports\AccountStatementService;
 use App\Support\PythonBinary;
+use App\Support\TempWorkspace;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use RuntimeException;
@@ -65,8 +66,9 @@ final class AccountStatementAction
             throw new RuntimeException(__('ui.statement.no_invoices'));
         }
 
-        $carpeta = storage_path('app/private/estados-de-cuenta');
-        @mkdir($carpeta, 0775, true);
+        // Si la carpeta de storage no es escribible se cae a la temporal, en vez de
+        // reventar con Permission denied.
+        $carpeta = TempWorkspace::directory();
 
         $marca = uniqid('estado-cliente-', true);
         $json = $carpeta . '/data-' . $marca . '.json';

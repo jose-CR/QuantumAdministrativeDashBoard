@@ -6,6 +6,7 @@ use App\Models\Credit;
 use App\Models\Customer;
 use App\Support\ElSalvadorCatalogo;
 use App\Support\PythonBinary;
+use App\Support\TempWorkspace;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use RuntimeException;
@@ -56,8 +57,7 @@ final class CustomerStatementService
             throw new RuntimeException(__('ui.statement.nothing'));
         }
 
-        $carpeta = storage_path('app/private/estados-de-cuenta');
-        @mkdir($carpeta, 0775, true);
+        $carpeta = TempWorkspace::directory();
 
         $marca = uniqid('estado-', true);
         $json = $carpeta . '/data-' . $marca . '.json';
