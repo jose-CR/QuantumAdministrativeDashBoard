@@ -278,76 +278,168 @@ def facturas(hoja, fila, datos):
     return fila + 2
 
 
-def planes(hoja, fila, datos):
-    if not datos["planes"]:
+def aviso_creditos(hoja, fila, datos):
+    """En la hoja del estado de cuenta solo se avisa dónde están los créditos."""
+    planes = datos["planes"]
+
+    if not planes:
         return fila
 
-    fila = banda(hoja, fila, "PLAN DE PAGO DE LO VENDIDO A CRÉDITO")
+    fila = banda(hoja, fila, "CRÉDITOS")
+
+    hojas = ", ".join(f"«Crédito #{plan['numero']}»" for plan in planes)
 
     hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
     celda = hoja.cell(row=fila, column=1, value=(
-        "No suma al saldo: la deuda de esa venta ya está contada en su factura. "
-        "Acá se ve cómo se paga."
+        f"Esta cuenta tiene {len(planes)} venta(s) a crédito, cada una en su propia hoja: {hojas}. "
+        "El plan de cuotas no suma al saldo: la deuda ya está contada en su factura."
     ))
     celda.font = Font(size=8, italic=True, color=GRIS_TEXTO)
+    celda.alignment = Alignment(vertical="top", wrap_text=True)
+    hoja.row_dimensions[fila].height = 26
+
+    return fila + 2
+
+
+def nombre_hoja_credito(plan):
+    nombre = f"Crédito #{plan['numero']}"
+    for caracter in ("/", "\\", "?", "*", "[", "]", ":"):
+        nombre = nombre.replace(caracter, "-")
+    return nombre[:31]
+
+
+def hoja_credito(libro, datos, plan):
+    """Una hoja por crédito: sus datos y su plan de cuotas completo."""
+    hoja = libro.create_sheet(nombre_hoja_credito(plan))
+    hoja.sheet_properties.tabColor = AZUL_MEDIO
+
+    for columna, ancho in ANCHOS.items():
+        hoja.column_dimensions[columna].width = ancho
+
+    fila = encabezado_credito(hoja, datos, plan)
+    fila = datos_credito(hoja, fila, datos, plan)
+    fila = cuotas_credito(hoja, fila, plan)
+
+    hoja.page_setup.orientation = "portrait"
+    hoja.page_setup.paperSize = hoja.PAPERSIZE_A4
+    hoja.page_setup.fitToWidth = 1
+    hoja.page_setup.fitToHeight = 0
+    hoja.sheet_properties.pageSetUpPr.fitToPage = True
+    hoja.page_margins = PageMargins(left=0.4, right=0.4, top=0.5, bottom=0.5)
+    hoja.print_title_rows = "1:1"
+
+    return hoja
+
+
+def encabezado_credito(hoja, datos, plan):
+    fila = 1
+    hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
+    celda = hoja.cell(row=fila, column=1, value=EMPRESA)
+    celda.fill = PatternFill("solid", fgColor=AZUL)
+    celda.font = Font(bold=True, size=13, color="FFFFFF")
+    celda.alignment = Alignment(vertical="center", indent=1)
+    hoja.row_dimensions[fila].height = 28
     fila += 1
 
-    for plan in datos["planes"]:
-        referencia = plan["referencia"]
-        if plan["factura"]:
-            referencia += f"   ·   factura N° {plan['factura']}"
-        else:
-            referencia += "   ·   sin factura identificada"
+    hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
+    celda = hoja.cell(row=fila, column=1, value=f"ESTADO DE CUENTA · CRÉDITO #{plan['numero']}")
+    celda.font = Font(bold=True, size=11, color=AZUL)
+    celda.alignment = Alignment(horizontal="center", vertical="center")
+    for columna in range(1, ULTIMA + 1):
+        hoja.cell(row=fila, column=columna).border = Border(bottom=MEDIO)
+    fila += 1
 
-        hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
-        celda = hoja.cell(row=fila, column=1, value=referencia)
-        celda.font = Font(bold=True, size=8.5, color=AZUL)
-        fila += 1
+    hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
+    celda = hoja.cell(row=fila, column=1, value=(
+        f"{datos['cliente']['nombre']}   ·   {datos['cliente']['documento']}   ·   "
+        f"estado de cuenta N° {datos['estado']['numero']}"
+    ))
+    celda.font = Font(size=8, italic=True, color=GRIS_TEXTO)
+    celda.alignment = Alignment(horizontal="center")
 
-        fila = titulos(hoja, fila, [
-            (1, "Cuota", 1), (2, "Vence", 1), (3, "Estado", 3),
-            (6, "Monto", 1), (7, "Pagado", 1), (8, "Saldo", 1),
-        ])
+    return fila + 2
 
-        for indice, cuota in enumerate(plan["cuotas"]):
-            relleno = GRIS_FILA if indice % 2 else None
-            vencida = cuota["estado"] in ("late", "pending") and cuota["saldo"] > 0
-            etiqueta = {"paid": "Pagada", "late": "Vencida", "pending": "Pendiente",
-                        "partial": "Parcial", "cancelled": "Anulada"}.get(cuota["estado"], cuota["estado"])
 
-            for columna, valor in ((1, cuota["numero"]), (2, cuota["vence"]),
-                                   (6, cuota["monto"]), (7, cuota["pagado"]), (8, cuota["saldo"])):
-                celda = hoja.cell(row=fila, column=columna, value=valor)
-                celda.font = Font(size=8.5)
-                celda.border = Border(bottom=FIN, left=FIN, right=FIN)
-                if relleno:
-                    celda.fill = PatternFill("solid", fgColor=relleno)
-                if columna in (1, 2):
-                    celda.alignment = Alignment(horizontal="center")
-                if columna in (6, 7, 8):
-                    dinero(celda)
+def datos_credito(hoja, fila, datos, plan):
+    fila = banda(hoja, fila, "CRÉDITO")
 
-            hoja.merge_cells(start_row=fila, start_column=3, end_row=fila, end_column=5)
-            celda = hoja.cell(row=fila, column=3, value=etiqueta)
-            celda.font = Font(size=8.5, bold=vencida, color=ROJO if vencida else GRIS_TEXTO)
-            celda.alignment = Alignment(horizontal="center")
+    if plan["factura"]:
+        origen = f"Factura N° {plan['factura']} (ver hoja del estado de cuenta)"
+    else:
+        origen = "Sin factura identificada"
+
+    izquierda = fila
+    izquierda = etiqueta_valor(hoja, izquierda, "Origen", origen)
+    izquierda = etiqueta_valor(hoja, izquierda, "Inicio", plan["inicio"] or "—")
+    izquierda = etiqueta_valor(hoja, izquierda, "Monto inicial", numero(plan["monto_inicial"]))
+    izquierda = etiqueta_valor(hoja, izquierda, "Prima", numero(plan["prima"]))
+    izquierda = etiqueta_valor(hoja, izquierda, "Financiado", numero(plan["financiado"]))
+
+    derecha = fila
+    derecha = etiqueta_valor(hoja, derecha, "Cuotas", f"{plan['cuotas_total']} · {numero(plan['cuota_monto'])} c/u", columna=6)
+    derecha = etiqueta_valor(hoja, derecha, "Día de pago", plan["dia_pago"], columna=6)
+    derecha = etiqueta_valor(hoja, derecha, "Total a pagar", numero(plan["total_credito"]), columna=6)
+    derecha = etiqueta_valor(hoja, derecha, "Saldo pendiente", numero(plan["saldo_credito"]), columna=6)
+    derecha = etiqueta_valor(hoja, derecha, "Cuotas vencidas", plan["vencidas"], columna=6)
+
+    return max(izquierda, derecha) + 1
+
+
+def cuotas_credito(hoja, fila, plan):
+    fila = banda(hoja, fila, "PLAN DE CUOTAS")
+    fila = titulos(hoja, fila, [
+        (1, "Cuota", 1), (2, "Vence", 1), (3, "Estado", 2),
+        (5, "Días", 1), (6, "Monto", 1), (7, "Pagado", 1), (8, "Saldo", 1),
+    ])
+
+    for indice, cuota in enumerate(plan["cuotas"]):
+        relleno = GRIS_FILA if indice % 2 else None
+        etiqueta = {"paid": "Pagada", "late": "Vencida", "pending": "Pendiente",
+                    "partial": "Parcial", "cancelled": "Anulada"}.get(cuota["estado"], cuota["estado"])
+        vencida = cuota["estado"] == "late" and cuota["saldo"] > 0
+
+        for columna, valor in ((1, cuota["numero"]), (2, cuota["vence"]), (5, cuota["dias"]),
+                               (6, cuota["monto"]), (7, cuota["pagado"]), (8, cuota["saldo"])):
+            celda = hoja.cell(row=fila, column=columna, value=valor)
+            celda.font = Font(size=8.5)
+            celda.border = Border(bottom=FIN, left=FIN, right=FIN)
             if relleno:
                 celda.fill = PatternFill("solid", fgColor=relleno)
-            fila += 1
+            if columna in (1, 2, 5):
+                celda.alignment = Alignment(horizontal="center")
+            if columna in (6, 7, 8):
+                dinero(celda)
 
-        hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=5)
-        celda = hoja.cell(row=fila, column=1, value="TOTAL DEL PLAN")
-        celda.font = Font(bold=True, size=9)
-        celda.alignment = Alignment(horizontal="right")
+        hoja.merge_cells(start_row=fila, start_column=3, end_row=fila, end_column=4)
+        celda = hoja.cell(row=fila, column=3, value=etiqueta)
+        celda.font = Font(size=8.5, bold=vencida, color=ROJO if vencida else GRIS_TEXTO)
+        celda.alignment = Alignment(horizontal="center")
+        if relleno:
+            celda.fill = PatternFill("solid", fgColor=relleno)
+        fila += 1
 
-        for columna, valor in ((6, plan["total"]), (7, round(plan["total"] - plan["saldo"], 2)), (8, plan["saldo"])):
-            celda = hoja.cell(row=fila, column=columna, value=valor)
-            dinero(celda, negrita=True, color=AZUL, tamano=9)
-            celda.border = Border(top=MEDIO, bottom=MEDIO, left=FIN, right=FIN)
+    hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=5)
+    celda = hoja.cell(row=fila, column=1, value="TOTAL DEL CRÉDITO")
+    celda.font = Font(bold=True, size=9)
+    celda.alignment = Alignment(horizontal="right")
 
-        fila += 2
+    for columna, valor in ((6, plan["total"]), (7, round(plan["total"] - plan["saldo"], 2)), (8, plan["saldo"])):
+        celda = hoja.cell(row=fila, column=columna, value=valor)
+        dinero(celda, negrita=True, color=AZUL, tamano=9)
+        celda.border = Border(top=MEDIO, bottom=MEDIO, left=FIN, right=FIN)
 
-    return fila
+    fila += 2
+
+    hoja.merge_cells(start_row=fila, start_column=1, end_row=fila, end_column=ULTIMA)
+    celda = hoja.cell(row=fila, column=1, value=(
+        "Este plan no se suma al estado de cuenta: la deuda está contada en su factura. "
+        "Los pagos aparecen con su número de recibo en la hoja del estado de cuenta."
+    ))
+    celda.font = Font(size=8, italic=True, color=GRIS_TEXTO)
+    celda.alignment = Alignment(vertical="top", wrap_text=True)
+    hoja.row_dimensions[fila].height = 22
+
+    return fila + 2
 
 
 def recibos(hoja, fila, datos):
@@ -473,7 +565,7 @@ def hoja_cliente(libro, datos):
     fila = resumen(hoja, fila, datos)
     fila = antiguedad(hoja, fila, datos)
     fila = facturas(hoja, fila, datos)
-    fila = planes(hoja, fila, datos)
+    fila = aviso_creditos(hoja, fila, datos)
     fila = recibos(hoja, fila, datos)
     fila = notas(hoja, fila)
     firmas(hoja, fila)
@@ -504,6 +596,11 @@ def main():
 
     for datos in clientes:
         hoja_cliente(libro, datos)
+
+        # Un crédito abierto por hoja: el plan de cuotas no cabe (ni se lee) dentro del
+        # estado de cuenta, y con dos créditos son dos hojas.
+        for plan in datos.get("planes", []):
+            hoja_credito(libro, datos, plan)
 
     destino = sys.argv[2]
     os.makedirs(os.path.dirname(destino) or ".", exist_ok=True)

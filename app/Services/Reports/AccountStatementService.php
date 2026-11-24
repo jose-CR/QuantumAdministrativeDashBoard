@@ -212,8 +212,27 @@ final class AccountStatementService
                 continue;
             }
 
+            $pendientes = $cuotas->filter(fn ($cuota): bool => (float) $cuota->remaining_balance > 0);
+
             $planes[] = [
                 'referencia' => __('ui.statement.credit') . ' #' . $credito->getKey(),
+                'numero' => $credito->getKey(),
+                // Datos del crédito para que la hoja se entienda sola.
+                'estado' => $credito->status,
+                'inicio' => $credito->start_date?->format('d/m/Y'),
+                'dia_pago' => $credito->payment_day,
+                'periodicidad' => $credito->periodicity,
+                'monto_inicial' => round((float) $credito->initial_amount, 2),
+                'prima' => round((float) $credito->down_payment, 2),
+                'financiado' => round((float) $credito->financed_amount, 2),
+                'total_credito' => round((float) $credito->total_amount, 2),
+                'cuotas_total' => (int) $credito->installments,
+                'cuota_monto' => round((float) $credito->installment_amount, 2),
+                'tasa' => round((float) $credito->interest_rate, 2),
+                'interes' => round((float) $credito->total_interest, 2),
+                'saldo_credito' => round((float) $credito->pending_balance, 2),
+                'vencidas' => $pendientes->filter(fn ($cuota): bool => $cuota->due_date?->isPast())->count(),
+                'por_vencer' => $pendientes->count() - $pendientes->filter(fn ($cuota): bool => $cuota->due_date?->isPast())->count(),
                 // Si una factura del cliente tiene el mismo monto, es casi seguro la que
                 // originó el crédito: se dice, pero no se da por hecho.
                 'factura' => $this->matchingInvoiceNumber($customer, (float) $credito->total_amount, $creditos),
@@ -224,6 +243,10 @@ final class AccountStatementService
                     'pagado' => round((float) $cuota->amount - (float) $cuota->remaining_balance, 2),
                     'saldo' => round((float) $cuota->remaining_balance, 2),
                     'estado' => $cuota->status,
+                    // Días de atraso: solo si sigue debiendo y ya venció.
+                    'dias' => (float) $cuota->remaining_balance > 0 && $cuota->due_date?->isPast()
+                        ? max(0, (int) $cuota->due_date->copy()->startOfDay()->diffInDays(now()->startOfDay(), false))
+                        : null,
                 ])->values()->all(),
                 'total' => round((float) $cuotas->sum('amount'), 2),
                 'saldo' => round((float) $cuotas->sum('remaining_balance'), 2),

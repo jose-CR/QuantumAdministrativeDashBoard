@@ -251,6 +251,54 @@ class AccountStatementTest extends TestCase
         @unlink($ruta);
     }
 
+    public function test_cada_credito_abierto_va_en_su_propia_hoja(): void
+    {
+        $cliente = Customer::factory()->create(['full_name' => 'Cliente Dos Créditos']);
+
+        $this->factura($cliente, 'F-300', 600, 0, '2026-10-01');
+
+        $cuotas = [['2026-11-05', 'pending'], ['2026-12-05', 'pending']];
+
+        // Dos créditos: dos hojas, además de la del estado de cuenta.
+        foreach ([600, 400] as $indice => $monto) {
+            $credito = Credit::factory()->create([
+                'customer_id' => $cliente->id,
+                'status' => 'active',
+                'installments' => 2,
+                'installment_amount' => $monto / 2,
+                'total_amount' => $monto,
+                'pending_balance' => $monto,
+            ]);
+
+            foreach ($cuotas as $posicion => [$vence, $estado]) {
+                $credito->installments()->create([
+                    'number' => $posicion + 1,
+                    'amount' => $monto / 2,
+                    'remaining_balance' => $monto / 2,
+                    'due_date' => $vence,
+                    'status' => $estado,
+                ]);
+            }
+        }
+
+        $ruta = AccountStatementAction::build($cliente);
+
+        $script = 'import sys, json; from openpyxl import load_workbook; '
+            . 'w = load_workbook(sys.argv[1]); print(json.dumps(w.sheetnames))';
+
+        $hojas = json_decode(trim((string) shell_exec(
+            escapeshellarg(PythonBinary::path()) . ' -c ' . escapeshellarg($script) . ' ' . escapeshellarg($ruta)
+        )), true);
+
+        $this->assertCount(3, $hojas);
+        $this->assertSame('Estado de cuenta', $hojas[0]);
+        $this->assertStringStartsWith('Crédito #', $hojas[1]);
+        $this->assertStringStartsWith('Crédito #', $hojas[2]);
+        $this->assertNotSame($hojas[1], $hojas[2]);
+
+        @unlink($ruta);
+    }
+
     public function test_el_boton_esta_en_la_ficha_solo_si_hay_facturas(): void
     {
         $conFacturas = Customer::factory()->create();
