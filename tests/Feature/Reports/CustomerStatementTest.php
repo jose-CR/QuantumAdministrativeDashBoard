@@ -3,7 +3,6 @@
 namespace Tests\Feature\Reports;
 
 use App\Filament\Admin\Actions\CustomerStatementAction;
-use App\Filament\Admin\Resources\Client\Customers\Pages\ViewCustomer;
 use App\Models\Credit;
 use App\Models\Customer;
 use App\Models\Inflow;
@@ -61,6 +60,20 @@ class CustomerStatementTest extends TestCase
         return [$cliente, $credito];
     }
 
+    /**
+     * Los créditos de un cliente, para alimentar el payload del informe.
+     *
+     * @return \Illuminate\Support\Collection<int, Credit>
+     */
+    private function creditosDe(Customer $cliente): \Illuminate\Support\Collection
+    {
+        return Credit::query()
+            ->where('customer_id', $cliente->id)
+            ->with(['customer.tags'])
+            ->orderBy('id')
+            ->get();
+    }
+
     private function hojas(string $ruta): array
     {
         $script = 'import sys, json; from openpyxl import load_workbook; '
@@ -90,7 +103,7 @@ class CustomerStatementTest extends TestCase
         ]);
 
         $datos = app(CustomerStatementService::class)
-            ->payload(app(CustomerStatementService::class)->customerCredits($cliente));
+            ->payload($this->creditosDe($cliente));
 
         $this->assertCount(1, $datos['clientes']);
         $this->assertCount(2, $datos['clientes'][0]['creditos']);
@@ -103,7 +116,7 @@ class CustomerStatementTest extends TestCase
         [$cliente] = $this->clienteConCredito('Cliente Vencido', 1000, 4, '2026-01-10');
 
         $datos = app(CustomerStatementService::class)
-            ->payload(app(CustomerStatementService::class)->customerCredits($cliente));
+            ->payload($this->creditosDe($cliente));
 
         $resumen = $datos['clientes'][0]['resumen'];
 
@@ -119,12 +132,12 @@ class CustomerStatementTest extends TestCase
         [$dos] = $this->clienteConCredito('Beto Dos');
 
         $datos = app(CustomerStatementService::class)
-            ->payload(app(CustomerStatementService::class)->customerCredits($uno)
-                ->concat(app(CustomerStatementService::class)->customerCredits($dos)));
+            ->payload($this->creditosDe($uno)
+                ->concat($this->creditosDe($dos)));
 
         $ruta = app(CustomerStatementService::class)->build(
-            app(CustomerStatementService::class)->customerCredits($uno)
-                ->concat(app(CustomerStatementService::class)->customerCredits($dos))
+            $this->creditosDe($uno)
+                ->concat($this->creditosDe($dos))
         );
 
         $this->assertFileExists($ruta);
@@ -151,7 +164,7 @@ class CustomerStatementTest extends TestCase
         ]);
 
         $datos = app(CustomerStatementService::class)
-            ->payload(app(CustomerStatementService::class)->customerCredits($cliente));
+            ->payload($this->creditosDe($cliente));
 
         $this->assertSame('Vendedor Real', $datos['clientes'][0]['vendedor']);
         $this->assertSame('Vendedor Real', $datos['vendedores'][0]['vendedor']);

@@ -7,7 +7,6 @@ use App\Models\Customer;
 use App\Support\ElSalvadorCatalogo;
 use App\Support\PythonBinary;
 use App\Support\TempWorkspace;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -31,18 +30,6 @@ final class CustomerStatementService
             ->overdue()
             ->with(['customer.tags'])
             ->orderByDesc('pending_balance')
-            ->get();
-    }
-
-    /**
-     * Todos los créditos de una persona, vencidos o al día.
-     */
-    public function customerCredits(Customer $customer): Collection
-    {
-        return Credit::query()
-            ->where('customer_id', $customer->id)
-            ->with(['customer.tags'])
-            ->orderBy('id')
             ->get();
     }
 

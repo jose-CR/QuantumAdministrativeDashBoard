@@ -303,6 +303,7 @@ def aviso_creditos(hoja, fila, datos):
 
 def nombre_hoja_credito(plan):
     nombre = f"Crédito #{plan['numero']}"
+    # Un nombre de hoja no admite estos caracteres; el backslash es uno solo.
     for caracter in ("/", "\\", "?", "*", "[", "]", ":"):
         nombre = nombre.replace(caracter, "-")
     return nombre[:31]

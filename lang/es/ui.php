@@ -203,7 +203,7 @@ return [
         'no_invoices' => 'Este cliente no tiene facturas cargadas.',
         'credit' => 'Crédito',
         'credit_payment' => 'Pago de cuota',
-        'overdue' => 'Informe de estados de cuenta',
+        'overdue' => 'Informe de créditos vencidos',
         'heading' => 'Descargar estados de cuenta',
         'description' => 'Un Excel con una hoja por cliente: sus datos, sus créditos, las cuotas que debe y el historial de pagos.',
         'download' => 'Descargar',

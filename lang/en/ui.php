@@ -203,7 +203,7 @@ return [
         'no_invoices' => 'This customer has no invoices recorded.',
         'credit' => 'Credit',
         'credit_payment' => 'Installment payment',
-        'overdue' => 'Customer statements report',
+        'overdue' => 'Overdue credits report',
         'heading' => 'Download customer statements',
         'description' => 'One Excel file with a sheet per customer: details, credits, installments owed and payment history.',
         'download' => 'Download',

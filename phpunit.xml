@@ -17,7 +17,10 @@
             <directory>app</directory>
         </include>
     </source>
+    <!-- Con la suite completa compilando vistas, los 128 MB por defecto no alcanzan:
+         sin esto muere con "Allowed memory size exhausted" aunque los tests estén bien. -->
     <php>
+        <ini name="memory_limit" value="512M"/>
         <env name="APP_ENV" value="testing"/>
         <env name="APP_MAINTENANCE_DRIVER" value="file"/>
         <env name="BCRYPT_ROUNDS" value="4"/>
