@@ -18,6 +18,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\DatePicker;
+use App\Filament\Concerns\MonthFilter;
 use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\Summarizers\Sum;
 use Filament\Tables\Columns\TextColumn;
@@ -35,7 +36,8 @@ class InflowsTable
         return $table
             ->columns([
                 TextColumn::make('invoice_number')
-                    ->label(__('resources.flow.inflow.cod_invoice')),
+                    ->label(__('resources.flow.inflow.cod_invoice'))
+                    ->searchable(),
                 
                 TextColumn::make('document_type')
                     ->label(__('ui.document_types.label'))
@@ -48,7 +50,8 @@ class InflowsTable
                     ->label(__('resources.flow.inflow.date')),
 
                 TextColumn::make('customer.full_name')
-                    ->label(__('resources.flow.inflow.client')),
+                    ->label(__('resources.flow.inflow.client'))
+                    ->searchable(),
 
                 TextColumn::make('amount')
                     ->money('usd')
@@ -87,7 +90,8 @@ class InflowsTable
                     ->color(fn (?string $state): string => PaymentStatus::color($state)),
 
                 TextColumn::make('salesperson')
-                    ->label(__('resources.flow.inflow.salesperson')),
+                    ->label(__('resources.flow.inflow.salesperson'))
+                    ->searchable(),
 
                 // Etiquetas de la entrada (tipo `inflow`): se agregan con el botón de
                 // la fila, igual que en la ficha del cliente.
@@ -108,6 +112,8 @@ class InflowsTable
                     ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : __('ui.tables.no_attachments')),
             ])
             ->filters([
+                MonthFilter::make(Inflow::class, 'date'),
+
                 SelectFilter::make('payment_status')
                     ->label(__('resources.flow.inflow.payment_status'))
                     ->options([
@@ -157,6 +163,13 @@ class InflowsTable
                         ->where('payment_status', 'partial')
                         ->where('amount_paid', '<=', 0)),
             ])
+            // Sin esto Postgres devuelve las filas en el orden que quiere y una
+            // factura del 15 aparece entre las del 20.
+            ->defaultSort('date', 'desc')
+            ->persistSortInSession()
+            ->striped()
+            ->paginated([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
             ->recordActions([
                 ActionGroup::make([
                     EditAction::make()

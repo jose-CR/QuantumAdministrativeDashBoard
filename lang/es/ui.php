@@ -287,6 +287,8 @@ return [
     ],
 
     'tables' => [
+        'month' => 'Mes',
+        'all_months' => 'Todos los meses',
         'total' => 'Total',
         'items' => 'Artículos',
         'no_attachments' => 'Sin adjuntos',

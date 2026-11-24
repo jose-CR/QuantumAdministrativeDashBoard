@@ -12,6 +12,7 @@ use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use App\Filament\Concerns\MonthFilter;
 use App\Filament\Concerns\TagsColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -30,7 +31,8 @@ class OutflowsTable
                     ->label(__('resources.flow.outflow.date')),
 
                 TextColumn::make('company')
-                    ->label(__('resources.flow.outflow.company')),
+                    ->label(__('resources.flow.outflow.company'))
+                    ->searchable(),
 
                 TextColumn::make('document_type')
                     ->label(__('ui.document_types.label'))
@@ -39,7 +41,8 @@ class OutflowsTable
                     ->color(fn (?string $state): string => DocumentTypes::color($state)),
 
                 TextColumn::make('invoice_code')
-                    ->label(__('resources.flow.outflow.cod_invoice')),
+                    ->label(__('resources.flow.outflow.cod_invoice'))
+                    ->searchable(),
 
                 TextColumn::make('quantity')
                     ->label(__('resources.flow.outflow.quantity')),
@@ -50,7 +53,9 @@ class OutflowsTable
 
                 TextColumn::make('source')->label(__('resources.flow.outflow.source')),
 
-                TextColumn::make('area')->label(__('resources.flow.outflow.area')),
+                TextColumn::make('area')
+                    ->label(__('resources.flow.outflow.area'))
+                    ->searchable(),
 
                 // Etiquetas de la salida (tipo `outflow`): para marcar, por ejemplo,
                 // compras de repuestos o gastos de taller.
@@ -71,10 +76,18 @@ class OutflowsTable
                     ->formatStateUsing(fn (int $state) => $state > 0 ? "{$state} archivo(s)" : __('ui.tables.no_attachments')),
             ])
             ->filters([
+                MonthFilter::make(Outflow::class, 'invoice_date'),
+
                 SelectFilter::make('document_type')
                     ->label(__('ui.document_types.label'))
                     ->options(DocumentTypes::options(DocumentTypes::outflow())),
             ])
+            // Más reciente primero: la última compra es la que se mira.
+            ->defaultSort('invoice_date', 'desc')
+            ->persistSortInSession()
+            ->striped()
+            ->paginated([10, 25, 50, 100])
+            ->defaultPaginationPageOption(25)
             ->recordActions([
                 EditAction::make()
                     ->url($editUrl),
