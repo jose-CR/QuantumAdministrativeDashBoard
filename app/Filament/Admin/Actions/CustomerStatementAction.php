@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Actions;
 
-use App\Models\Customer;
 use App\Services\Reports\CustomerStatementService;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
@@ -29,26 +28,14 @@ final class CustomerStatementAction
             });
     }
 
-    public static function customer(): Action
-    {
-        return self::base()
-            ->label(__('ui.statement.customer'))
-            ->visible(fn (Customer $record): bool => $record->credits()->exists())
-            ->action(function (Customer $record): ?BinaryFileResponse {
-                $servicio = app(CustomerStatementService::class);
-
-                return self::download($servicio, $servicio->customerCredits($record));
-            });
-    }
-
     private static function base(): Action
     {
         return Action::make('estadoDeCuenta')
             ->icon('heroicon-o-document-arrow-down')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading(__('ui.statement.heading'))
-            ->modalDescription(__('ui.statement.description'))
+            ->modalHeading(__('ui.statement.overdue_heading'))
+            ->modalDescription(__('ui.statement.overdue_description'))
             ->modalSubmitActionLabel(__('ui.statement.download'));
     }
 

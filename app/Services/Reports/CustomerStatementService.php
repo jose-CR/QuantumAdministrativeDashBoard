@@ -6,7 +6,7 @@ use App\Models\Credit;
 use App\Models\Customer;
 use App\Support\ElSalvadorCatalogo;
 use App\Support\PythonBinary;
-use Illuminate\Database\Eloquent\Builder;
+use App\Support\TempWorkspace;
 use Illuminate\Support\Collection;
 use RuntimeException;
 use Symfony\Component\Process\Process;
@@ -34,18 +34,6 @@ final class CustomerStatementService
     }
 
     /**
-     * Todos los créditos de una persona, vencidos o al día.
-     */
-    public function customerCredits(Customer $customer): Collection
-    {
-        return Credit::query()
-            ->where('customer_id', $customer->id)
-            ->with(['customer.tags'])
-            ->orderBy('id')
-            ->get();
-    }
-
-    /**
      * Genera el archivo y devuelve su ruta.
      *
      * @param  Collection<int, Credit>  $credits
@@ -56,8 +44,7 @@ final class CustomerStatementService
             throw new RuntimeException(__('ui.statement.nothing'));
         }
 
-        $carpeta = storage_path('app/private/estados-de-cuenta');
-        @mkdir($carpeta, 0775, true);
+        $carpeta = TempWorkspace::directory();
 
         $marca = uniqid('estado-', true);
         $json = $carpeta . '/data-' . $marca . '.json';
