@@ -2,10 +2,10 @@
 
 namespace App\Services\Credits;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Credit;
 use App\Models\Installment;
 use App\Services\InstallmentGeneratorService;
-use InvalidArgumentException;
 
 class InstallmentSyncService
 {
@@ -27,9 +27,8 @@ class InstallmentSyncService
         }
 
         if ($count < $last->number) {
-            throw new InvalidArgumentException(
-                'No se puede reducir el número de cuotas de un crédito ya generado.'
-            );
+            // Ya hay cuotas con ese número: bajar la cantidad dejaría cuotas huérfanas.
+            throw BusinessRuleException::field('installments', __('ui.validation.installments_cannot_reduce'));
         }
 
         // 1. Cuotas faltantes: la fecha sale del día de pago pactado, igual que al

@@ -2,6 +2,7 @@
 
 namespace App\Services\Credits;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Credit;
 use App\Models\CreditItem;
 use App\Models\Customer;
@@ -20,13 +21,13 @@ class RefinancingService
             $oldCredit = Credit::lockForUpdate()->findOrFail($oldCredit->id);
 
             if ($oldCredit->status !== 'active') {
-                throw new Exception('Solo se pueden refinanciar créditos activos.');
+                throw BusinessRuleException::document(__('ui.validation.credit_not_active'));
             }
 
             $saldo = round((float) $oldCredit->pending_balance, 2);
 
             if ($saldo <= 0) {
-                throw new Exception('Este crédito no tiene saldo pendiente: no hay nada que refinanciar.');
+                throw BusinessRuleException::document(__('ui.validation.nothing_to_refinance'));
             }
 
             /*

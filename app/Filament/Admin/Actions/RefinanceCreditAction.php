@@ -2,10 +2,11 @@
 
 namespace App\Filament\Admin\Actions;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Credit;
 use App\Services\Credits\RefinancingService;
 use App\Services\LoanCalculatorService;
-use Exception;
+use App\Support\Ui\Alert;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
@@ -217,25 +218,13 @@ class RefinanceCreditAction extends Action
                 $credit = $this->resolveCredit($record);
 
                 if (! $credit) {
-                    Notification::make()
-                        ->title('No se pudo refinanciar')
-                        ->body(__('ui.refinance.no_credit'))
-                        ->danger()
-                        ->send();
-
-                    $this->halt();
+                    Alert::stop(__('ui.refinance.no_credit'), __('ui.refinance.failed'));
                 }
 
                 try {
                     $nuevo = app(RefinancingService::class)->execute($credit->client, $credit, $data);
-                } catch (Exception $e) {
-                    Notification::make()
-                        ->title('No se pudo refinanciar')
-                        ->body($e->getMessage())
-                        ->danger()
-                        ->send();
-
-                    $this->halt();
+                } catch (BusinessRuleException $error) {
+                    Alert::fromRule($error, __('ui.refinance.failed'));
                 }
 
                 Notification::make()

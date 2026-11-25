@@ -73,6 +73,7 @@ return [
         'auto_option' => 'Calculado según la cuota',
         'no_credit' => 'No hay un crédito activo con saldo para refinanciar.',
         'created_title' => 'Crédito refinanciado',
+        'failed' => 'No se pudo refinanciar',
         'created_body' => 'Crédito #%d por $%s. El #%d quedó cerrado.',
     ],
 
@@ -390,6 +391,8 @@ return [
         'down_payment_over_initial' => 'El pago inicial no puede ser mayor al monto inicial.',
         'installments_positive' => 'El número de cuotas debe ser mayor que cero.',
         'nothing_to_finance' => 'No hay saldo que financiar: el pago inicial cubre el monto total.',
+        'installments_cannot_reduce' => 'No se puede reducir el número de cuotas de un crédito que ya tiene cuotas generadas.',
+        'nothing_to_refinance' => 'Este crédito no tiene saldo pendiente: no hay nada que refinanciar.',
         'installments_over_max' => 'El número de cuotas no puede ser mayor a :max.',
         'interest_over_max' => 'La tasa de interés por cuota no puede superar :max%.',
         'installment_amount_positive' => 'El monto de la cuota debe ser mayor que cero.',

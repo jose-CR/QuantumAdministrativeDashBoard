@@ -199,6 +199,57 @@ class ErrorMessagesTest extends TestCase
         }
     }
 
+    public function test_no_se_pueden_quitar_cuotas_de_un_credito_ya_generado(): void
+    {
+        [$credito] = $this->creditoConCuota(600);
+
+        // Ya tiene 12 cuotas generadas: bajar la cantidad dejaría cuotas huérfanas.
+        for ($numero = 2; $numero <= 12; $numero++) {
+            $credito->installments()->create([
+                'number' => $numero,
+                'amount' => 50,
+                'remaining_balance' => 50,
+                'due_date' => now()->addMonths($numero - 1)->toDateString(),
+                'status' => 'pending',
+            ]);
+        }
+
+        $credito->update(['installments' => 6, 'installment_amount' => 50]);
+
+        $this->expectException(BusinessRuleException::class);
+
+        try {
+            app(\App\Services\Credits\InstallmentSyncService::class)->sync($credito->fresh());
+        } catch (BusinessRuleException $error) {
+            // El error apunta al campo «Cuotas» de la pantalla del crédito.
+            $this->assertSame('installments', $error->campo);
+            $this->assertSame(__('ui.validation.installments_cannot_reduce'), $error->getMessage());
+
+            throw $error;
+        }
+    }
+
+    public function test_refinanciar_un_credito_cancelado_dice_por_que(): void
+    {
+        [$credito] = $this->creditoConCuota(500);
+        $credito->update(['status' => 'cancelled']);
+
+        $this->expectException(BusinessRuleException::class);
+
+        try {
+            app(\App\Services\Credits\RefinancingService::class)->execute(
+                $credito->client,
+                $credito->fresh(),
+                ['installments' => 6, 'interest_rate' => 0],
+            );
+        } catch (BusinessRuleException $error) {
+            $this->assertNull($error->campo);
+            $this->assertSame(__('ui.validation.credit_not_active'), $error->getMessage());
+
+            throw $error;
+        }
+    }
+
     public function test_la_accion_de_pagar_esta_conectada_al_aviso(): void
     {
         // La clase existe y expone la acción: si se rompe el `use`, esto falla.

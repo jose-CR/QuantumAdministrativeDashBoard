@@ -73,6 +73,7 @@ return [
         'auto_option' => 'Calculated from the installment',
         'no_credit' => 'There is no active credit with a balance to refinance.',
         'created_title' => 'Credit refinanced',
+        'failed' => 'The credit could not be refinanced',
         'created_body' => 'Credit #%d for $%s. #%d was closed.',
     ],
 
@@ -390,6 +391,8 @@ return [
         'down_payment_over_initial' => 'The down payment cannot be more than the initial amount.',
         'installments_positive' => 'The number of installments must be greater than zero.',
         'nothing_to_finance' => 'Nothing to finance: the down payment covers the total amount.',
+        'installments_cannot_reduce' => 'The number of installments cannot be reduced on a credit that already has installments.',
+        'nothing_to_refinance' => 'This credit has no pending balance: there is nothing to refinance.',
         'installments_over_max' => 'The number of installments cannot be more than :max.',
         'interest_over_max' => 'The interest rate per installment cannot exceed :max%.',
         'installment_amount_positive' => 'The installment amount must be greater than zero.',
