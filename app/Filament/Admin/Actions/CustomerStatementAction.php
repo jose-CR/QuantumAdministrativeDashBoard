@@ -34,8 +34,8 @@ final class CustomerStatementAction
             ->icon('heroicon-o-document-arrow-down')
             ->color('success')
             ->requiresConfirmation()
-            ->modalHeading(__('ui.statement.heading'))
-            ->modalDescription(__('ui.statement.description'))
+            ->modalHeading(__('ui.statement.overdue_heading'))
+            ->modalDescription(__('ui.statement.overdue_description'))
             ->modalSubmitActionLabel(__('ui.statement.download'));
     }
 
