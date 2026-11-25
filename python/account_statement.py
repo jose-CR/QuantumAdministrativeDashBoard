@@ -37,6 +37,10 @@ AMBAR = "9A6700"
 ROJO = "B42318"
 
 DINERO = '"$"#,##0.00'
+
+# Caracteres que openpyxl no acepta en el nombre de una hoja.
+# `chr(92)` es la barra invertida: escribirla escapada en el código es un lío.
+PROHIBIDOS = "/" + chr(92) + "?*[]:"
 FIN = Side(style="thin", color="C9D2DC")
 MEDIO = Side(style="medium", color=AZUL)
 
@@ -304,7 +308,7 @@ def aviso_creditos(hoja, fila, datos):
 def nombre_hoja_credito(plan):
     nombre = f"Crédito #{plan['numero']}"
     # Un nombre de hoja no admite estos caracteres; el backslash es uno solo.
-    for caracter in ("/", "\\", "?", "*", "[", "]", ":"):
+    for caracter in PROHIBIDOS:
         nombre = nombre.replace(caracter, "-")
     return nombre[:31]
 
@@ -554,8 +558,15 @@ def firmas(hoja, fila):
     return fila + 4
 
 
-def hoja_cliente(libro, datos):
-    hoja = libro.create_sheet("Estado de cuenta")
+def hoja_cliente(libro, datos, varios=False):
+    # Con un solo cliente la hoja se llama «Estado de cuenta»; si algún día se bajan
+    # varios de golpe, cada hoja lleva el nombre del cliente para no repetirse.
+    titulo = "Estado de cuenta" if not varios else f"Cuenta {datos['cliente']['nombre']}"[:31]
+
+    for caracter in PROHIBIDOS:
+        titulo = titulo.replace(caracter, "-")
+
+    hoja = libro.create_sheet(titulo)
     hoja.sheet_properties.tabColor = AZUL
 
     for columna, ancho in ANCHOS.items():
@@ -596,7 +607,7 @@ def main():
     clientes = payload.get("clientes") or [payload]
 
     for datos in clientes:
-        hoja_cliente(libro, datos)
+        hoja_cliente(libro, datos, varios=len(clientes) > 1)
 
         # Un crédito abierto por hoja: el plan de cuotas no cabe (ni se lee) dentro del
         # estado de cuenta, y con dos créditos son dos hojas.
