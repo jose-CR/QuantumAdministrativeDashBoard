@@ -2,14 +2,14 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Exceptions\BusinessRuleException;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Services\Credits\InstallmentSyncService;
 use App\Services\LoanCalculatorService;
+use App\Support\Ui\Alert;
 use Filament\Actions\DeleteAction;
-use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
-use Filament\Support\Exceptions\Halt;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use InvalidArgumentException;
@@ -38,10 +38,11 @@ class EditLoans extends EditRecord
 
                 return $record;
             });
+        } catch (BusinessRuleException $e) {
+            Alert::fromRule($e, __('ui.errors.save_credit'));
         } catch (InvalidArgumentException $e) {
-            Notification::make()->danger()->title($e->getMessage())->send();
-
-            throw new Halt();
+            // Los servicios viejos todavía lanzan el mensaje suelto.
+            Alert::stop($e->getMessage(), __('ui.errors.save_credit'));
         }
     }
 

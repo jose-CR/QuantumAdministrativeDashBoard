@@ -212,6 +212,13 @@ return [
         'no_salesperson' => 'No salesperson',
     ],
 
+    'errors' => [
+        'title' => 'Could not complete',
+        'payment' => 'The payment could not be recorded',
+        'save_credit' => 'The credit could not be saved',
+        'unexpected' => 'Something unexpected happened and nothing was saved. If it happens again, tell the administrator.',
+    ],
+
     'tags' => [
         'manage' => 'Tags',
         'manage_help' => 'Type to search or create a new tag.',
@@ -383,6 +390,13 @@ return [
         'down_payment_over_initial' => 'The down payment cannot be more than the initial amount.',
         'installments_positive' => 'The number of installments must be greater than zero.',
         'nothing_to_finance' => 'Nothing to finance: the down payment covers the total amount.',
+        'installments_over_max' => 'The number of installments cannot be more than :max.',
+        'interest_over_max' => 'The interest rate per installment cannot exceed :max%.',
+        'installment_amount_positive' => 'The installment amount must be greater than zero.',
+        'installments_total_too_high' => 'The installments total ($:total) is more than :ratio times the financed amount. Check the installment amount.',
+        'credit_not_active' => 'Payments can only be recorded on active credits.',
+        'payment_amount_positive' => 'The payment amount must be greater than zero.',
+        'payment_over_balance' => 'The payment of $:amount exceeds what is owed on that installment: $:pending left.',
         'interest_not_negative' => 'The interest rate cannot be negative.',
         'tag_taken' => 'A tag with that name already exists.',
     ],

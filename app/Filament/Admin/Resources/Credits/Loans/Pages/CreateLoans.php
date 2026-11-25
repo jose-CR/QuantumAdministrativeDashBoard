@@ -2,11 +2,13 @@
 
 namespace App\Filament\Admin\Resources\Credits\Loans\Pages;
 
+use App\Exceptions\BusinessRuleException;
 use App\Filament\Admin\Resources\Client\Customers\CustomerResource;
 use App\Filament\Admin\Resources\Credits\Loans\LoansResource;
 use App\Models\User;
 use App\Services\InstallmentGeneratorService;
 use App\Services\LoanCalculatorService;
+use App\Support\Ui\Alert;
 use Filament\Facades\Filament;
 use Filament\Resources\Pages\CreateRecord;
 
@@ -16,13 +18,15 @@ class CreateLoans extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
+        try {
+            $calculado = app(LoanCalculatorService::class)->calculate($data);
+        } catch (BusinessRuleException $error) {
+            // Sin esto, un número mal puesto (cuotas en cero, prima mayor al monto)
+            // salía como pantalla de error en vez de marcar el campo.
+            Alert::fromRule($error, __('ui.errors.save_credit'));
+        }
 
-        $calculator = app(LoanCalculatorService::class);
-
-        return array_merge(
-            $data,
-            $calculator->calculate($data)
-        );
+        return array_merge($data, $calculado);
     }
 
     protected function afterCreate(): void

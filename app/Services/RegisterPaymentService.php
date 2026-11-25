@@ -7,7 +7,7 @@ use App\Models\Installment;
 use App\Models\PaymentHistory;
 use App\Services\Credits\CloseCreditService;
 use Illuminate\Support\Facades\DB;
-use InvalidArgumentException;
+use App\Exceptions\BusinessRuleException;
 
 class RegisterPaymentService
 {
@@ -41,12 +41,14 @@ class RegisterPaymentService
 
             $amount = round($amount, 2);
 
+            // El error dice qué pasa y, cuando corresponde, a qué campo pertenece: la
+            // pantalla lo marca en rojo en vez de mostrar un aviso suelto.
             if ($credit->status !== 'active') {
-                throw new InvalidArgumentException('Solo se pueden registrar pagos en créditos activos.');
+                throw BusinessRuleException::document(__('ui.validation.credit_not_active'));
             }
 
             if ($amount <= 0) {
-                throw new InvalidArgumentException('El monto del pago debe ser mayor que cero.');
+                throw BusinessRuleException::field('amount', __('ui.validation.payment_amount_positive'));
             }
 
             // Lo máximo que este pago puede cubrir
@@ -63,9 +65,10 @@ class RegisterPaymentService
             $maxPayable = round((float) $unpaid->sum('remaining_balance'), 2);
 
             if ($amount > $maxPayable) {
-                throw new InvalidArgumentException(
-                    "El pago ({$amount}) supera lo pendiente ({$maxPayable})."
-                );
+                throw BusinessRuleException::field('amount', __('ui.validation.payment_over_balance', [
+                    'amount' => number_format($amount, 2),
+                    'pending' => number_format($maxPayable, 2),
+                ]));
             }
 
             $previousBalance = $credit->pending_balance;

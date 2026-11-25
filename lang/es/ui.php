@@ -212,6 +212,13 @@ return [
         'no_salesperson' => 'Sin vendedor',
     ],
 
+    'errors' => [
+        'title' => 'No se pudo completar',
+        'payment' => 'No se pudo registrar el pago',
+        'save_credit' => 'No se pudo guardar el crédito',
+        'unexpected' => 'Ocurrió un error inesperado y no se guardó nada. Si vuelve a pasar, avisá al administrador.',
+    ],
+
     'tags' => [
         'manage' => 'Etiquetas',
         'manage_help' => 'Escribí para buscar o crear una etiqueta nueva.',
@@ -383,6 +390,13 @@ return [
         'down_payment_over_initial' => 'El pago inicial no puede ser mayor al monto inicial.',
         'installments_positive' => 'El número de cuotas debe ser mayor que cero.',
         'nothing_to_finance' => 'No hay saldo que financiar: el pago inicial cubre el monto total.',
+        'installments_over_max' => 'El número de cuotas no puede ser mayor a :max.',
+        'interest_over_max' => 'La tasa de interés por cuota no puede superar :max%.',
+        'installment_amount_positive' => 'El monto de la cuota debe ser mayor que cero.',
+        'installments_total_too_high' => 'El total de las cuotas ($:total) supera :ratio veces lo financiado. Revisá el monto de la cuota.',
+        'credit_not_active' => 'Solo se pueden registrar pagos en créditos activos.',
+        'payment_amount_positive' => 'El monto del pago tiene que ser mayor que cero.',
+        'payment_over_balance' => 'El pago de $:amount supera lo que se debe de esa cuota: quedan $:pending.',
         'interest_not_negative' => 'La tasa de interés no puede ser negativa.',
         'tag_taken' => 'Ya hay una etiqueta con ese nombre.',
     ],

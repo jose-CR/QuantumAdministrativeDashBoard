@@ -2,19 +2,19 @@
 
 namespace App\Filament\Admin\Actions;
 
+use App\Exceptions\BusinessRuleException;
 use App\Models\Bank;
 use App\Models\Credit;
 use App\Models\Customer as ModelsCustomer;
 use App\Models\Installment;
 use App\Services\RegisterPaymentService;
+use App\Support\Ui\Alert;
 use Filament\Actions\Action;
 use Filament\Forms\Components\DatePicker;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
-use Filament\Support\Exceptions\Halt;
 use InvalidArgumentException;
 
 class PayInstallmentAction extends Action
@@ -127,10 +127,11 @@ class PayInstallmentAction extends Action
                         bankId: $data['bank_id'] ?? null,
                         paymentDate: $data['payment_date'],
                     );
+                } catch (BusinessRuleException $e) {
+                    // Con campo, el mensaje sale debajo del input; sin campo, aviso.
+                    Alert::fromRule($e, __('ui.errors.payment'));
                 } catch (InvalidArgumentException $e) {
-                    Notification::make()->danger()->title($e->getMessage())->send();
-
-                    throw new Halt();
+                    Alert::stop($e->getMessage(), __('ui.errors.payment'));
                 }
 
                 $record->refresh();

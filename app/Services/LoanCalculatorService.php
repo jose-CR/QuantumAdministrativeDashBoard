@@ -2,7 +2,7 @@
 
 namespace App\Services;
 
-use InvalidArgumentException;
+use App\Exceptions\BusinessRuleException;
 
 class LoanCalculatorService
 {
@@ -11,9 +11,7 @@ class LoanCalculatorService
         $initialAmount = $this->resolveInitialAmount($data);
 
         if ($initialAmount <= 0) {
-            throw new InvalidArgumentException(
-                __('ui.validation.initial_amount_positive')
-            );
+            throw BusinessRuleException::field('initial_amount', __('ui.validation.initial_amount_positive'));
         }
 
         $downPayment = round(
@@ -22,15 +20,11 @@ class LoanCalculatorService
         );
 
         if ($downPayment < 0) {
-            throw new InvalidArgumentException(
-                __('ui.validation.down_payment_negative')
-            );
+            throw BusinessRuleException::field('down_payment', __('ui.validation.down_payment_negative'));
         }
 
         if ($downPayment > $initialAmount) {
-            throw new InvalidArgumentException(
-                __('ui.validation.down_payment_over_initial')
-            );
+            throw BusinessRuleException::field('down_payment', __('ui.validation.down_payment_over_initial'));
         }
 
         $financedAmount = round(
@@ -41,17 +35,15 @@ class LoanCalculatorService
         $installments = (int) ($data['installments'] ?? 0);
 
         if ($installments <= 0) {
-            throw new InvalidArgumentException(
-                __('ui.validation.installments_positive')
-            );
+            throw BusinessRuleException::field('installments', __('ui.validation.installments_positive'));
         }
 
         $maxInstallments = (int) config('quantum.installments.max');
 
         if ($installments > $maxInstallments) {
-            throw new InvalidArgumentException(
-                "El número de cuotas no puede ser mayor a {$maxInstallments}."
-            );
+            throw BusinessRuleException::field('installments', __('ui.validation.installments_over_max', [
+                'max' => $maxInstallments,
+            ]));
         }
 
         $interestType = ($data['interest_type'] ?? 'auto') === 'fixed' ? 'fixed' : 'auto';
@@ -59,9 +51,7 @@ class LoanCalculatorService
         if ($interestType === 'fixed') {
             // El interés es el que se pactó: la tasa manda y la cuota sale de ella.
             if ($financedAmount <= 0) {
-                throw new InvalidArgumentException(
-                    __('ui.validation.nothing_to_finance')
-                );
+                throw BusinessRuleException::field('down_payment', __('ui.validation.nothing_to_finance'));
             }
 
             $interestRate = round((float) ($data['interest_rate'] ?? 0), 2);
@@ -69,13 +59,13 @@ class LoanCalculatorService
             $maxRate = (float) config('quantum.interest.max_rate', 20);
 
             if ($interestRate < 0) {
-                throw new InvalidArgumentException(__('ui.validation.interest_not_negative'));
+                throw BusinessRuleException::field('interest_rate', __('ui.validation.interest_not_negative'));
             }
 
             if ($interestRate > $maxRate) {
-                throw new InvalidArgumentException(
-                    "La tasa de interés por cuota no puede superar {$maxRate}%."
-                );
+                throw BusinessRuleException::field('interest_rate', __('ui.validation.interest_over_max', [
+                    'max' => $maxRate,
+                ]));
             }
 
             $totalAmount = round(
@@ -95,9 +85,7 @@ class LoanCalculatorService
             );
 
             if ($installmentAmount <= 0) {
-                throw new InvalidArgumentException(
-                    'El monto de la cuota debe ser mayor que cero.'
-                );
+                throw BusinessRuleException::field('installment_amount', __('ui.validation.installment_amount_positive'));
             }
 
             /*
@@ -140,9 +128,10 @@ class LoanCalculatorService
         $maxRatio = (float) config('quantum.installments.max_total_ratio', 3);
 
         if ($financedAmount > 0 && $totalAmount > $financedAmount * $maxRatio) {
-            throw new InvalidArgumentException(
-                "El total de las cuotas ({$totalAmount}) supera {$maxRatio} veces lo financiado. Revisa el monto de la cuota."
-            );
+            throw BusinessRuleException::field('installment_amount', __('ui.validation.installments_total_too_high', [
+                'total' => number_format($totalAmount, 2),
+                'ratio' => $maxRatio,
+            ]));
         }
 
         return [
