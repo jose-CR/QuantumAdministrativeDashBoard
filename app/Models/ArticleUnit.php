@@ -83,6 +83,14 @@ class ArticleUnit extends Model
             ->implode(' • ');
     }
 
+    /**
+     * Fotos de esta unidad: la del frente, la del tablero, el detalle de la batería.
+     */
+    public function images()
+    {
+        return $this->hasMany(ArticleUnitImage::class)->orderBy('sort')->orderBy('id');
+    }
+
     public function article()
     {
         return $this->belongsTo(Article::class);

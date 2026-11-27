@@ -41,9 +41,22 @@ class Category extends Model
                 return false;
             }
 
+            /*
+             * Las fotos de la galería cuelgan de la categoría: si alguna está publicada
+             * hay una URL viva en algún chat o publicación. Se bloquea el borrado en vez
+             * de dejar enlaces rotos o borrar archivos sin que nadie lo pida.
+             */
+            if ($category->galleryImages()->where('is_public', true)->exists()) {
+                return false;
+            }
+
             $articleIds = $category->articles()->pluck('id');
 
-            DB::transaction(function () use ($articleIds): void {
+            DB::transaction(function () use ($articleIds, $category): void {
+                // Las privadas se van con su archivo; el FK es RESTRICT, así que se
+                // borran por el modelo y no por la base.
+                $category->galleryImages()->get()->each->delete();
+
                 ArticleUnit::query()->whereIn('article_id', $articleIds)->delete();
                 Article::query()->whereIn('id', $articleIds)->delete();
             });
@@ -55,6 +68,14 @@ class Category extends Model
     public function articles()
     {
         return $this->hasMany(Article::class);
+    }
+
+    /**
+     * Fotos de la galería libre que usan esta categoría.
+     */
+    public function galleryImages()
+    {
+        return $this->hasMany(GalleryImage::class);
     }
 
     /**

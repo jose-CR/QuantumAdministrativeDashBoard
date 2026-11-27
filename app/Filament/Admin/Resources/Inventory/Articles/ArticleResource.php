@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\Inventory\Articles;
 
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\CreateArticle;
-use App\Filament\Admin\Resources\Inventory\Articles\RelationManagers\AttachmentsRelationManager;
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\EditArticle;
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\ListArticles;
 use App\Filament\Admin\Resources\Inventory\Articles\Schemas\ArticleForm;
@@ -50,7 +49,8 @@ class ArticleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            AttachmentsRelationManager::class,
+            // Las fotos viven en cada unidad (ArticleUnit → pestaña Imágenes), no en el
+            // artículo: el mismo artículo puede tener diez carritos con fotos distintas.
         ];
     }
 

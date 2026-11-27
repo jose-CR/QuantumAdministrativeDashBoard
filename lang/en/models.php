@@ -38,6 +38,12 @@ return [
             'plural' => 'Categories',
         ],
 
+        'gallery' => [
+            'navigation' => 'Gallery',
+            'singular' => 'Gallery image',
+            'plural' => 'Gallery',
+        ],
+
         'article_units' => [
             'navigation' => 'Article Units',
             'singular' => 'Article Unit',

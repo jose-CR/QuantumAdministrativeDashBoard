@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Attachments\PrivateMediaController;
 use App\Http\Controllers\Attachments\PublicImageController;
 use App\Http\Controllers\Payroll\PayslipDownloadController;
 use App\Http\Controllers\Report\CashReportDownloadController;
@@ -29,6 +30,11 @@ Route::get('/payroll/{filename}', PayslipDownloadController::class)
 Route::get('/img/{token}/{name?}', PublicImageController::class)
     ->name('attachments.public')
     ->middleware('throttle:120,1');
+
+// Archivo privado con sesión: miniaturas y visor del panel (URL firmada, 30 minutos).
+Route::get('/media/{type}/{id}/ver', PrivateMediaController::class)
+    ->name('media.private')
+    ->middleware(['web', 'auth', 'signed']);
 
 Route::get('/attachments/{attachment}/ver', function (Attachment $attachment) {
     return Storage::disk($attachment->disk)->response($attachment->path);

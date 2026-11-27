@@ -2,42 +2,59 @@
 
 namespace App\Http\Controllers\Attachments;
 
-use App\Models\Attachment;
+use App\Support\Media\MediaTypes;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Sirve un adjunto publicado, sin sesión: es la URL que se comparte (Mercado Libre,
- * catálogo, redes).
+ * Sirve un archivo publicado, SIN sesión: es la URL que se comparte.
  *
- * Reglas:
- *  - solo adjuntos publicados con token válido; el resto es 404, no 403 (no se
- *    confirma que el archivo exista);
- *  - solo imágenes o PDF, y solo de los tipos que pueden publicar (artículos);
- *  - caché larga e inmutable: el token es único por archivo y su contenido no cambia.
+ * El token aleatorio es la autorización. Se busca en los modelos que publican
+ * (adjuntos, fotos de unidad, galería) y lo que no aparece es 404 — no 403, para no
+ * confirmar que el archivo existe.
  */
 final class PublicImageController
 {
     public function __invoke(string $token, ?string $name = null): StreamedResponse
     {
-        $adjunto = Attachment::query()
-            ->where('public_token', $token)
-            ->where('is_public', true)
-            ->first();
+        $archivo = null;
 
-        abort_unless($adjunto && $adjunto->canBePublic(), 404);
-        abort_unless($adjunto->disk === 'media', 404);
-        abort_unless(Storage::disk($adjunto->disk)->exists($adjunto->path), 404);
+        foreach (MediaTypes::all() as $modelo) {
+            $archivo = $modelo::query()
+                ->where('public_token', $token)
+                ->where('is_public', true)
+                ->first();
 
-        return Storage::disk($adjunto->disk)->response(
-            $adjunto->path,
-            $name ?: basename($adjunto->path),
+            if ($archivo) {
+                break;
+            }
+        }
+
+        abort_unless($archivo && $archivo->canBePublic(), 404);
+
+        // El archivo tiene que estar en la copia pública, no en la privada.
+        abort_unless(Storage::disk('media')->exists($archivo->path), 404);
+
+        return Storage::disk('media')->response(
+            $archivo->path,
+            $name ?: basename($archivo->path),
             [
-                'Content-Type' => $adjunto->mime_type ?: 'application/octet-stream',
+                'Content-Type' => $archivo->mime_type ?? $this->mimeFor($archivo->path),
                 'Cache-Control' => 'public, max-age=31536000, immutable',
                 'X-Robots-Tag' => 'all',
             ],
             'inline',
         );
+    }
+
+    private function mimeFor(string $path): string
+    {
+        return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
+            'png' => 'image/png',
+            'webp' => 'image/webp',
+            'gif' => 'image/gif',
+            'pdf' => 'application/pdf',
+            default => 'image/jpeg',
+        };
     }
 }

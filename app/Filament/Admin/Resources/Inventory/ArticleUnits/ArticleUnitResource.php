@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Inventory\ArticleUnits;
 
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\CreateArticleUnit;
+use App\Filament\Admin\Resources\Inventory\ArticleUnits\RelationManagers\ImagesRelationManager;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\EditArticleUnit;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Pages\ListArticleUnits;
 use App\Filament\Admin\Resources\Inventory\ArticleUnits\Schemas\ArticleUnitForm;
@@ -49,7 +50,7 @@ class ArticleUnitResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ImagesRelationManager::class,
         ];
     }
 

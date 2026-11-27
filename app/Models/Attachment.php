@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\PublishableMedia;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
@@ -10,6 +11,10 @@ use Illuminate\Support\Str;
 
 class Attachment extends Model
 {
+    // Publicar, despublicar y armar la URL: la misma lógica que las imágenes del
+    // inventario (app/Models/Concerns/PublishableMedia.php).
+    use PublishableMedia;
+
     protected $fillable = [
         'collection',
         'disk',
@@ -49,6 +54,12 @@ class Attachment extends Model
 
             if (! $compartido) {
                 Storage::disk($attachment->disk)->delete($attachment->path);
+
+                // Si estaba publicado, la copia de la carpeta pública también se va.
+                if (filled($attachment->private_path)
+                    && Storage::disk('media')->exists($attachment->path)) {
+                    Storage::disk('media')->delete($attachment->path);
+                }
             }
         });
     }
@@ -118,90 +129,22 @@ class Attachment extends Model
         return $this->mime_type === 'application/pdf' || $this->is_image;
     }
 
-    public function isPublished(): bool
-    {
-        return $this->is_public && filled($this->public_token);
-    }
-
     /**
-     * Copia el archivo a la carpeta pública y devuelve la URL para pegar afuera.
+     * El adjunto sigue guardando su disco en la columna `disk`: al publicar pasa a
+     * `media` y al despublicar vuelve al privado del que salió.
      *
-     * El original privado se anota (private_disk/private_path) para que al
-     * despublicar vuelva exactamente al mismo lugar.
+     * @return array<string, mixed>
      */
-    public function publish(): ?string
+    protected function mediaStateOnPublish(): array
     {
-        if (! $this->canBePublic()) {
-            return null;
-        }
-
-        if ($this->isPublished()) {
-            return $this->public_url;
-        }
-
-        $origen = Storage::disk($this->disk);
-
-        if (! $origen->exists($this->path)) {
-            return null;
-        }
-
-        Storage::disk('media')->put($this->path, $origen->get($this->path));
-
-        $this->forceFill([
-            'is_public' => true,
-            'public_token' => Str::random(32),
-            'private_disk' => $this->disk,
-            'private_path' => $this->path,
-            'disk' => 'media',
-        ])->save();
-
-        return $this->public_url;
+        return ['disk' => 'media'];
     }
 
     /**
-     * Despublica: el archivo vuelve a la carpeta privada y la URL deja de existir.
+     * @return array<string, mixed>
      */
-    public function unpublish(): void
+    protected function mediaStateOnUnpublish(string $discoPrivado): array
     {
-        if ($this->is_public && Storage::disk($this->disk)->exists($this->path)) {
-            $destino = $this->private_disk ?: 'attachments';
-
-            Storage::disk($destino)->put($this->path, Storage::disk($this->disk)->get($this->path));
-            Storage::disk($this->disk)->delete($this->path);
-
-            $this->forceFill(['disk' => $destino]);
-        }
-
-        $this->forceFill([
-            'is_public' => false,
-            'public_token' => null,
-            'private_disk' => null,
-            'private_path' => null,
-        ])->save();
-    }
-
-    /**
-     * La URL que se comparte: token aleatorio (no el id) y nombre legible.
-     */
-    public function getPublicUrlAttribute(): ?string
-    {
-        if (! $this->isPublished()) {
-            return null;
-        }
-
-        $base = config('quantum.media_url');
-        $ruta = 'img/' . $this->public_token . '/' . $this->publicFileName();
-
-        return filled($base)
-            ? rtrim((string) $base, '/') . '/' . $ruta
-            : route('attachments.public', ['token' => $this->public_token, 'name' => $this->publicFileName()]);
-    }
-
-    private function publicFileName(): string
-    {
-        $nombre = Str::slug(pathinfo((string) $this->original_name, PATHINFO_FILENAME)) ?: 'archivo';
-        $extension = $this->extension ?: 'jpg';
-
-        return mb_substr($nombre, 0, 60) . '.' . $extension;
+        return ['disk' => $discoPrivado];
     }
 }
