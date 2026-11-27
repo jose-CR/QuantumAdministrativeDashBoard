@@ -2,9 +2,7 @@
 
 namespace App\Support\Media;
 
-use App\Models\ArticleUnitImage;
 use App\Models\Attachment;
-use App\Models\GalleryImage;
 
 /**
  * Los modelos que guardan archivos y pueden servirse por una URL.
@@ -15,10 +13,15 @@ use App\Models\GalleryImage;
 final class MediaTypes
 {
     /** @var array<string, class-string> */
+    /*
+     * Las dos fotos del inventario son adjuntos: la de la unidad es un adjunto con
+     * dueño (la unidad) y la de la galería es un adjunto sin dueño con categoría.
+     * Los alias se conservan para que las URLs firmadas ya generadas sigan sirviendo.
+     */
     private const TYPES = [
         'attachment' => Attachment::class,
-        'unit-image' => ArticleUnitImage::class,
-        'gallery' => GalleryImage::class,
+        'unit-image' => Attachment::class,
+        'gallery' => Attachment::class,
     ];
 
     /**

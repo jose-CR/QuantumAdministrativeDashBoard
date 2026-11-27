@@ -3,8 +3,8 @@
 namespace App\Filament\Admin\Resources\Inventory\Gallery\Tables;
 
 use App\Filament\Concerns\ImageActions;
+use App\Models\Attachment;
 use App\Models\Category;
-use App\Models\GalleryImage;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\ImageColumn;
@@ -20,12 +20,12 @@ class GalleryImagesTable
     {
         return $table
             ->columns([
-                ImageColumn::make('url')
+                ImageColumn::make('image_url')
                     ->label(__('ui.images.image'))
                     ->height(60)
                     ->width(60),
 
-                TextColumn::make('name')
+                TextColumn::make('original_name')
                     ->label(__('ui.images.name'))
                     ->searchable()
                     ->sortable()

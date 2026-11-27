@@ -3,11 +3,10 @@
 namespace App\Filament\Admin\Resources\Inventory\ArticleUnits\RelationManagers;
 
 use App\Filament\Concerns\ImageActions;
-use App\Models\ArticleUnitImage;
+use App\Services\AttachmentService;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
@@ -17,9 +16,8 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Fotos de una unidad: la del frente, el tablero, el detalle de la batería.
- *
- * Se suben privadas y se publican con «Obtener URL» cuando hay que compartirlas.
+ * Fotos de una unidad: son adjuntos del inventario (tabla `attachments`, dueño = la
+ * unidad, colección `images`), no una tabla aparte.
  */
 class ImagesRelationManager extends RelationManager
 {
@@ -35,24 +33,26 @@ class ImagesRelationManager extends RelationManager
     public function form(Schema $schema): Schema
     {
         return $schema->components([
-            TextInput::make('name')
-                ->label(__('ui.images.name'))
-                ->required()
-                ->maxLength(255),
+            FileUpload::make('path')
+                ->label(__('ui.images.image'))
+                ->disk('attachments')
+                ->directory('units')
+                ->image()
+                ->required(),
         ]);
     }
 
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('name')
+            ->recordTitleAttribute('original_name')
             ->columns([
-                ImageColumn::make('url')
+                ImageColumn::make('image_url')
                     ->label(__('ui.images.image'))
                     ->height(60)
                     ->width(60),
 
-                TextColumn::make('name')
+                TextColumn::make('original_name')
                     ->label(__('ui.images.name'))
                     ->searchable()
                     ->wrap(),
@@ -82,18 +82,18 @@ class ImagesRelationManager extends RelationManager
                             ->directory('units')
                             ->image()
                             ->maxSize(10240)
+                            ->storeFiles(false)
                             ->required(),
                     ])
-                    ->action(function (array $data): void {
+                    // El servicio guarda el archivo privado y crea el adjunto con
+                    // dueño = unidad y colección `images`.
+                    ->action(function (array $data, AttachmentService $service): void {
                         $unidad = $this->getOwnerRecord();
                         $orden = (int) $unidad->images()->max('sort');
 
-                        foreach ($data['files'] as $ruta) {
-                            $unidad->images()->create([
-                                'name' => pathinfo((string) $ruta, PATHINFO_FILENAME),
-                                'path' => $ruta,
-                                'sort' => ++$orden,
-                            ]);
+                        foreach ($data['files'] as $archivo) {
+                            $adjunto = $service->store($unidad, $archivo, 'images', 'attachments');
+                            $adjunto->forceFill(['sort' => ++$orden])->save();
                         }
 
                         Notification::make()

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Concerns\PublishableMedia;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -26,11 +27,14 @@ class Attachment extends Model
         'public_token',
         'private_disk',
         'private_path',
+        'category_id',
+        'sort',
     ];
 
     protected $casts = [
         'is_public' => 'boolean',
         'size' => 'integer',
+        'sort' => 'integer',
     ];
 
     protected $appends = [
@@ -53,12 +57,16 @@ class Attachment extends Model
                 ->exists();
 
             if (! $compartido) {
-                Storage::disk($attachment->disk)->delete($attachment->path);
-
-                // Si estaba publicado, la copia de la carpeta pública también se va.
-                if (filled($attachment->private_path)
-                    && Storage::disk('media')->exists($attachment->path)) {
-                    Storage::disk('media')->delete($attachment->path);
+                // Se borran las dos copias: la del disco actual y, si estaba publicado,
+                // la de la carpeta pública y la privada de origen.
+                foreach (array_unique(array_filter([
+                    $attachment->disk,
+                    'media',
+                    $attachment->private_disk,
+                ])) as $disco) {
+                    if (Storage::disk($disco)->exists($attachment->path)) {
+                        Storage::disk($disco)->delete($attachment->path);
+                    }
                 }
             }
         });
@@ -67,6 +75,14 @@ class Attachment extends Model
     public function attachable(): MorphTo
     {
         return $this->morphTo();
+    }
+
+    /**
+     * Categoría del inventario: solo la llevan las fotos sueltas de la galería.
+     */
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
     }
 
     public function getUrlAttribute(): string
@@ -86,6 +102,26 @@ class Attachment extends Model
     public function getIsImageAttribute(): bool
     {
         return str_starts_with($this->mime_type ?? '', 'image/');
+    }
+
+    /**
+     * URL firmada (30 minutos) para ver el archivo con sesión, sin exponerlo.
+     * Es la que usan las miniaturas y el visor del inventario.
+     */
+    public function getImageUrlAttribute(): string
+    {
+        return URL::temporarySignedRoute('media.private', now()->addMinutes(30), [
+            'type' => 'attachment',
+            'id' => $this->getKey(),
+        ]);
+    }
+
+    /**
+     * Nombre editable de la foto (en el inventario se escribe «Carrito Duke — lateral»).
+     */
+    public function getDisplayNameAttribute(): string
+    {
+        return (string) ($this->original_name ?: basename((string) $this->path));
     }
 
     public function getFormattedSizeAttribute(): string
@@ -120,13 +156,40 @@ class Attachment extends Model
         return array_values((array) config('quantum.public_attachments', []));
     }
 
+    /**
+     * Colecciones del inventario: fotos de una unidad y fotos sueltas de la galería.
+     * Son las únicas que se publican sin preguntar de quién son.
+     */
+    public const IMAGE_COLLECTIONS = ['images', 'gallery'];
+
     public function canBePublic(): bool
     {
+        if (in_array($this->collection, self::IMAGE_COLLECTIONS, true)) {
+            // Fotos de producto: solo imágenes, nunca un PDF.
+            return $this->is_image;
+        }
+
         if (! in_array($this->attachable_type, static::publishableTypes(), true)) {
             return false;
         }
 
         return $this->mime_type === 'application/pdf' || $this->is_image;
+    }
+
+    /**
+     * Fotos sueltas: sin dueño y con categoría.
+     */
+    public function scopeGallery($query)
+    {
+        return $query->where('collection', 'gallery')->whereNull('attachable_id');
+    }
+
+    /**
+     * Fotos que cuelgan de una unidad del inventario.
+     */
+    public function scopeUnitImages($query)
+    {
+        return $query->where('collection', 'images');
     }
 
     /**

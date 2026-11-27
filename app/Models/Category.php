@@ -71,11 +71,11 @@ class Category extends Model
     }
 
     /**
-     * Fotos de la galería libre que usan esta categoría.
+     * Fotos de la galería libre que usan esta categoría (adjuntos sin dueño).
      */
     public function galleryImages()
     {
-        return $this->hasMany(GalleryImage::class);
+        return $this->hasMany(Attachment::class)->where('collection', 'gallery');
     }
 
     /**

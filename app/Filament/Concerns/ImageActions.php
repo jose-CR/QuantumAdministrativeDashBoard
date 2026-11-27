@@ -24,11 +24,11 @@ trait ImageActions
         return Action::make('ver')
             ->label(__('ui.images.view'))
             ->icon(Heroicon::OutlinedEye)
-            ->modalHeading(fn (Model $record): string => (string) $record->name)
+            ->modalHeading(fn (Model $record): string => (string) $record->original_name)
             ->modalSubmitAction(false)
             ->modalCancelActionLabel(__('ui.images.close'))
             ->modalContent(fn (Model $record): HtmlString => new HtmlString(
-                '<img src="' . e($record->url) . '" alt="' . e((string) $record->name) . '"'
+                '<img src="' . e($record->image_url) . '" alt="' . e((string) $record->original_name) . '"'
                 . ' style="display:block;margin:0 auto;width:100%;max-width:500px;height:auto;border-radius:.5rem">'
             ));
     }
@@ -49,6 +49,9 @@ trait ImageActions
             ->modalDescription(__('ui.images.get_url_help'))
             ->action(function (Model $record): void {
                 $url = $record->publish();
+
+                // Sin refrescar, la fila sigue pintando el estado anterior (privada).
+                $record->refresh();
 
                 \Filament\Notifications\Notification::make()
                     ->success()
@@ -88,6 +91,7 @@ trait ImageActions
             ->modalDescription(__('ui.images.unpublish_help'))
             ->action(function (Model $record): void {
                 $record->unpublish();
+                $record->refresh();
 
                 \Filament\Notifications\Notification::make()
                     ->success()

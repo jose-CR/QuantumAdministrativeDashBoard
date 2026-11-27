@@ -104,6 +104,9 @@ return [
             'driver' => 'local',
             'root' => storage_path('app/private/attachments'),
             'visibility' => 'private',
+            // Permite URLs temporales firmadas: sin esto la vista previa del archivo
+            // (el FileUpload y la imagen ya subida al editar) no se puede mostrar.
+            'serve' => true,
 
             'permissions' => [
                 'file' => [

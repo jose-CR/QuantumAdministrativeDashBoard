@@ -85,10 +85,14 @@ class ArticleUnit extends Model
 
     /**
      * Fotos de esta unidad: la del frente, la del tablero, el detalle de la batería.
+     * Son adjuntos (tabla `attachments`) cuyo dueño es la unidad.
      */
     public function images()
     {
-        return $this->hasMany(ArticleUnitImage::class)->orderBy('sort')->orderBy('id');
+        return $this->morphMany(Attachment::class, 'attachable')
+            ->where('collection', 'images')
+            ->orderBy('sort')
+            ->orderBy('id');
     }
 
     public function article()
