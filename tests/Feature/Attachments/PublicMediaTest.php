@@ -30,11 +30,10 @@ class PublicMediaTest extends TestCase
         Storage::fake('attachments');
         Storage::fake('media');
 
-        $ruta = $modelo instanceof Article
-            ? UploadedFile::fake()->image($nombre)->store('galeria', 'attachments')
-            : 'cliente/' . $nombre;
-
-        Storage::disk('attachments')->put($ruta, 'contenido');
+        // create() y no image(): fabricar un JPEG real necesita la extensión GD, que el
+        // servidor no tiene instalada. Para lo que se prueba —el registro, el disco y la
+        // ruta pública— alcanza con un archivo con su tipo declarado.
+        $ruta = UploadedFile::fake()->create($nombre, 64, $mime)->store('galeria', 'attachments');
 
         return $modelo->attachments()->create([
             'collection' => 'galeria',
