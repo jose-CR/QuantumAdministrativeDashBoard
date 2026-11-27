@@ -9,6 +9,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Forms\Components\FileUpload;
 use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
+use Illuminate\Database\Eloquent\Model;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -23,9 +24,11 @@ class AttachmentsRelationManager extends RelationManager
 {
     protected static string $relationship = 'attachments';
 
-    protected static ?string $title = null;
-
-    public function getTitle(): string
+    /**
+     * En Filament 4 el título de un RelationManager es estático: se sobreescribe
+     * con la misma firma (no se puede llamar a __() en una propiedad).
+     */
+    public static function getTitle(Model $ownerRecord, string $pageClass): string
     {
         return __('ui.attachments.title');
     }
