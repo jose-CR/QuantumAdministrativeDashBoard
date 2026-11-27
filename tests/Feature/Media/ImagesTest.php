@@ -151,13 +151,22 @@ class ImagesTest extends TestCase
         $this->assertDatabaseHas('gallery_images', ['id' => $imagen->id]);
     }
 
-    public function test_sin_el_permiso_de_publicar_las_acciones_no_aparecen(): void
+    public function test_publicar_pide_su_propio_permiso_y_no_el_de_editar_articulos(): void
     {
-        $imagen = $this->imagenDeUnidad();
-        $edit = $this->admin();          // sin Publish:Media
-        $this->actingAs($edit);
+        $galeria = $this->imagenDeGaleria();
 
-        $this->assertFalse($edit->can('Publish:Media'));
-        $this->assertTrue($imagen->canBePublic());
+        // El administrativo ve la galería pero no puede sacar archivos a internet.
+        $operador = \App\Models\User::factory()->create();
+        $operador->assignRole('Administrativo');
+
+        $this->assertTrue($operador->can('ViewAny:GalleryImage'));
+        $this->assertFalse($operador->can('Publish:Media'));
+
+        // El super administrador sí.
+        $this->assertTrue($this->admin()->can('Publish:Media'));
+
+        $this->actingAs($operador);
+        \Livewire\Livewire::test(\App\Filament\Admin\Resources\Inventory\Gallery\Pages\ManageGallery::class)
+            ->assertTableActionHidden('obtenerUrl', $galeria);
     }
 }
