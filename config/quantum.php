@@ -33,6 +33,24 @@ return [
     'currency' => 'USD',
 
     /*
+     * Quién puede sacar un adjunto afuera (URL pública para publicaciones).
+     * Los clientes quedan fuera a propósito: sus comprobantes e identificaciones
+     * no se publican nunca.
+     */
+    'public_attachments' => [
+        'article' => 'App\Models\Article',
+    ],
+
+    /*
+     * De dónde salen las URLs públicas (fotos para compartir).
+     *
+     * Si está vacío se usa la misma dirección del panel (APP_URL). Con un dominio
+     * propio conviene un nombre aparte —por ejemplo https://media.tudominio.com—
+     * para que ese nombre sirva SOLO las imágenes y el panel no quede expuesto.
+     */
+    'media_url' => env('MEDIA_URL'),
+
+    /*
     |--------------------------------------------------------------------------
     | Python
     |--------------------------------------------------------------------------

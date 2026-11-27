@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Inventory\Articles;
 
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\CreateArticle;
+use App\Filament\Admin\Resources\Inventory\Articles\RelationManagers\AttachmentsRelationManager;
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\EditArticle;
 use App\Filament\Admin\Resources\Inventory\Articles\Pages\ListArticles;
 use App\Filament\Admin\Resources\Inventory\Articles\Schemas\ArticleForm;
@@ -49,7 +50,7 @@ class ArticleResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            AttachmentsRelationManager::class,
         ];
     }
 

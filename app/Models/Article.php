@@ -6,6 +6,7 @@ use App\Models\Concerns\HasCreditBlockedDeletion;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Article extends Model
 {
@@ -174,5 +175,14 @@ class Article extends Model
     public function units()
     {
         return $this->hasMany(ArticleUnit::class);
+    }
+
+    /**
+     * Fotos y fichas del artículo. Son las que se pueden publicar para compartir
+     * el producto afuera (Mercado Libre, catálogo, redes).
+     */
+    public function attachments(): MorphMany
+    {
+        return $this->morphMany(Attachment::class, 'attachable');
     }
 }

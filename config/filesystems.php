@@ -77,6 +77,29 @@ return [
             'report' => false,
         ],
 
+        /*
+         * Media pública: solo lo que se marca para publicar (fotos de artículos).
+         * Vive fuera del webroot y se sirve por la ruta /img/{token}, nunca por
+         * el servidor de archivos: así un comprobante privado no queda expuesto.
+         */
+        'media' => [
+            'driver' => 'local',
+            'root' => storage_path('app/public/media'),
+            'url' => '/img',
+            'visibility' => 'public',
+
+            'permissions' => [
+                'file' => [
+                    'public' => 0644,
+                    'private' => 0644,
+                ],
+                'dir' => [
+                    'public' => 0755,
+                    'private' => 0755,
+                ],
+            ],
+        ],
+
         'attachments' => [
             'driver' => 'local',
             'root' => storage_path('app/private/attachments'),
