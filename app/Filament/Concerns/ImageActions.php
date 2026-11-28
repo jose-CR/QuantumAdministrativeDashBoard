@@ -4,7 +4,7 @@ namespace App\Filament\Concerns;
 
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
-use Filament\Schemas\Components\Grid;
+use Filament\Schemas\Components\Flex;
 use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Text;
 use Filament\Support\Icons\Heroicon;
@@ -43,25 +43,27 @@ trait ImageActions
                     ->imageWidth('100%')
                     ->imageHeight('auto')
                     ->extraAttributes([
+                        // La foto manda: ocupa todo el ancho del modal y hasta el 78% del
+                        // alto de la pantalla. `contain` evita recortar (una foto vertical
+                        // no se deforma ni se corta).
                         'style' => 'display:block;width:100%;height:auto;'
-                            . 'max-height:70vh;object-fit:contain;border-radius:.75rem;'
+                            . 'max-height:78vh;object-fit:contain;border-radius:.75rem;'
                             . 'background:rgba(127,127,127,.06)',
                     ]),
 
-                Grid::make(3)
-                    ->schema([
-                        Text::make(fn (Model $item): string => __('ui.images.size')
-                            . ': ' . $item->formatted_size),
+                // Los datos en una sola fila de chips (un Grid acá apilaba todo).
+                Flex::make([
+                    Text::make(fn (Model $item): string => $item->formatted_size)->badge(),
 
-                        Text::make(fn (Model $item): string => __('ui.images.date')
-                            . ': ' . ($item->created_at?->format('d/m/Y H:i') ?? '—')),
+                    Text::make(fn (Model $item): string => $item->created_at?->format('d/m/Y H:i') ?? '—')
+                        ->badge(),
 
-                        Text::make(fn (Model $item): string => $item->is_public
-                            ? __('ui.images.public')
-                            : __('ui.images.private'))
-                            ->badge()
-                            ->color(fn (Model $item): string => $item->is_public ? 'success' : 'gray'),
-                    ]),
+                    Text::make(fn (Model $item): string => $item->is_public
+                        ? __('ui.images.public')
+                        : __('ui.images.private'))
+                        ->badge()
+                        ->color(fn (Model $item): string => $item->is_public ? 'success' : 'gray'),
+                ])->extraAttributes(['style' => 'justify-content:center;gap:.5rem;flex-wrap:wrap']),
             ]);
     }
 
