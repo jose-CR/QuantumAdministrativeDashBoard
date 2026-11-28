@@ -40,7 +40,10 @@ final class PublicImageController
             $name ?: basename($archivo->path),
             [
                 'Content-Type' => $archivo->mime_type ?? $this->mimeFor($archivo->path),
-                'Cache-Control' => 'public, max-age=31536000, immutable',
+                // Revocable: con `immutable`/un año, un enlace despublicado seguia
+                // viendose porque el navegador ya lo tenia guardado. Cinco minutos
+                // alcanzan para que el robot de un marketplace no vuelva a bajarla.
+                'Cache-Control' => 'public, max-age=300, must-revalidate',
                 'X-Robots-Tag' => 'all',
             ],
             'inline',

@@ -322,6 +322,7 @@ return [
         'private' => 'Private',
         'sort' => 'Order',
         'sort_help' => 'Lower numbers come first.',
+        'size' => 'Size',
         'date' => 'Uploaded',
         'search_placeholder' => 'Search by name…',
         'upload' => 'Upload image',

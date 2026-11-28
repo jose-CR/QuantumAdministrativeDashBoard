@@ -3,22 +3,28 @@
 namespace App\Filament\Concerns;
 
 use Filament\Actions\Action;
+use Filament\Notifications\Notification;
+use Filament\Schemas\Components\Grid;
 use Filament\Schemas\Components\Image;
 use Filament\Schemas\Components\Text;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 /**
- * Las acciones que toda imagen del inventario comparte: verla completa, obtener la
- * URL para compartir, descargarla y dejar de publicarla.
+ * Acciones de una foto del inventario: verla, obtener la URL para compartir,
+ * descargarla y dejar de publicarla.
  *
- * Lo usan la pestaña de fotos de una unidad y la galería libre, para que se comporten
- * igual. La lógica de publicar vive en el trait PublishableMedia.
+ * Las usan la galería y la pestaña de fotos de una unidad, para que las dos se
+ * comporten igual. La lógica de publicar vive en el trait PublishableMedia.
  */
 trait ImageActions
 {
     /**
-     * Ver la imagen completa en un modal, escalada a 500 px de ancho sin recortar.
+     * Visor: la foto grande y, debajo, sus datos como chips del panel.
+     *
+     * Todo con componentes de Filament (nada de HTML suelto) para que herede el
+     * estilo del modal; los botones viven en la fila de la tabla.
      */
     protected static function viewImageAction(): Action
     {
@@ -26,28 +32,36 @@ trait ImageActions
             ->label(__('ui.images.view'))
             ->icon(Heroicon::OutlinedEye)
             ->modalHeading(fn (Model $record): string => (string) $record->original_name)
-            ->modalWidth('2xl')
+            ->modalWidth('5xl')
             ->modalSubmitAction(false)
             ->modalCancelActionLabel(__('ui.images.close'))
-            // Componentes del panel, no HTML suelto: así el modal hereda el estilo y la
-            // imagen se ve completa (500 px de ancho y 65% de alto), sin recortar.
             ->schema([
                 Image::make(
                     fn (Model $record): string => (string) $record->image_url,
                     fn (Model $record): string => (string) ($record->original_name ?? ''),
                 )
-                    ->imageWidth('auto')
+                    ->imageWidth('100%')
                     ->imageHeight('auto')
                     ->extraAttributes([
-                        'style' => 'display:block;margin:0 auto;width:auto;height:auto;'
-                            . 'max-width:min(500px,100%);max-height:65vh;object-fit:contain;'
-                            . 'border-radius:.5rem;background:rgba(127,127,127,.08)',
+                        'style' => 'display:block;width:100%;height:auto;'
+                            . 'max-height:70vh;object-fit:contain;border-radius:.75rem;'
+                            . 'background:rgba(127,127,127,.06)',
                     ]),
 
-                Text::make(fn (Model $record): string => trim(
-                    (string) $record->formatted_size . ' · ' . (string) $record->created_at?->format('d/m/Y H:i')
-                ))
-                    ->size('sm'),
+                Grid::make(3)
+                    ->schema([
+                        Text::make(fn (Model $item): string => __('ui.images.size')
+                            . ': ' . $item->formatted_size),
+
+                        Text::make(fn (Model $item): string => __('ui.images.date')
+                            . ': ' . ($item->created_at?->format('d/m/Y H:i') ?? '—')),
+
+                        Text::make(fn (Model $item): string => $item->is_public
+                            ? __('ui.images.public')
+                            : __('ui.images.private'))
+                            ->badge()
+                            ->color(fn (Model $item): string => $item->is_public ? 'success' : 'gray'),
+                    ]),
             ]);
     }
 
@@ -60,7 +74,7 @@ trait ImageActions
             ->label(__('ui.images.get_url'))
             ->icon(Heroicon::OutlinedLink)
             ->color('success')
-            // Publicar saca el archivo afuera: pide permiso propio, no el de editar artículos.
+            // Publicar saca el archivo afuera: pide permiso propio.
             ->visible(fn (): bool => auth()->user()?->can('Publish:Media') ?? false)
             ->requiresConfirmation()
             ->modalHeading(__('ui.images.get_url'))
@@ -68,10 +82,10 @@ trait ImageActions
             ->action(function (Model $record): void {
                 $url = $record->publish();
 
-                // Sin refrescar, la fila sigue pintando el estado anterior (privada).
+                // Sin refrescar, la fila sigue pintando el estado anterior.
                 $record->refresh();
 
-                \Filament\Notifications\Notification::make()
+                Notification::make()
                     ->success()
                     ->title($url ? __('ui.images.url_ready') : __('ui.images.url_failed'))
                     ->body($url)
@@ -89,10 +103,9 @@ trait ImageActions
             ->label(__('ui.images.download'))
             ->icon(Heroicon::OutlinedArrowDownTray)
             ->action(function (Model $record) {
-                $disco = $record->private_disk ?: 'attachments';
+                $disco = $record->private_disk ?: ($record->disk ?: 'attachments');
 
-                return \Illuminate\Support\Facades\Storage::disk($disco)
-                    ->download($record->path, basename($record->path));
+                return Storage::disk($disco)->download($record->path, basename($record->path));
             });
     }
 
@@ -111,7 +124,7 @@ trait ImageActions
                 $record->unpublish();
                 $record->refresh();
 
-                \Filament\Notifications\Notification::make()
+                Notification::make()
                     ->success()
                     ->title(__('ui.images.unpublished'))
                     ->send();
