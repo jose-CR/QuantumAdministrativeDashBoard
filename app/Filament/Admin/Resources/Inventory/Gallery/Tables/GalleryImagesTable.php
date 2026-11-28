@@ -68,7 +68,9 @@ class GalleryImagesTable
                 self::obtainUrlAction(),
                 self::downloadImageAction(),
                 self::unpublishImageAction(),
-                EditAction::make()->label(__('ui.images.edit')),
+                EditAction::make()
+                    ->label(__('ui.images.edit'))
+                    ->modalWidth('2xl'),
                 DeleteAction::make()->label(__('ui.images.delete')),
             ])
             ->defaultSort('sort')

@@ -16,6 +16,10 @@ class ManageGallery extends ManageRecords
         return [
             CreateAction::make()
                 ->label(__('ui.images.upload'))
+                // Modal de tamaño razonable: a todo el ancho el formulario quedaba
+                // flotando en un espacio vacío.
+                ->modalWidth('2xl')
+                ->createAnother(false)
                 // Una foto de galería es un adjunto sin dueño, en su propia colección.
                 ->mutateDataUsing(fn (array $data): array => [
                     ...$data,
