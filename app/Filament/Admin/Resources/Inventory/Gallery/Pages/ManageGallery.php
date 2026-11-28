@@ -23,7 +23,10 @@ class ManageGallery extends ManageRecords
                     'attachable_type' => null,
                     'attachable_id' => null,
                     'disk' => 'attachments',
-                ]),
+                ])
+                // El archivo se escribe después de crear el registro: mime y tamaño se
+                // completan acá, cuando ya está en el disco.
+                ->after(fn ($record) => $record->fillMediaMetadata()),
         ];
     }
 }

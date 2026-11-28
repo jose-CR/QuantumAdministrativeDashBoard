@@ -40,6 +40,12 @@ trait PublishableMedia
      */
     public function publish(): ?string
     {
+        // Un adjunto creado desde un formulario puede no traer mime ni tamaño: se
+        // completan desde el archivo antes de decidir si se puede publicar.
+        if (method_exists($this, 'fillMediaMetadata')) {
+            $this->fillMediaMetadata();
+        }
+
         if (! $this->canBePublic()) {
             return null;
         }

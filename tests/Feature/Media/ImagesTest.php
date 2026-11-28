@@ -211,6 +211,17 @@ class ImagesTest extends TestCase
         $this->assertNotNull($foto->refresh()->public_url);
     }
 
+    public function test_el_modal_de_ver_se_monta_con_la_imagen(): void
+    {
+        $foto = $this->fotoDeGaleria();
+
+        Livewire::actingAs($this->admin())
+            ->test(ManageGallery::class)
+            ->loadTable()
+            ->mountTableAction('ver', $foto)
+            ->assertOk();
+    }
+
     public function test_publicar_pide_su_propio_permiso(): void
     {
         $foto = $this->fotoDeGaleria();

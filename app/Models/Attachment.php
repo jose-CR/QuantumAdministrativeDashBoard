@@ -47,26 +47,6 @@ class Attachment extends Model
 
     protected static function booted(): void
     {
-        /*
-         * Cuando la foto entra por el formulario (FileUpload) solo llega la ruta: el
-         * mime y el tamaño quedan nulos, y sin mime el adjunto no se considera imagen
-         * ni se puede publicar. Se completan desde el disco al guardar.
-         */
-        static::saving(function (Attachment $attachment): void {
-            $disco = $attachment->disk ?: 'attachments';
-
-            if (blank($attachment->path) || ! Storage::disk($disco)->exists($attachment->path)) {
-                return;
-            }
-
-            $attachment->mime_type ??= Storage::disk($disco)->mimeType($attachment->path);
-            $attachment->size ??= Storage::disk($disco)->size($attachment->path);
-
-            if (blank($attachment->original_name)) {
-                $attachment->original_name = basename((string) $attachment->path);
-            }
-        });
-
         static::deleting(function (Attachment $attachment) {
             // Un comprobante que paga varias cuotas es un solo archivo con varias
             // filas: se borra del disco recién cuando no queda ninguna otra.
@@ -197,7 +177,43 @@ class Attachment extends Model
     }
 
     /**
-     * Fotos sueltas: sin dueño y con categoría.
+     * Completa mime, tamaño y nombre desde el archivo en disco.
+     *
+     * Hace falta porque el formulario guarda **solo la ruta** (el FileUpload escribe el
+     * archivo después de crear el registro, así que un hook de `saving` llega tarde) y
+     * sin mime el adjunto no se reconoce como imagen ni se puede publicar.
+     */
+    public function fillMediaMetadata(): static
+    {
+        $disco = $this->disk ?: 'attachments';
+
+        if (blank($this->path) || ! Storage::disk($disco)->exists($this->path)) {
+            return $this;
+        }
+
+        $cambios = [];
+
+        if (blank($this->mime_type)) {
+            $cambios['mime_type'] = Storage::disk($disco)->mimeType($this->path);
+        }
+
+        if (blank($this->size)) {
+            $cambios['size'] = Storage::disk($disco)->size($this->path);
+        }
+
+        if (blank($this->original_name)) {
+            $cambios['original_name'] = basename((string) $this->path);
+        }
+
+        if ($cambios !== []) {
+            $this->forceFill($cambios)->saveQuietly();
+        }
+
+        return $this;
+    }
+
+    /**
+     * Las fotos sueltas: sin dueño y con categoría.
      */
     public function scopeGallery($query)
     {

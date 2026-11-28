@@ -3,9 +3,10 @@
 namespace App\Filament\Concerns;
 
 use Filament\Actions\Action;
+use Filament\Schemas\Components\Image;
+use Filament\Schemas\Components\Text;
 use Filament\Support\Icons\Heroicon;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\HtmlString;
 
 /**
  * Las acciones que toda imagen del inventario comparte: verla completa, obtener la
@@ -28,19 +29,26 @@ trait ImageActions
             ->modalWidth('2xl')
             ->modalSubmitAction(false)
             ->modalCancelActionLabel(__('ui.images.close'))
-            // 500 px de ancho como tope y 65% de la altura de la pantalla, sin recortar
-            // ni estirar: la imagen se ve completa aunque sea vertical.
-            ->modalContent(fn (Model $record): HtmlString => new HtmlString(
-                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem">'
-                . '<img src="' . e($record->image_url) . '"'
-                . ' alt="' . e((string) $record->original_name) . '"'
-                . ' style="display:block;width:auto;height:auto;max-width:min(500px,100%);max-height:65vh;'
-                . 'object-fit:contain;border-radius:.5rem;background:rgba(127,127,127,.08)">'
-                . '<div style="font-size:.75rem;opacity:.65;text-align:center">'
-                . e((string) $record->formatted_size) . ' · ' . e((string) $record->created_at?->format('d/m/Y H:i'))
-                . '</div>'
-                . '</div>'
-            ));
+            // Componentes del panel, no HTML suelto: así el modal hereda el estilo y la
+            // imagen se ve completa (500 px de ancho y 65% de alto), sin recortar.
+            ->schema([
+                Image::make(
+                    fn (Model $record): string => (string) $record->image_url,
+                    fn (Model $record): string => (string) ($record->original_name ?? ''),
+                )
+                    ->imageWidth('auto')
+                    ->imageHeight('auto')
+                    ->extraAttributes([
+                        'style' => 'display:block;margin:0 auto;width:auto;height:auto;'
+                            . 'max-width:min(500px,100%);max-height:65vh;object-fit:contain;'
+                            . 'border-radius:.5rem;background:rgba(127,127,127,.08)',
+                    ]),
+
+                Text::make(fn (Model $record): string => trim(
+                    (string) $record->formatted_size . ' · ' . (string) $record->created_at?->format('d/m/Y H:i')
+                ))
+                    ->size('sm'),
+            ]);
     }
 
     /**
