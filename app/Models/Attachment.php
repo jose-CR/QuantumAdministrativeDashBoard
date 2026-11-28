@@ -47,6 +47,26 @@ class Attachment extends Model
 
     protected static function booted(): void
     {
+        /*
+         * Cuando la foto entra por el formulario (FileUpload) solo llega la ruta: el
+         * mime y el tamaño quedan nulos, y sin mime el adjunto no se considera imagen
+         * ni se puede publicar. Se completan desde el disco al guardar.
+         */
+        static::saving(function (Attachment $attachment): void {
+            $disco = $attachment->disk ?: 'attachments';
+
+            if (blank($attachment->path) || ! Storage::disk($disco)->exists($attachment->path)) {
+                return;
+            }
+
+            $attachment->mime_type ??= Storage::disk($disco)->mimeType($attachment->path);
+            $attachment->size ??= Storage::disk($disco)->size($attachment->path);
+
+            if (blank($attachment->original_name)) {
+                $attachment->original_name = basename((string) $attachment->path);
+            }
+        });
+
         static::deleting(function (Attachment $attachment) {
             // Un comprobante que paga varias cuotas es un solo archivo con varias
             // filas: se borra del disco recién cuando no queda ninguna otra.

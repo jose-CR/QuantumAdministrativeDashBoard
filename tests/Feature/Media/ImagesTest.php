@@ -178,6 +178,39 @@ class ImagesTest extends TestCase
         $this->assertNotNull($foto->public_url);
     }
 
+    public function test_una_foto_subida_desde_la_pantalla_se_puede_publicar(): void
+    {
+        $admin = $this->admin();
+        $categoria = Category::factory()->create();
+
+        // Flujo real del taller: subir desde el boton «Subir imagen» de la galeria.
+        Livewire::actingAs($admin)
+            ->test(ManageGallery::class)
+            ->callAction('create', [
+                'category_id' => $categoria->id,
+                'original_name' => 'Nueva desde pantalla',
+                'path' => UploadedFile::fake()->create('nueva.jpg', 40, 'image/jpeg'),
+            ]);
+
+        $foto = Attachment::query()->gallery()->where('original_name', 'Nueva desde pantalla')->firstOrFail();
+
+        // El formulario solo manda la ruta: mime y tamano los completa el modelo, y sin
+        // ellos la foto no se considera imagen y no se puede publicar.
+        $this->assertSame('image/jpeg', $foto->mime_type);
+        // El archivo falso no pesa nada: lo que importa es que el dato quede cargado.
+        $this->assertNotNull($foto->size);
+        $this->assertTrue($foto->canBePublic());
+        $this->assertFalse($foto->is_public);
+
+        Livewire::actingAs($admin)
+            ->test(ManageGallery::class)
+            ->loadTable()
+            ->callTableAction('obtenerUrl', $foto)
+            ->assertTableColumnStateSet('is_public', true, record: $foto);
+
+        $this->assertNotNull($foto->refresh()->public_url);
+    }
+
     public function test_publicar_pide_su_propio_permiso(): void
     {
         $foto = $this->fotoDeGaleria();

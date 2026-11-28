@@ -25,11 +25,21 @@ trait ImageActions
             ->label(__('ui.images.view'))
             ->icon(Heroicon::OutlinedEye)
             ->modalHeading(fn (Model $record): string => (string) $record->original_name)
+            ->modalWidth('2xl')
             ->modalSubmitAction(false)
             ->modalCancelActionLabel(__('ui.images.close'))
+            // 500 px de ancho como tope y 65% de la altura de la pantalla, sin recortar
+            // ni estirar: la imagen se ve completa aunque sea vertical.
             ->modalContent(fn (Model $record): HtmlString => new HtmlString(
-                '<img src="' . e($record->image_url) . '" alt="' . e((string) $record->original_name) . '"'
-                . ' style="display:block;margin:0 auto;width:100%;max-width:500px;height:auto;border-radius:.5rem">'
+                '<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.75rem">'
+                . '<img src="' . e($record->image_url) . '"'
+                . ' alt="' . e((string) $record->original_name) . '"'
+                . ' style="display:block;width:auto;height:auto;max-width:min(500px,100%);max-height:65vh;'
+                . 'object-fit:contain;border-radius:.5rem;background:rgba(127,127,127,.08)">'
+                . '<div style="font-size:.75rem;opacity:.65;text-align:center">'
+                . e((string) $record->formatted_size) . ' · ' . e((string) $record->created_at?->format('d/m/Y H:i'))
+                . '</div>'
+                . '</div>'
             ));
     }
 
